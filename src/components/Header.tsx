@@ -3,9 +3,9 @@ import { useI18n } from "@/i18n/I18nProvider"
 import type { Lang } from "@/i18n/strings"
 import { cn } from "@/lib/utils"
 
-export function Logo() {
+export function Logo({ className }:{ className?:string }) {
   return (
-    <span className="inline-flex items-baseline font-display text-[26px] leading-none font-extrabold tracking-[-0.04em]">
+    <span className={cn("inline-flex items-baseline font-display text-[26px] leading-none font-extrabold tracking-[-0.04em]", className)}>
       squish
       <span aria-hidden className="ml-[3px] inline-block size-[9px] rounded-full bg-primary" />
     </span>
