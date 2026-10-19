@@ -121,12 +121,10 @@ export default function App() {
       <Header onOpen={setInfo} />
       <main id="top" className={"mx-auto flex max-w-[940px] flex-col gap-3.5 px-4 pt-2 sm:px-6 "+(visible.length?"pb-36":"pb-16")}>
         <DropCard drag={drag} notice={notice} onFiles={take} onPaste={pasteFromButton} />
+        <KindTabs value={kind} onChange={setKind} counts={counts} />
         <SettingsStrip kind={kind} settings={settings} setSettings={setSettings} encoders={encoders} />
-        <div className="mt-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <KindTabs value={kind} onChange={setKind} counts={counts} />
-          {tally&&<p className="text-sm text-muted-foreground tabular-nums">{tally}</p>}
-        </div>
         <div id="kind-panel" role="tabpanel" aria-labelledby={"tab-"+kind}>
+          {tally&&<p className="mb-2 px-1 text-right text-sm text-muted-foreground tabular-nums">{tally}</p>}
           {visible.length>0
             ?<FileList items={visible} onRetry={retry} onRemove={remove} />
             :<p className="glass px-5 py-6 text-center text-sm text-muted-foreground">{t.listEmpty}</p>}

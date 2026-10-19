@@ -25,7 +25,7 @@ export function KindTabs({ value, onChange, counts }:{
   }
 
   return (
-    <div role="tablist" aria-label={t.tabsLabel} className="glass flex w-full gap-1 rounded-full p-1 sm:w-max">
+    <div role="tablist" aria-label={t.tabsLabel} className="glass flex w-full gap-1.5 rounded-full p-1.5">
       {KINDS.map((kind,i)=>{
         const active=value===kind
         return (
@@ -42,11 +42,11 @@ export function KindTabs({ value, onChange, counts }:{
             tabIndex={active?0:-1}
             onClick={()=>onChange(kind)}
             onKeyDown={(e)=>onKey(e,i)}
-            className={cn("inline-flex h-9 min-w-0 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-full px-2 text-sm font-semibold transition-colors sm:flex-none sm:px-4", active?"bg-white/12 text-foreground":"text-muted-foreground hover:text-foreground")}
+            className={cn("inline-flex h-12 min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 rounded-full px-2 text-base font-semibold transition-colors sm:h-14 sm:text-lg", active?"bg-foreground text-background":"text-muted-foreground hover:bg-white/6 hover:text-foreground")}
           >
             {labels[kind]}
             {counts[kind]>0&&(
-              <span className={cn("grid h-[18px] min-w-[18px] place-items-center rounded-full px-1.5 text-[11px] font-bold tabular-nums", active?"bg-primary text-primary-foreground":"bg-white/10 text-foreground")}>
+              <span className={cn("grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-xs font-bold tabular-nums", active?"bg-primary text-primary-foreground":"bg-white/10 text-foreground")}>
                 {counts[kind]}
               </span>
             )}
