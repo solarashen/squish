@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish · polar layout B</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0f15;--c1:#1f6a63;--c2:#2b4473;--c3:#4a3a78;--accent:#8fd3c4;--on:#0b1d1a;--warn:#e9cf8f;--err:#e99aa5;--fg:#eef1f8;--muted:#a3abc0;--glass:rgba(255,255,255,.055);--edge:rgba(255,255,255,.12);--line:rgba(255,255,255,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{font:500 15px/1.45 Sora,sans-serif;color:var(--fg);background:var(--bg);position:relative}
+.aur{position:absolute;filter:blur(110px);opacity:.32;border-radius:50%;pointer-events:none}
+.a1{width:900px;height:260px;left:-120px;top:-40px;background:var(--c1);transform:rotate(-12deg)}
+.a2{width:760px;height:300px;right:-200px;top:40px;background:var(--c2);transform:rotate(14deg)}
+.a3{width:620px;height:420px;left:520px;top:420px;background:var(--c3);opacity:.18}
+.gl{background:var(--glass);backdrop-filter:blur(26px) saturate(1.4);border:1px solid var(--edge);border-radius:24px;box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 20px 50px rgba(0,0,0,.35)}
+.logo{font:800 26px Sora;letter-spacing:-.04em}.logo i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-left:3px}
+.chip{padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-weight:600;font-size:13px}
+.loc{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px}.loc i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.lang{display:flex;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:3px}.lang b{padding:6px 12px;border-radius:999px;font-size:12px;color:var(--muted)}.lang b.on{background:var(--fg);color:var(--bg)}
+.up{width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.08);border:1px solid var(--edge);display:grid;place-items:center;color:var(--accent);font:700 22px Sora;flex:none}
+.btn{background:var(--accent);color:var(--on);border-radius:999px;padding:13px 22px;font-weight:700;white-space:nowrap}
+.mut{color:var(--muted);font-size:14px}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px}
+.seg{display:flex;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:4px}.seg b{flex:1;text-align:center;padding:8px 0;border-radius:10px;font-weight:600;font-size:13px;color:var(--muted)}.seg b.on{background:var(--fg);color:var(--bg)}
+.sl{height:6px;border-radius:3px;background:rgba(255,255,255,.1);position:relative;margin-top:14px}.sl::before{content:"";position:absolute;inset:0 22% 0 0;border-radius:3px;background:var(--accent)}.sl::after{content:"";position:absolute;left:78%;top:-8px;width:22px;height:22px;border-radius:50%;background:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.5);margin-left:-11px}
+.tabs{display:flex;gap:4px;padding:4px;border-radius:999px;width:max-content}.tabs span{padding:8px 16px;border-radius:999px;font-weight:600;font-size:14px;display:flex;gap:6px;align-items:center;color:var(--muted)}.tabs .on{background:rgba(255,255,255,.12);color:var(--fg)}.tabs small{background:var(--accent);color:var(--on);border-radius:999px;padding:0 7px;font-size:11px;font-weight:700}
+.pg{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}.pg i{display:block;height:100%;border-radius:3px;background:var(--accent)}
+.st{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid currentColor}
+.big{font:800 92px/.9 Sora;letter-spacing:-.06em}.big span{color:var(--accent)}
+.dl{text-align:center;padding:16px;border-radius:999px;background:var(--fg);color:var(--bg);font-weight:700}
+.th{border-radius:14px}
+</style>
+</head>
+<body>
+<div class="aur a1"></div><div class="aur a2"></div><div class="aur a3"></div>
+<style>
+/* B · a glass control rail on the left, a gallery of files on the right */
+.wrap{position:relative;display:grid;grid-template-columns:330px 1fr;gap:22px;padding:20px 40px;height:900px}
+.rail{padding:24px;display:flex;flex-direction:column;gap:16px}
+.rail .tabs{width:100%}.rail .tabs span{flex:1;justify-content:center}
+.rail .res{margin-top:auto}.rail .big{font-size:76px}
+.main{display:flex;flex-direction:column;gap:18px}
+.top{display:flex;align-items:center;gap:12px}.top .r{margin-left:auto;display:flex;gap:14px;align-items:center}
+.drop{padding:22px 26px;display:flex;align-items:center;gap:18px;border-style:dashed;border-color:rgba(255,255,255,.22)}
+.drop h1{font:700 24px Sora;letter-spacing:-.02em}.drop .btn{margin-left:auto}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.card{overflow:hidden}
+.card .img{height:150px;position:relative}
+.card .img b{position:absolute;left:12px;bottom:12px;background:rgba(11,15,21,.75);backdrop-filter:blur(8px);border-radius:999px;padding:4px 12px;font-weight:800;color:var(--accent)}
+.card .t{padding:12px 14px}.card small{color:var(--muted);font-size:12px;display:block}
+.card .pg{margin:0 14px 14px}
+.add{border:1.5px dashed rgba(255,255,255,.2);border-radius:24px;display:grid;place-items:center;color:var(--muted);font:600 15px Sora;min-height:230px}
+</style>
+<div class="wrap">
+ <aside class="gl rail">
+  <span class="logo">squish<i></i></span>
+  <div class="tabs" style="background:rgba(255,255,255,.04);border:1px solid var(--line)"><span class="on">Images <small>4</small></span><span>Video</span><span>Audio</span></div>
+  <div><label>Convert to</label><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b><b>AVIF</b></div></div>
+  <div><label>Quality · 78</label><div class="sl"></div></div>
+  <div><label>Max width</label><div class="seg"><b>Orig.</b><b class="on">1920</b><b>1280</b></div></div>
+  <div class="res"><span class="big"><span>−</span>76%</span><p class="mut">17.8 MB → 4.4 MB · 2 of 4 done</p></div>
+  <span class="dl">Download all (.zip)</span>
+ </aside>
+ <section class="main">
+  <div class="top"><span class="chip">How it works</span><span class="chip">About</span><div class="r"><span class="loc"><i></i>Everything stays on your device</span><span class="lang"><b class="on">EN</b><b>HR</b></span></div></div>
+  <div class="gl drop"><span class="up">↑</span><div><h1>Drag and drop files here</h1><span class="mut">Images, video and audio · up to 50 · or Ctrl+V</span></div><span class="btn">Choose files</span></div>
+  <div class="cards">
+   <div class="gl card"><div class="img" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"><b>−71%</b></div><div class="t">diploma_scan.png<small>9.1 → 2.6 MB · WebP</small></div></div>
+   <div class="gl card"><div class="img" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"><b>−79%</b></div><div class="t">beach_split.jpg<small>6.8 → 1.4 MB · WebP</small></div></div>
+   <div class="gl card"><div class="img" style="background:linear-gradient(120deg,#cfd6df,#6b7686)"><b style="color:var(--warn)">62%</b></div><div class="t">screenshot.png<small>Converting…</small></div><div class="pg"><i style="width:62%"></i></div></div>
+   <div class="gl card"><div class="img" style="background:rgba(255,255,255,.05)"><b style="color:var(--err)">Failed</b></div><div class="t">plitvice.heic<small style="color:var(--err)">Can't open HEIC · retry</small></div></div>
+   <div class="add">+ Add more files</div>
+  </div>
+ </section>
+</div>
+
+</body>
+</html>

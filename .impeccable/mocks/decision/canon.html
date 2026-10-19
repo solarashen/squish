@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffffff;--soft:#f1f5f9;--line:#e2e8f0;--ink:#0f172a;--muted:#475569;--acc:#4f46e5;--ok:#15803d;--err:#b91c1c}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.5 Geist,sans-serif}
+header{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 48px;gap:32px}
+.logo{font-weight:700;font-size:22px;letter-spacing:-.02em}
+nav{display:flex;gap:22px;color:var(--muted);font-weight:500}
+.r{margin-left:auto;display:flex;gap:12px;align-items:center}
+.sel{border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-weight:500}
+.wrap{max-width:960px;margin:0 auto;padding:40px 0}
+h1{font-size:40px;font-weight:700;letter-spacing:-.03em;text-align:center}
+.sub{text-align:center;color:var(--muted);margin-top:8px;font-size:17px}
+.drop{margin-top:28px;border:2px dashed #cbd5e1;border-radius:16px;background:var(--soft);padding:36px;text-align:center}
+.drop b{display:block;font-size:18px}
+.drop span{color:var(--muted)}
+.drop .btn{color:#fff}
+.btn{display:inline-block;margin-top:14px;background:var(--ink);color:#fff;border-radius:8px;padding:10px 18px;font-weight:600}
+.opts{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:16px;margin-top:20px;border:1px solid var(--line);border-radius:12px;padding:18px}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:8px}
+.seg{display:flex;background:var(--soft);border-radius:8px;padding:3px}
+.seg b{flex:1;text-align:center;padding:6px 0;border-radius:6px;font-weight:500;color:var(--muted)}
+.seg b.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.sl{height:6px;background:var(--line);border-radius:3px;position:relative;margin-top:14px}
+.sl::before{content:"";position:absolute;inset:0 22% 0 0;background:var(--acc);border-radius:3px}
+.sl::after{content:"";position:absolute;left:78%;top:-6px;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--acc);margin-left:-9px}
+.in{border:1px solid var(--line);border-radius:8px;padding:6px 12px}
+.list{margin-top:20px;border:1px solid var(--line);border-radius:12px}
+.it{display:grid;grid-template-columns:44px 1fr 90px 90px 70px 110px;gap:14px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.it:last-child{border-bottom:0}
+.it i{width:44px;height:44px;border-radius:8px;display:block}
+.it small{display:block;color:var(--muted);font-size:13px}
+.it s{color:var(--muted)}
+.ok{color:var(--ok);font-weight:600}.er{color:var(--err);font-weight:600}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+.foot b{font-size:18px}
+.dl{background:var(--acc);color:#fff;border-radius:8px;padding:10px 18px;font-weight:600}
+</style>
+</head>
+<body>
+<header><div class="logo">squish</div><nav><span>Convert</span><span>How it works</span><span>About</span></nav><div class="r"><span style="color:var(--muted);font-size:14px">100% in your browser</span><span class="sel">English ▾</span></div></header>
+<div class="wrap">
+ <h1>Compress and convert images</h1>
+ <p class="sub">JPEG, PNG and WebP. Files never leave your device.</p>
+ <div class="drop"><b>Drag and drop images here</b><span>or</span><br><span class="btn">Select files</span></div>
+ <div class="opts">
+  <div><label>Output format</label><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b></div></div>
+  <div><label>Quality: 78%</label><div class="sl"></div></div>
+  <div><label>Max width</label><div class="in">1920 px</div></div>
+ </div>
+ <div class="list">
+  <div class="it"><i style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><span>beach_split.jpg<small>4032 × 3024 → 1920 × 1440</small></span><s>6.8 MB</s><b>1.4 MB</b><span class="ok">−79%</span><span>Download</span></div>
+  <div class="it"><i style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><span>diploma_scan.png<small>2480 × 3508 → 1358 × 1920</small></span><s>9.1 MB</s><b>2.6 MB</b><span class="ok">−71%</span><span>Download</span></div>
+  <div class="it"><i style="background:linear-gradient(140deg,#7bbf8f,#2f6b47)"></i><span>plitvice.heic<small>Format not supported</small></span><s>3.2 MB</s><b>—</b><span class="er">Error</span><span>Remove</span></div>
+ </div>
+ <div class="foot"><span><b>24.6 MB → 7.1 MB</b> <span style="color:var(--muted)">saved 71%</span></span><span class="dl">Download all (.zip)</span></div>
+</div>
+</body>
+</html>

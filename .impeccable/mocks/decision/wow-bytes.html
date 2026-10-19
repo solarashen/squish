@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish · bytes</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Onest:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#141418;--muted:#4f5260;--pink:#ff8fc7;--lemon:#ffe66d;--mint:#b8f0d0;--bg:#f7f7f9}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:500 15px/1.45 Onest,sans-serif}
+header{display:flex;align-items:center;gap:14px;padding:26px 48px 0}
+.logo{font:800 38px/1 "Baloo 2"}.logo i{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--pink)}
+.clay{border-radius:999px;box-shadow:inset -3px -4px 7px rgba(0,0,0,.12),inset 3px 3px 6px rgba(255,255,255,.75),0 4px 10px rgba(20,20,24,.12)}
+.pill{background:#fff;padding:8px 16px;font-weight:600}
+.r{margin-left:auto;display:flex;gap:8px}.ink{background:var(--ink);color:#fff}
+.wrap{display:grid;grid-template-columns:1fr 380px;gap:28px;padding:22px 48px}
+.card{background:#fff;border-radius:32px;border:1px solid rgba(20,20,24,.08)}
+/* signature: every square is 100 KB; squares that get squished away fall out of the grid */
+.hero{padding:32px 36px}
+.hero h1{font:800 46px/.95 "Baloo 2";letter-spacing:-.02em}
+.hero p{color:var(--muted);margin-top:6px}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:24px}
+.zone{flex:none;border:2.5px dashed rgba(20,20,24,.3);border-radius:22px;padding:14px 20px;display:flex;gap:12px;align-items:center}
+.up{width:44px;height:44px;display:grid;place-items:center;background:var(--pink);font:700 24px Onest}
+.zone b{display:block;font:800 18px "Baloo 2"}.zone span{font-size:13px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(41,1fr);gap:4px;margin-top:26px}
+.grid i{aspect-ratio:1;border-radius:4px;background:var(--ink)}
+.grid i.gone{background:transparent;outline:1.5px dashed rgba(20,20,24,.2);outline-offset:-2px}
+.grid i.fall{animation:fall 2.4s cubic-bezier(.55,0,.8,.4) infinite}
+@keyframes fall{0%,30%{transform:none;opacity:1;background:var(--pink)}100%{transform:translateY(160px) rotate(80deg);opacity:0}}
+.key{display:flex;gap:20px;margin-top:16px;font-size:13px;color:var(--muted)}
+.key i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:6px}
+.rows{margin-top:22px;padding:8px 26px}
+.row{display:grid;grid-template-columns:48px 220px 1fr 70px;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(20,20,24,.08)}
+.row:last-child{border:0}
+.th{width:48px;height:38px;border-radius:12px}
+.row b{display:block;font-weight:600}.row small{color:var(--muted)}
+.mini{display:flex;flex-wrap:wrap;gap:3px}
+.mini i{width:10px;height:10px;border-radius:2px;background:var(--ink)}.mini i.gone{background:transparent;outline:1.5px dashed rgba(20,20,24,.22);outline-offset:-1.5px}
+.pct{font:800 22px "Baloo 2";text-align:right}
+.panel{padding:28px;display:flex;flex-direction:column;gap:18px}
+.panel h2{font:800 22px "Baloo 2"}
+.big{font:800 92px/.9 "Baloo 2";letter-spacing:-.03em}.big span{display:inline-block;line-height:.95;background:var(--lemon);border-radius:18px;padding:12px 14px 0}
+.mut{color:var(--muted)}
+label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:8px}
+.seg{display:flex;gap:6px}.seg b{flex:1;text-align:center;padding:9px 0;background:#fff;font-weight:600}.seg b.on{background:var(--ink);color:#fff}
+.sl{height:14px;border-radius:7px;background:rgba(20,20,24,.08);position:relative}.sl::before{content:"";position:absolute;inset:0 22% 0 0;border-radius:7px;background:var(--mint)}.sl::after{content:"";position:absolute;left:78%;top:-9px;width:32px;height:32px;border-radius:50%;background:var(--pink);margin-left:-16px;box-shadow:inset -4px -5px 8px rgba(0,0,0,.14),0 4px 10px rgba(20,20,24,.2)}
+.dl{margin-top:auto;text-align:center;padding:16px;background:var(--ink);color:#fff;font:800 18px "Baloo 2"}
+</style>
+</head>
+<body>
+<header><div class="logo">squish<i></i></div><span class="pill clay" style="margin-left:20px">How it works</span><span class="pill clay">About</span><div class="r"><span class="pill clay ink">EN</span><span class="pill clay">HR</span></div></header>
+<div class="wrap">
+ <section>
+  <div class="card hero">
+   <div class="top">
+    <div><h1>See your bytes leave.</h1><p>Each square is 100 KB of your files. Everything dashed was squished away.</p></div>
+    <div class="zone"><span class="up clay">↑</span><div><b>Drop files here</b><span>or choose from your device</span></div></div>
+   </div>
+   <div class="grid" id="g">
+    <!-- 178 squares = 17.8 MB, 44 stay -->
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    <i></i><i></i><i></i><i class="fall"></i><i class="fall" style="animation-delay:.2s"></i><i class="fall" style="animation-delay:.5s"></i><i class="fall" style="animation-delay:.1s"></i><i class="fall" style="animation-delay:.7s"></i><i class="fall" style="animation-delay:.3s"></i><i class="fall" style="animation-delay:.9s"></i><i class="fall" style="animation-delay:.4s"></i><i class="fall" style="animation-delay:.6s"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i>
+    <i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i>
+    <i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i>
+    <i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i>
+   </div>
+   <div class="key"><span><i style="background:var(--ink)"></i>kept · 4.4 MB</span><span><i style="outline:1.5px dashed rgba(20,20,24,.35)"></i>squished away · 13.4 MB</span><span><i style="background:var(--pink)"></i>leaving right now</span></div>
+  </div>
+  <div class="card rows">
+   <div class="row"><i class="th" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><div><b>diploma_scan.png</b><small>9.1 → 2.6 MB · PNG → WebP</small></div><div class="mini"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i></div><span class="pct">−71%</span></div>
+   <div class="row"><i class="th" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><div><b>beach_split.jpg</b><small>6.8 → 1.4 MB · JPG → WebP</small></div><div class="mini"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i><i class="gone"></i></div><span class="pct">−79%</span></div>
+  </div>
+ </section>
+ <aside class="card panel">
+  <h2>Your images</h2>
+  <div class="big"><span>−76%</span></div>
+  <p class="mut">17.8 MB → 4.4 MB · 3 files</p>
+  <div><label>Convert to</label><div class="seg"><b class="clay">JPEG</b><b class="clay on">WebP</b><b class="clay">PNG</b></div></div>
+  <div><label>Quality · 78</label><div class="sl"></div></div>
+  <div><label>Max width</label><div class="seg"><b class="clay">Original</b><b class="clay on">1920</b><b class="clay">1280</b></div></div>
+  <span class="dl clay">Download all (.zip)</span>
+ </aside>
+</div>
+</body>
+</html>

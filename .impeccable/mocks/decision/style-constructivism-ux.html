@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>squish · constructivism, task first</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#ebeae6;--card:#f6f5f2;--red:#c8261a;--ink:#111;--grey:#55534e;--line:#111}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font:500 15px/1.45 Archivo,sans-serif}
+.disp{font-family:Anton,sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.01em}
+/* header: compact; the poster energy lives in one diagonal, not in a hero that pushes the tool down */
+header{position:relative;height:84px;display:flex;align-items:center;gap:22px;padding:0 40px;border-bottom:4px solid var(--ink);overflow:hidden;background:var(--paper)}
+header::before{content:"";position:absolute;left:-40px;top:-30px;width:330px;height:150px;background:var(--red);transform:skewX(-24deg)}
+.logo{position:relative;font-size:46px;line-height:1;color:var(--paper)}
+.stamp{position:relative;margin-left:120px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+.stamp i{width:10px;height:10px;background:var(--red);transform:rotate(45deg)}
+nav{margin-left:auto;display:flex}
+nav a{font:800 12px Archivo;letter-spacing:.12em;text-transform:uppercase;padding:10px 14px;border:3px solid var(--ink);margin-left:-3px;background:var(--card)}
+nav a.on{background:var(--ink);color:var(--paper)}
+nav .gap{margin-left:14px}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:28px;padding:28px 40px 40px;max-width:1440px;margin:0 auto}
+.step{display:flex;align-items:center;gap:10px;font:800 12px Archivo;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+.step b{display:grid;place-items:center;width:26px;height:26px;background:var(--red);color:#fff;font:400 16px Anton}
+/* 1 · drop zone: the biggest, clearest thing on screen; the red wedge points into it */
+.drop{position:relative;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:28px;padding:30px 34px;background:var(--card);border:4px dashed var(--ink);overflow:hidden;cursor:pointer}
+.drop::after{content:"";position:absolute;right:-60px;top:-60px;width:180px;height:180px;background:var(--red);transform:rotate(45deg)}
+.arrow{width:84px;height:84px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font:400 52px/1 Anton;clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)}
+.drop h1{font-size:46px;line-height:.95}
+.drop p{color:var(--grey);margin-top:6px}
+.drop .formats{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.drop .formats span{font:700 12px Archivo;padding:4px 8px;border:2px solid var(--ink);background:#fff}
+.btn{position:relative;z-index:1;background:var(--ink);color:var(--paper);font:800 14px Archivo;letter-spacing:.08em;text-transform:uppercase;padding:16px 22px;border:3px solid var(--ink);box-shadow:5px 5px 0 var(--red)}
+.paste{margin-top:10px;font-size:13px;color:var(--grey)}.paste b{color:var(--ink);border:2px solid var(--ink);padding:1px 6px;font-weight:700;background:#fff}
+/* 2 · files */
+.files{margin-top:26px}
+.tabs{display:flex;gap:0;border-bottom:4px solid var(--ink)}
+.tab{font:800 13px Archivo;letter-spacing:.08em;text-transform:uppercase;padding:12px 22px;border:3px solid var(--ink);border-bottom:0;margin-right:-3px;background:var(--card);display:flex;gap:8px;align-items:center;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 100%,0 100%);padding-right:30px}
+.tab.on{background:var(--ink);color:var(--paper)}
+.tab small{font:400 15px Anton;color:var(--red)}
+.list{background:var(--card);border:3px solid var(--ink);border-top:0}
+.row{display:grid;grid-template-columns:52px minmax(0,1fr) 200px 76px 110px 84px;gap:16px;align-items:center;padding:12px 18px;border-top:2px solid #cfcdc7}
+.row:first-child{border-top:0}
+.th{width:52px;height:40px;border:2px solid var(--ink)}
+.row b{display:block;font-weight:700}.row small{color:var(--grey)}
+.bar{height:10px;background:#d9d7d1;position:relative}.bar i{position:absolute;inset:0 auto 0 0;background:var(--ink)}
+.pct{font:400 28px Anton;text-align:right}
+.st{justify-self:end;font:800 11px Archivo;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border:2px solid var(--ink)}
+.st.ok{background:var(--ink);color:var(--paper)}.st.wk{background:#fff}.st.er{background:var(--red);color:#fff;border-color:var(--red)}
+.acts{display:flex;gap:6px;justify-content:flex-end}
+.ic{width:36px;height:36px;border:2px solid var(--ink);display:grid;place-items:center;font-weight:800;background:#fff}
+.err{grid-column:2/7;margin-top:-6px;color:var(--red);font-weight:700;font-size:13px}
+/* 3 · result and settings, always visible on the right */
+.panel{background:var(--ink);color:var(--paper);align-self:start;position:sticky;top:20px}
+.panel .head{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:3px solid #333}
+.panel .head .step{margin:0}
+.res{padding:20px 22px 6px}
+.big{font:400 128px/.82 Anton;color:var(--red)}
+.sum{margin-top:10px;font-weight:600}
+.sum span{color:#b9b6ae;font-weight:500}
+.set{padding:8px 22px 22px}
+.lab{font:800 11px Archivo;letter-spacing:.14em;text-transform:uppercase;color:#bdbab3;margin:16px 0 7px;display:flex;justify-content:space-between}
+.lab em{font:400 16px Anton;color:var(--paper);font-style:normal;letter-spacing:.02em}
+.seg{display:flex}.seg b{flex:1;text-align:center;padding:9px 0;border:2px solid #77746d;margin-left:-2px;font:800 13px Archivo}.seg b:first-child{margin-left:0}.seg b.on{background:var(--paper);color:var(--ink);border-color:var(--paper);position:relative}
+.track{height:10px;background:#333;position:relative;margin:14px 0 14px}.track i{position:absolute;inset:0 22% 0 0;background:var(--red)}.track s{position:absolute;left:78%;top:-8px;width:12px;height:26px;margin-left:-6px;background:var(--paper)}
+.hint{font-size:12px;color:#b9b6ae}
+.dl{display:flex;justify-content:space-between;align-items:center;margin:20px 22px 22px;background:var(--red);color:#fff;padding:16px 18px;font:400 24px Anton;text-transform:uppercase;letter-spacing:.03em}
+.dl small{font:700 12px Archivo;letter-spacing:.08em}
+/* empty-state toggle for the second capture */
+body.empty .files,body.empty .res .sum span{display:none}
+body.empty .drop{padding:120px 34px;grid-template-columns:1fr;justify-items:center;text-align:center}body.empty .drop .formats{justify-content:center}
+@media (max-width:900px){header::before{width:190px}.wrap{grid-template-columns:1fr;padding:18px 16px 32px}header{padding:0 16px;height:70px}.logo{font-size:36px}.stamp{display:none}nav a:not(.on):not(.lang){display:none}.drop{grid-template-columns:1fr;text-align:left;padding:22px}.arrow{width:60px;height:60px;font-size:36px}.drop h1{font-size:36px}.row{grid-template-columns:44px minmax(0,1fr) 80px;}.row .bar,.row .st{display:none}.row .acts{grid-column:3}.pct{grid-column:3;grid-row:1}.panel{position:static}.err{grid-column:1/4}}
+</style>
+</head>
+<body>
+<header><span class="logo disp">Squish</span><span class="stamp"><i></i>Nothing leaves your device</span>
+ <nav><a>How it works</a><a>About</a><a class="on lang gap">EN</a><a class="lang">HR</a></nav></header>
+<main class="wrap">
+ <section>
+  <p class="step"><b>1</b>Add files</p>
+  <div class="drop">
+   <div class="arrow">↓</div>
+   <div><h1 class="disp">Drop files here</h1><p>Images, video and audio · up to 50 at once</p>
+    <div class="formats"><span>JPG</span><span>PNG</span><span>WEBP</span><span>MP4</span><span>MOV</span><span>MP3</span><span>WAV</span></div></div>
+   <span class="btn">Choose files</span>
+  </div>
+  <p class="paste">Copied an image? Press <b>Ctrl</b> + <b>V</b> anywhere.</p>
+
+  <div class="files">
+   <p class="step" style="margin-top:4px"><b>2</b>Check your files</p>
+   <div class="tabs"><span class="tab on">Images <small>4</small></span><span class="tab">Video</span><span class="tab">Audio</span></div>
+   <div class="list">
+    <div class="row"><i class="th" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><div><b>diploma_scan.png</b><small>9.1 → 2.6 MB · PNG → WebP · 2480×3508 → 1358×1920</small></div><div class="bar"><i style="width:100%"></i></div><span class="pct">−71%</span><span class="st ok">Done</span><div class="acts"><span class="ic">↓</span><span class="ic">✕</span></div></div>
+    <div class="row"><i class="th" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><div><b>beach_split.jpg</b><small>6.8 → 1.4 MB · JPG → WebP · 4032×3024 → 1920×1440</small></div><div class="bar"><i style="width:100%"></i></div><span class="pct">−79%</span><span class="st ok">Done</span><div class="acts"><span class="ic">↓</span><span class="ic">✕</span></div></div>
+    <div class="row"><i class="th" style="background:linear-gradient(120deg,#cfd6df,#6b7686)"></i><div><b>screenshot_osijek.png</b><small>2.4 MB · converting</small></div><div class="bar"><i style="width:62%;background:var(--red)"></i></div><span class="pct" style="color:var(--grey)">62%</span><span class="st wk">Working</span><div class="acts"><span class="ic">✕</span></div></div>
+    <div class="row"><i class="th" style="background:#d9d7d1"></i><div><b>plitvice.heic</b><small>3.2 MB</small></div><div class="bar"></div><span class="pct">—</span><span class="st er">Failed</span><div class="acts"><span class="ic">↻</span><span class="ic">✕</span></div>
+     <p class="err">This browser can't open HEIC. Convert it to JPG first, then drop it again.</p></div>
+   </div>
+  </div>
+ </section>
+
+ <aside class="panel">
+  <div class="head"><p class="step"><b>3</b>Format &amp; download</p></div>
+  <div class="res"><div class="big">−76%</div><p class="sum">17.8 MB → 4.4 MB <span>· 2 of 4 done</span></p></div>
+  <div class="set">
+   <p class="lab">Convert to</p><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b><b>AVIF</b></div>
+   <p class="lab">Quality <em>78</em></p><div class="track"><i></i><s></s></div><p class="hint">Lower = smaller file. 70–80 looks the same to most eyes.</p>
+   <p class="lab">Max width</p><div class="seg"><b>Original</b><b class="on">1920</b><b>1280</b><b>800</b></div>
+  </div>
+  <div class="dl">Download all <small>2 FILES · .ZIP ↓</small></div>
+ </aside>
+</main>
+</body>
+</html>

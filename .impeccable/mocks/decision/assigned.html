@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--cover:#1f3fbf;--cover-ink:#e9edff;--paper:#f1f3ee;--paper-2:#e2e8de;--ink:#1b1f2e;--muted:#5b5f6e;--road:#c8321d;--mway:#f2c230;--park:#1f6e43;--crease:rgba(27,31,46,.10)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--paper);color:var(--ink);font:500 15px/1.45 Barlow,sans-serif}
+.cover{height:72px;background:var(--cover);color:var(--cover-ink);display:flex;align-items:center;padding:0 40px;gap:40px}
+.logo{font:800 34px/1 "Barlow Condensed";letter-spacing:-.01em;color:#fff}
+.logo span{display:inline-block;width:10px;height:10px;background:var(--mway);margin-left:4px}
+.cover nav{display:flex;gap:28px;font:600 15px "Barlow Condensed";letter-spacing:.06em;text-transform:uppercase}
+.cover nav a{color:#cdd6ff;text-decoration:none}
+.cover nav a.on{color:#fff;border-bottom:3px solid var(--mway);padding-bottom:4px}
+.local{margin-left:auto;font-size:14px;display:flex;align-items:center;gap:8px}
+.local i{width:8px;height:8px;border-radius:50%;background:#7be3a4}
+.lang{display:flex;border:1.5px solid rgba(255,255,255,.4)}
+.lang b{font:700 13px "Barlow Condensed";letter-spacing:.08em;padding:6px 10px}
+.lang b.on{background:#fff;color:var(--cover)}
+/* panels = fold grid: 4 columns, creases are real gutters */
+.sheet{display:grid;grid-template-columns:360px 1fr;height:828px;background:
+ linear-gradient(90deg,transparent calc(25% - 1px),var(--crease) 25%,transparent calc(25% + 1px),transparent calc(50% - 1px),var(--crease) 50%,transparent calc(50% + 1px),transparent calc(75% - 1px),var(--crease) 75%,transparent calc(75% + 1px)),
+ linear-gradient(180deg,transparent calc(50% - 1px),var(--crease) 50%,transparent calc(50% + 1px))}
+.side{background:var(--paper-2);padding:32px;border-right:1px solid var(--crease);display:flex;flex-direction:column;gap:26px}
+.drop{border:2px dashed var(--cover);background:rgba(31,63,191,.05);padding:28px 22px;text-align:center}
+.drop h2{font:700 24px/1.1 "Barlow Condensed";color:var(--cover)}
+.drop p{font-size:14px;color:var(--muted);margin-top:6px}
+.btn{display:inline-block;margin-top:14px;background:var(--cover);color:#fff;font:700 15px "Barlow Condensed";letter-spacing:.06em;text-transform:uppercase;padding:10px 18px}
+.field label{display:block;font:700 13px "Barlow Condensed";letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);border:1.5px solid var(--ink)}
+.seg b{text-align:center;padding:9px 0;font:600 15px "Barlow Condensed";border-right:1.5px solid var(--ink)}
+.seg b:last-child{border-right:0}.seg b.on{background:var(--ink);color:var(--paper)}
+.slider{height:6px;background:#c9d0c4;position:relative;margin-top:14px}
+.slider::before{content:"";position:absolute;left:0;top:0;height:6px;width:78%;background:var(--road)}
+.slider::after{content:"";position:absolute;left:78%;top:-7px;width:20px;height:20px;margin-left:-10px;background:#fff;border:3px solid var(--road);border-radius:50%}
+.row{display:flex;justify-content:space-between;align-items:baseline}
+.row em{font:700 20px "Barlow Condensed";font-style:normal}
+.dims{display:grid;grid-template-columns:1fr 24px 1fr;gap:6px;align-items:center}
+.dims span{border:1.5px solid var(--ink);background:#fff;padding:8px 10px;font:600 16px Barlow}
+.dims i{text-align:center;color:var(--muted);font-style:normal}
+.main{padding:32px 40px;display:flex;flex-direction:column;gap:22px}
+.total{display:flex;align-items:flex-end;gap:36px;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+.big{font:800 148px/.82 "Barlow Condensed";letter-spacing:-.03em;color:var(--road)}
+.total .meta{padding-bottom:10px}
+.total .meta b{font:700 22px "Barlow Condensed";display:block}
+.total .meta span{color:var(--muted)}
+.scale{margin-left:auto;padding-bottom:10px;text-align:right}
+.scale b{font:800 40px "Barlow Condensed";display:block}
+.bar{display:flex;margin-top:6px;height:10px;width:240px;border:1.5px solid var(--ink)}
+.bar i{flex:1}.bar i:nth-child(odd){background:var(--ink)}
+.dl{background:var(--road);color:#fff;font:700 17px "Barlow Condensed";letter-spacing:.06em;text-transform:uppercase;padding:14px 22px;margin-left:24px;align-self:center}
+table{width:100%;border-collapse:collapse}
+th{font:700 13px "Barlow Condensed";letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:0 10px 10px}
+td{padding:12px 10px;border-top:1px solid var(--crease);vertical-align:middle;font-variant-numeric:tabular-nums}
+.th{width:52px;height:40px;display:block}
+.name{font-weight:600}.name small{display:block;color:var(--muted);font-weight:500;font-size:13px}
+.fold{display:flex;gap:2px;width:220px;height:14px}
+.fold i{flex:1;background:var(--cover)}.fold i.off{background:transparent;border:1px dashed #a3ab9d}
+.sc{font:700 18px "Barlow Condensed"}
+.st{font:700 13px "Barlow Condensed";letter-spacing:.08em;text-transform:uppercase;padding:4px 8px;display:inline-block}
+.done{background:var(--park);color:#fff}.work{background:var(--mway);color:var(--ink)}.err{background:var(--road);color:#fff}
+</style>
+</head>
+<body>
+<header class="cover">
+ <div class="logo">squish<span></span></div>
+ <nav><a class="on">Convert</a><a>How it works</a><a>About</a></nav>
+ <div class="local"><i></i>Processed on your device. Nothing is uploaded.</div>
+ <div class="lang"><b class="on">EN</b><b>HR</b></div>
+</header>
+<main class="sheet">
+ <aside class="side">
+  <div class="drop"><h2>Drop images here</h2><p>JPEG, PNG, WebP, GIF, BMP. Up to 50 files.</p><span class="btn">Choose files</span></div>
+  <div class="field"><label>Convert to</label><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b><b>AVIF</b></div></div>
+  <div class="field"><div class="row"><label>Quality</label><em>78</em></div><div class="slider"></div></div>
+  <div class="field"><label>Resize (px)</label><div class="dims"><span>1920</span><i>×</i><span>auto</span></div></div>
+  <div class="field"><label>Keep aspect ratio</label><div class="seg" style="grid-template-columns:1fr 1fr"><b class="on">On</b><b>Off</b></div></div>
+ </aside>
+ <section class="main">
+  <div class="total">
+   <div class="big">−71%</div>
+   <div class="meta"><b>24.6 MB → 7.1 MB</b><span>6 images, 5 done, 1 failed</span></div>
+   <div class="scale"><b>1 : 3.5</b><div class="bar"><i></i><i></i><i></i><i></i><i></i></div></div>
+   <span class="dl">Download all (.zip)</span>
+  </div>
+  <table>
+   <tr><th></th><th>File</th><th>Before</th><th>After</th><th>Folded size</th><th>Scale</th><th>Status</th></tr>
+   <tr><td><i class="th" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8 60%,#2d3b55)"></i></td><td class="name">beach_split.jpg<small>4032 × 3024 → 1920 × 1440</small></td><td>6.8 MB</td><td>1.4 MB</td><td><div class="fold"><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i></div></td><td class="sc">1 : 4.9</td><td><span class="st done">Folded</span></td></tr>
+   <tr><td><i class="th" style="background:linear-gradient(200deg,#e8c27a,#b5562e 70%)"></i></td><td class="name">diploma_scan.png<small>2480 × 3508 → 1358 × 1920</small></td><td>9.1 MB</td><td>2.6 MB</td><td><div class="fold"><i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i></div></td><td class="sc">1 : 3.5</td><td><span class="st done">Folded</span></td></tr>
+   <tr><td><i class="th" style="background:linear-gradient(140deg,#7bbf8f,#2f6b47)"></i></td><td class="name">plitvice.heic<small>Format not supported by this browser</small></td><td>3.2 MB</td><td>—</td><td><div class="fold"><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i></div></td><td class="sc">—</td><td><span class="st err">Torn: retry</span></td></tr>
+   <tr><td><i class="th" style="background:linear-gradient(180deg,#f5d0d6,#c46a7c)"></i></td><td class="name">cv_photo.jpg<small>1200 × 1600, no resize</small></td><td>1.9 MB</td><td>0.4 MB</td><td><div class="fold"><i></i><i class="off"></i><i class="off"></i><i class="off"></i><i class="off"></i></div></td><td class="sc">1 : 4.8</td><td><span class="st done">Folded</span></td></tr>
+   <tr><td><i class="th" style="background:linear-gradient(120deg,#cfd6df,#6b7686)"></i></td><td class="name">screenshot_osijek.png<small>2880 × 1800 → 1920 × 1200</small></td><td>2.4 MB</td><td>0.9 MB</td><td><div class="fold"><i></i><i></i><i class="off"></i><i class="off"></i><i class="off"></i></div></td><td class="sc">1 : 2.7</td><td><span class="st work">Folding…</span></td></tr>
+   <tr><td><i class="th" style="background:linear-gradient(170deg,#ffe08a,#e8402a)"></i></td><td class="name">poster_final.png<small>3000 × 4000 → 1440 × 1920</small></td><td>1.2 MB</td><td>—</td><td><div class="fold"><i></i><i></i><i></i><i></i><i></i></div></td><td class="sc">—</td><td><span class="st" style="border:1px solid var(--ink)">Flat</span></td></tr>
+  </table>
+ </section>
+</main>
+</body>
+</html>

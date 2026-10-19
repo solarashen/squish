@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>squish</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800;900&family=Instrument+Serif:ital@0;1&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#120d1f;--pink:#ff4fa3;--yellow:#ffd60a;--blue:#3b2bff;--mint:#2de2a6;--orange:#ff6b2c;--lilac:#cbb8ff;--paper:#fff7fb}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--ink);font:600 15px/1.4 Manrope,sans-serif;overflow-x:hidden}
+.ticker{background:var(--yellow);border-bottom:3px solid var(--ink);overflow:hidden;white-space:nowrap;font:800 13px Unbounded;letter-spacing:.06em;padding:9px 0}
+.ticker span{display:inline-block;animation:run 22s linear infinite;padding-left:100%}
+@keyframes run{to{transform:translateX(-100%)}}
+.page{padding-right:52px;background:radial-gradient(circle at 12% 30%,var(--pink) 0 140px,transparent 141px),radial-gradient(circle at 92% 85%,var(--mint) 0 180px,transparent 181px),repeating-linear-gradient(45deg,#1b1430 0 14px,#160f28 14px 28px);padding:18px 52px 40px 40px;min-height:calc(100vh - 38px)}
+header{display:flex;align-items:center;gap:18px}
+.word{font:900 76px/0.8 Unbounded;color:var(--paper);letter-spacing:-.05em;transform:scaleY(.72);transform-origin:left center;text-shadow:5px 5px 0 var(--pink),10px 10px 0 var(--blue)}
+.sticker{font:800 12px Unbounded;background:var(--mint);border:3px solid var(--ink);border-radius:999px;padding:8px 14px;transform:rotate(-8deg);box-shadow:4px 4px 0 var(--ink)}
+nav{margin-left:auto;display:flex;gap:10px}
+.pill{background:var(--paper);border:3px solid var(--ink);border-radius:999px;padding:9px 18px;font:800 14px Manrope;box-shadow:4px 4px 0 var(--pink)}
+.pill.on{background:var(--pink);box-shadow:4px 4px 0 var(--yellow)}
+.grid{display:grid;grid-template-columns:1fr 420px;gap:28px;margin-top:26px}
+.tabs{display:flex;gap:6px;padding-left:22px}
+.tab{font:800 15px Unbounded;padding:12px 22px 14px;border:3px solid var(--ink);border-bottom:0;border-radius:18px 18px 0 0}
+.tab b{font:800 11px Manrope;background:var(--ink);color:var(--yellow);border-radius:999px;padding:2px 8px;margin-left:6px}
+.drop{position:relative;background:var(--blue);border:3px solid var(--ink);border-radius:30px;padding:34px 38px;color:var(--paper);overflow:hidden;box-shadow:10px 10px 0 var(--yellow)}
+.drop::before{content:"";position:absolute;inset:0;background:radial-gradient(rgba(255,255,255,.18) 2px,transparent 2.5px) 0 0/22px 22px;pointer-events:none}
+.drop svg.wave{position:absolute;right:-40px;bottom:-30px;width:520px;opacity:.9}
+h1{position:relative;font:900 64px/.92 Unbounded;letter-spacing:-.04em;text-transform:uppercase}
+h1 em{font:italic 400 84px/.8 "Instrument Serif";text-transform:none;letter-spacing:0;color:var(--yellow)}
+h1 .o{-webkit-text-stroke:3px var(--paper);color:transparent}
+.zone{position:relative;margin-top:26px;background:var(--paper);color:var(--ink);border:3px dashed var(--ink);border-radius:26px;padding:26px;display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;transform:rotate(-1deg)}
+.blob{width:96px;height:96px;border-radius:42% 58% 63% 37%/45% 41% 59% 55%;background:var(--pink);border:3px solid var(--ink);display:grid;place-items:center;font:900 40px Unbounded;box-shadow:5px 5px 0 var(--ink)}
+.zone h2{font:900 26px/1 Unbounded;letter-spacing:-.02em}
+.zone p{margin-top:6px;font-size:16px}
+.zone p u{text-decoration-color:var(--pink);text-decoration-thickness:4px;text-underline-offset:4px}
+.btn{font:800 16px Unbounded;background:var(--yellow);border:3px solid var(--ink);border-radius:999px;padding:16px 22px;box-shadow:5px 5px 0 var(--ink);white-space:nowrap}
+.chips{position:relative;display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+.chip{font:800 12px Unbounded;border:3px solid var(--ink);border-radius:999px;padding:7px 12px;color:var(--ink)}
+.panel{background:var(--yellow);border:3px solid var(--ink);border-radius:30px;overflow:hidden;box-shadow:10px 10px 0 var(--pink);align-self:start}
+.check{height:26px;border-bottom:3px solid var(--ink);background:conic-gradient(var(--ink) 25%,var(--paper) 0 50%,var(--ink) 0 75%,var(--paper) 0) 0 0/26px 26px}
+.pin{padding:22px 26px 26px}
+.pin h3{font:800 18px Unbounded;display:flex;justify-content:space-between;align-items:center}
+.pin h3 span{font:italic 400 22px "Instrument Serif"}
+.big{position:relative;margin:10px 0 2px;font:900 92px/.85 Unbounded;letter-spacing:-.06em}
+.big .back{position:absolute;left:8px;top:8px;color:transparent;-webkit-text-stroke:3px var(--ink)}
+.big .front{position:relative;color:var(--pink);-webkit-text-stroke:3px var(--ink)}
+.sum{font:italic 400 26px "Instrument Serif"}
+.lab{font:800 11px Unbounded;letter-spacing:.08em;margin:18px 0 8px}
+.seg{display:flex;gap:6px}
+.seg b{flex:1;text-align:center;padding:10px 0;border:3px solid var(--ink);border-radius:14px;background:var(--paper);font:800 14px Manrope}
+.seg b.on{background:var(--blue);color:var(--paper);box-shadow:3px 3px 0 var(--ink)}
+.track{height:18px;border:3px solid var(--ink);border-radius:999px;background:var(--paper);position:relative;overflow:visible}
+.track i{position:absolute;inset:0 22% 0 0;background:repeating-linear-gradient(-45deg,var(--mint) 0 8px,#22c08c 8px 16px);border-radius:999px}
+.track s{position:absolute;left:78%;top:-11px;width:34px;height:34px;margin-left:-17px;border-radius:50%;background:var(--pink);border:3px solid var(--ink)}
+.dl{display:block;text-align:center;margin-top:22px;font:900 17px Unbounded;background:var(--ink);color:var(--yellow);border-radius:999px;padding:18px;box-shadow:5px 5px 0 var(--blue)}
+.files{margin-top:26px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.f{border:3px solid var(--ink);border-radius:22px;padding:14px;display:flex;gap:12px;align-items:center;box-shadow:6px 6px 0 var(--ink)}
+.f i{width:58px;height:58px;border-radius:16px;border:3px solid var(--ink);flex:none}
+.f b{display:block;font:800 14px Manrope}
+.f small{font-size:12px}
+.f em{margin-left:auto;font:900 22px Unbounded;font-style:normal}
+.f:nth-child(1){background:var(--mint);transform:rotate(-1.5deg)}.f:nth-child(2){background:var(--lilac);transform:rotate(1deg)}.f:nth-child(3){background:var(--orange);transform:rotate(-.5deg)}
+@media (max-width:900px){.grid{grid-template-columns:1fr}.word{font-size:54px}nav .pill:not(.on){display:none}h1{font-size:40px}h1 em{font-size:54px}.zone{grid-template-columns:1fr;text-align:center;justify-items:center}.files{grid-template-columns:1fr}.page{padding:14px 16px 32px}.drop{padding:26px 20px}.big{font-size:92px}.sticker{display:none}}
+</style>
+</head>
+<body>
+<div class="ticker"><span>JPG → WEBP ✦ PNG → AVIF ✦ MP4 → WEBM ✦ WAV → MP3 ✦ NOTHING IS UPLOADED ✦ UP TO 50 FILES ✦ ENGLISH / HRVATSKI ✦ JPG → WEBP ✦ MP4 → WEBM ✦ WAV → MP3 ✦</span></div>
+<div class="page">
+ <header>
+  <div class="word">squish</div>
+  <span class="sticker">100% in your browser</span>
+  <nav><span class="pill">How it works</span><span class="pill">About</span><span class="pill on">EN</span><span class="pill">HR</span></nav>
+ </header>
+ <div class="grid">
+  <section>
+   <div class="tabs"><span class="tab" style="background:var(--pink)">Images <b>3</b></span><span class="tab" style="background:var(--mint)">Video</span><span class="tab" style="background:var(--orange)">Audio</span></div>
+   <div class="drop">
+    <svg class="wave" viewBox="0 0 520 200" aria-hidden="true"><path d="M0 120 Q65 40 130 120 T260 120 T390 120 T520 120" fill="none" stroke="#ff4fa3" stroke-width="26"/><path d="M0 170 Q65 90 130 170 T260 170 T390 170 T520 170" fill="none" stroke="#2de2a6" stroke-width="26"/></svg>
+    <h1>Big files <em>in,</em><br><span class="o">tiny</span> files out.</h1>
+    <div class="zone">
+     <div class="blob">↑</div>
+     <div><h2>Drag &amp; drop anything here</h2><p>or <u>choose files from your device</u> · up to 50 at once</p></div>
+     <span class="btn">Choose files</span>
+    </div>
+    <div class="chips"><span class="chip" style="background:var(--yellow)">JPG · PNG · WEBP</span><span class="chip" style="background:var(--mint)">MP4 · MOV · WEBM</span><span class="chip" style="background:var(--lilac)">MP3 · WAV · M4A</span></div>
+   </div>
+   <div class="files">
+    <div class="f"><i style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><div><b>beach_split.jpg</b><small>6.8 MB → 1.4 MB</small></div><em>−79%</em></div>
+    <div class="f"><i style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><div><b>diploma_scan.png</b><small>9.1 MB → 2.6 MB</small></div><em>−71%</em></div>
+    <div class="f"><i style="background:linear-gradient(140deg,#7bbf8f,#2f6b47)"></i><div><b>cv_photo.jpg</b><small>Squishing…</small></div><em>62%</em></div>
+   </div>
+  </section>
+  <aside class="panel">
+   <div class="check"></div>
+   <div class="pin">
+    <h3>Your batch <span>so far</span></h3>
+    <div class="big"><span class="back">−76%</span><span class="front">−76%</span></div>
+    <p class="sum">24.6 MB squished to 5.9 MB</p>
+    <p class="lab">CONVERT TO</p>
+    <div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b><b>AVIF</b></div>
+    <p class="lab">QUALITY · 78</p>
+    <div class="track"><i></i><s></s></div>
+    <p class="lab">MAX WIDTH</p>
+    <div class="seg"><b>Original</b><b class="on">1920</b><b>1280</b></div>
+    <span class="dl">DOWNLOAD ALL ↓</span>
+   </div>
+  </aside>
+ </div>
+</div>
+</body>
+</html>

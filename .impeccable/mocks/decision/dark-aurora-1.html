@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish · dark aurora</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* PALETTE */
+:root{--bg:#060b14;--c1:#00c2a8;--c2:#2f6bff;--c3:#7b2ff7;--c4:#00e0c6;--accent:#3ee6c4;--accent2:#5b8cff;--on:#04201b;--warn:#ffd166;--err:#ff6b81}
+/* END PALETTE */
+:root{--fg:#eef1f8;--muted:#a3abc0;--glass:rgba(255,255,255,.055);--edge:rgba(255,255,255,.12);--line:rgba(255,255,255,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{font:500 15px/1.45 Sora,sans-serif;color:var(--fg);background:var(--bg);position:relative}
+/* aurora: wide curtains of colour, blurred and layered, like the real thing over a night sky */
+.aur{position:absolute;filter:blur(80px);opacity:.55;border-radius:50%}
+.a1{width:900px;height:260px;left:-120px;top:-40px;background:var(--c1);transform:rotate(-12deg)}
+.a2{width:760px;height:300px;right:-200px;top:40px;background:var(--c2);transform:rotate(14deg)}
+.a3{width:620px;height:420px;left:520px;top:380px;background:var(--c3);opacity:.35}
+.a4{width:520px;height:200px;left:60px;bottom:-60px;background:var(--c4);opacity:.25}
+.stars{position:absolute;inset:0;background-image:radial-gradient(1px 1px at 20% 30%,rgba(255,255,255,.5),transparent),radial-gradient(1px 1px at 70% 12%,rgba(255,255,255,.4),transparent),radial-gradient(1px 1px at 85% 60%,rgba(255,255,255,.35),transparent),radial-gradient(1px 1px at 40% 80%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 55% 45%,rgba(255,255,255,.25),transparent)}
+.gl{background:var(--glass);backdrop-filter:blur(26px) saturate(1.5);border:1px solid var(--edge);border-radius:26px;box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 20px 50px rgba(0,0,0,.35)}
+.page{position:relative;padding:22px 40px}
+header{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 22px}
+.logo{font:800 26px Sora;letter-spacing:-.04em;margin-right:14px}
+.logo i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-left:3px}
+.chip{padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-weight:600;font-size:13px}
+.loc{margin-left:auto;display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px}.loc i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.lang{display:flex;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:3px;margin-left:10px}.lang b{padding:6px 12px;border-radius:999px;font-size:12px;color:var(--muted)}.lang b.on{background:var(--fg);color:var(--bg)}
+.grid{display:grid;grid-template-columns:1fr 390px;gap:22px;margin-top:20px}
+.drop{padding:30px 34px}
+.drop h1{font:700 36px/1.05 Sora;letter-spacing:-.035em}
+.steps{display:flex;gap:18px;margin-top:12px;font-size:13px;font-weight:600;color:var(--muted)}
+.steps span{display:flex;gap:7px;align-items:center}.steps b{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--fg);color:var(--bg);font-size:11px}
+.zone{margin-top:22px;border:1.5px dashed rgba(255,255,255,.22);border-radius:20px;background:rgba(255,255,255,.03);padding:26px;display:flex;align-items:center;gap:20px}
+.up{width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:var(--on);font:700 24px Sora}
+.zone strong{font:700 19px Sora;display:block}.zone .sub{color:var(--muted);font-size:13px}
+.btn{margin-left:auto;background:var(--accent);color:var(--on);border-radius:999px;padding:13px 22px;font-weight:700}
+.tabs{display:flex;gap:6px;margin-top:20px;padding:4px;width:max-content;border-radius:999px}
+.tabs span{padding:8px 16px;border-radius:999px;font-weight:600;font-size:14px;display:flex;gap:6px;align-items:center;color:var(--muted)}.tabs .on{background:rgba(255,255,255,.12);color:var(--fg)}
+.tabs small{background:var(--accent);color:var(--on);border-radius:999px;padding:0 7px;font-size:11px;font-weight:700}
+.files{margin-top:12px;padding:6px 20px}
+.f{display:grid;grid-template-columns:48px 1.7fr 1fr 70px 90px;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.f:last-child{border:0}
+.th{width:48px;height:48px;border-radius:14px}
+.f small{display:block;color:var(--muted);font-size:12px}
+.pg{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}.pg i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.pc{font-weight:700;color:var(--accent);text-align:right}
+.st{justify-self:end;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid currentColor}
+.panel{padding:26px;display:flex;flex-direction:column;gap:16px}
+.panel h2{font:700 17px Sora}
+.big{font:800 92px/.9 Sora;letter-spacing:-.06em;color:var(--accent)}
+.mut{color:var(--muted);font-size:14px}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:7px}
+.seg{display:flex;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:14px;padding:4px}.seg b{flex:1;text-align:center;padding:8px 0;border-radius:10px;font-weight:600;font-size:13px;color:var(--muted)}.seg b.on{background:var(--fg);color:var(--bg)}
+.sl{height:6px;border-radius:3px;background:rgba(255,255,255,.1);position:relative;margin-top:14px}.sl::before{content:"";position:absolute;inset:0 22% 0 0;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}.sl::after{content:"";position:absolute;left:78%;top:-8px;width:22px;height:22px;border-radius:50%;background:var(--fg);box-shadow:0 2px 10px rgba(0,0,0,.5);margin-left:-11px}
+.dl{margin-top:auto;text-align:center;padding:16px;border-radius:999px;background:var(--fg);color:var(--bg);font-weight:700}
+</style>
+</head>
+<body>
+<div class="stars"></div><div class="aur a1"></div><div class="aur a2"></div><div class="aur a3"></div><div class="aur a4"></div>
+<div class="page">
+ <header class="gl"><span class="logo">squish<i></i></span><span class="chip">How it works</span><span class="chip">About</span><span class="loc"><i></i>Everything stays on your device</span><span class="lang"><b class="on">EN</b><b>HR</b></span></header>
+ <div class="grid">
+  <section>
+   <div class="gl drop">
+    <h1>Make your files smaller.</h1>
+    <div class="steps"><span><b>1</b>Add files</span><span><b>2</b>Pick format &amp; quality</span><span><b>3</b>Download</span></div>
+    <div class="zone"><span class="up">↑</span><div><strong>Drag and drop files here</strong><span class="sub">Images, video and audio · up to 50 · or press Ctrl+V</span></div><span class="btn">Choose files</span></div>
+   </div>
+   <div class="gl tabs"><span class="on">Images <small>4</small></span><span>Video</span><span>Audio</span></div>
+   <div class="gl files">
+    <div class="f"><i class="th" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><div><b>diploma_scan.png</b><small>9.1 MB → 2.6 MB · PNG → WebP</small></div><div class="pg"><i style="width:100%"></i></div><span class="pc">−71%</span><span class="st" style="color:var(--accent)">Done</span></div>
+    <div class="f"><i class="th" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><div><b>beach_split.jpg</b><small>6.8 MB → 1.4 MB · JPG → WebP</small></div><div class="pg"><i style="width:100%"></i></div><span class="pc">−79%</span><span class="st" style="color:var(--accent)">Done</span></div>
+    <div class="f"><i class="th" style="background:linear-gradient(120deg,#cfd6df,#6b7686)"></i><div><b>screenshot_osijek.png</b><small>2.4 MB · converting</small></div><div class="pg"><i style="width:62%"></i></div><span class="pc" style="color:var(--muted)">62%</span><span class="st" style="color:var(--warn)">Working</span></div>
+    <div class="f"><i class="th" style="background:rgba(255,255,255,.08)"></i><div><b>plitvice.heic</b><small style="color:var(--err)">This browser can't open HEIC. Convert it to JPG first.</small></div><div class="pg"></div><span class="pc">—</span><span class="st" style="color:var(--err)">Retry</span></div>
+   </div>
+  </section>
+  <aside class="gl panel">
+   <h2>Your images</h2>
+   <div><div class="big">−76%</div><p class="mut">17.8 MB → 4.4 MB · 2 of 4 done</p></div>
+   <div><label>Convert to</label><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b><b>AVIF</b></div></div>
+   <div><label>Quality · 78</label><div class="sl"></div></div>
+   <div><label>Max width</label><div class="seg"><b>Original</b><b class="on">1920</b><b>1280</b></div></div>
+   <span class="dl">Download all (.zip)</span>
+  </aside>
+ </div>
+</div>
+</body>
+</html>

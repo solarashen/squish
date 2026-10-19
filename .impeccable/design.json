@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-19T12:00:00Z",
+  "title": "Design System: squish",
+  "extensions": {
+    "colorMeta": {
+      "polar-mint": { "role": "primary", "displayName": "Polar Mint", "canonical": "#8fd3c4", "tonalRamp": ["oklch(20% 0.04 178)", "oklch(30% 0.055 178)", "oklch(42% 0.07 178)", "oklch(54% 0.08 178)", "oklch(66% 0.08 178)", "oklch(76% 0.078 178)", "oklch(84% 0.07 178)", "oklch(94% 0.035 178)"] },
+      "mint-ink": { "role": "primary", "displayName": "Mint Ink", "canonical": "#0b1d1a" },
+      "lamp-amber": { "role": "secondary", "displayName": "Lamp Amber", "canonical": "#e9cf8f", "tonalRamp": ["oklch(22% 0.04 90)", "oklch(34% 0.06 90)", "oklch(46% 0.08 90)", "oklch(58% 0.09 90)", "oklch(70% 0.095 90)", "oklch(80% 0.09 90)", "oklch(87% 0.085 90)", "oklch(95% 0.04 90)"] },
+      "dusk-rose": { "role": "tertiary", "displayName": "Dusk Rose", "canonical": "#e99aa5", "tonalRamp": ["oklch(22% 0.05 10)", "oklch(34% 0.07 10)", "oklch(46% 0.09 10)", "oklch(58% 0.1 10)", "oklch(68% 0.1 10)", "oklch(77% 0.09 10)", "oklch(86% 0.06 10)", "oklch(95% 0.025 10)"] },
+      "night-ground": { "role": "neutral", "displayName": "Night Ground", "canonical": "#0b0f15", "tonalRamp": ["oklch(15% 0.012 255)", "oklch(21% 0.014 255)", "oklch(30% 0.016 255)", "oklch(42% 0.018 255)", "oklch(55% 0.02 255)", "oklch(68% 0.02 255)", "oklch(82% 0.014 255)", "oklch(95% 0.008 255)"] },
+      "starlight": { "role": "neutral", "displayName": "Starlight", "canonical": "#eef1f8" },
+      "mist": { "role": "neutral", "displayName": "Mist", "canonical": "#a3abc0" },
+      "deep-popover": { "role": "neutral", "displayName": "Deep Popover", "canonical": "#141a24" },
+      "glass-fill": { "role": "neutral", "displayName": "Glass Fill", "canonical": "rgb(255 255 255 / 0.055)" },
+      "glass-edge": { "role": "neutral", "displayName": "Glass Edge", "canonical": "rgb(255 255 255 / 0.12)" },
+      "hairline": { "role": "neutral", "displayName": "Hairline", "canonical": "rgb(255 255 255 / 0.08)" },
+      "quiet-fill": { "role": "neutral", "displayName": "Quiet Fill", "canonical": "rgb(255 255 255 / 0.06)" },
+      "aurora-teal": { "role": "neutral", "displayName": "Aurora Teal (background only)", "canonical": "#1f6a63" },
+      "aurora-slate": { "role": "neutral", "displayName": "Aurora Slate (background only)", "canonical": "#2b4473" },
+      "aurora-violet": { "role": "neutral", "displayName": "Aurora Violet (background only)", "canonical": "#4a3a78" }
+    },
+    "typographyMeta": {
+      "figure": { "displayName": "Figure", "purpose": "The saving percentage in the dock; 34px on mobile (figure-compact)." },
+      "display": { "displayName": "Display", "purpose": "Drop card headline; 28px on mobile (display-compact)." },
+      "headline": { "displayName": "Headline", "purpose": "Info dialog titles." },
+      "logo": { "displayName": "Logo", "purpose": "The squish wordmark with its mint dot." },
+      "title": { "displayName": "Title", "purpose": "Drop zone title and dialog section heads (700 there)." },
+      "lead": { "displayName": "Lead", "purpose": "The About paragraph, max 65ch." },
+      "body-strong": { "displayName": "Body Strong", "purpose": "File names, medium buttons, row saving (700)." },
+      "body": { "displayName": "Body", "purpose": "Steps, tallies, notes, empty states." },
+      "label": { "displayName": "Label", "purpose": "Chips, segments, small buttons, settings notes." },
+      "caption": { "displayName": "Caption", "purpose": "Field captions, status pills, file detail lines, language switch." },
+      "badge": { "displayName": "Badge", "purpose": "Count inside a kind tab." }
+    },
+    "shadows": [
+      { "name": "glass", "value": "0 1px 0 rgb(255 255 255 / 0.08) inset, 0 20px 50px rgb(0 0 0 / 0.35)", "purpose": "Every glass panel, the kind tabs and the dock; paired with backdrop-filter: blur(26px) saturate(1.4)." },
+      { "name": "dialog", "value": "0 30px 80px rgb(0 0 0 / 0.5)", "purpose": "Info dialog only, over a backdrop of rgb(0 0 0 / 0.5) with blur(6px)." },
+      { "name": "knob", "value": "0 2px 10px rgb(0 0 0 / 0.5)", "purpose": "Slider thumb; the switch knob uses 0 2px 6px rgb(0 0 0 / 0.4)." }
+    ],
+    "motion": [
+      { "name": "ease-out-soft", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Default easing for dialog entry, dock pop and slider thumb." },
+      { "name": "press", "value": "transform scale(0.97), 150ms", "purpose": "Every button on press." },
+      { "name": "dialog-in", "value": "opacity 260ms, transform translateY(24px) scale(0.97) to none over 360ms", "purpose": "Info dialog rise-and-fade, with backdrop blur fading in over 260ms." },
+      { "name": "dock-pop", "value": "translateY(6px) opacity 0.4 to none over 420ms", "purpose": "Saving figure lift when it changes; the figure also counts up." },
+      { "name": "working-slide", "value": "1.1s ease-in-out infinite", "purpose": "Mint band sliding along a progress bar with unknown progress." },
+      { "name": "reduced-motion", "value": "1ms", "purpose": "All animations and transitions collapse under prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one accent action on a screen: Choose files.",
+      "html": "<button class=\"ds-btn-primary\">Choose files</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 20px; border: 0; border-radius: 9999px; background: var(--primary, #8fd3c4); color: var(--primary-foreground, #0b1d1a); font-family: 'Sora Variable', 'Onest Variable', ui-sans-serif, sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: filter 150ms, transform 150ms; } .ds-btn-primary:hover { filter: brightness(1.1); } .ds-btn-primary:active { transform: scale(0.97); } .ds-btn-primary:focus-visible { outline: 2px solid var(--primary, #8fd3c4); outline-offset: 3px; }"
+    },
+    {
+      "name": "Light Download Button",
+      "kind": "button",
+      "refersTo": "button-light",
+      "description": "Light pill for the final download in the dock.",
+      "html": "<button class=\"ds-btn-light\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><path d=\"m7 10 5 5 5-5\"/><path d=\"M12 15V3\"/></svg>Download all (.zip)</button>",
+      "css": ".ds-btn-light { display: inline-flex; align-items: center; gap: 8px; height: 52px; padding: 0 32px; border: 0; border-radius: 9999px; background: var(--foreground, #eef1f8); color: var(--background, #0b0f15); font-family: 'Sora Variable', 'Onest Variable', ui-sans-serif, sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background-color 150ms, transform 150ms; } .ds-btn-light:hover { background: #fff; } .ds-btn-light:active { transform: scale(0.97); } .ds-btn-light:focus-visible { outline: 2px solid var(--primary, #8fd3c4); outline-offset: 3px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Quiet glass pill for secondary actions such as Paste.",
+      "html": "<button class=\"ds-btn-ghost\">Paste image</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border: 1px solid rgb(255 255 255 / 0.08); border-radius: 9999px; background: rgb(255 255 255 / 0.06); color: var(--foreground, #eef1f8); font-family: 'Sora Variable', 'Onest Variable', ui-sans-serif, sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: background-color 150ms, transform 150ms; } .ds-btn-ghost:hover { background: rgb(255 255 255 / 0.1); } .ds-btn-ghost:active { transform: scale(0.97); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--primary, #8fd3c4); outline-offset: 3px; }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "input",
+      "refersTo": "segmented",
+      "description": "Radio group drawn as a glass track; the chosen segment is a light pill.",
+      "html": "<div class=\"ds-seg\" role=\"radiogroup\" aria-label=\"Convert to\"><button class=\"ds-seg-item\">JPEG</button><button class=\"ds-seg-item is-on\" aria-checked=\"true\">WebP</button><button class=\"ds-seg-item\">PNG</button><button class=\"ds-seg-item is-off\" disabled>AVIF</button></div>",
+      "css": ".ds-seg { display: flex; padding: 4px; border: 1px solid rgb(255 255 255 / 0.08); border-radius: 14px; background: rgb(255 255 255 / 0.05); width: 320px; } .ds-seg-item { flex: 1; height: 36px; border: 0; border-radius: 10px; background: transparent; color: var(--muted-foreground, #a3abc0); font-family: 'Sora Variable', 'Onest Variable', ui-sans-serif, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: color 150ms, background-color 150ms; } .ds-seg-item:hover { color: var(--foreground, #eef1f8); } .ds-seg-item.is-on { background: var(--foreground, #eef1f8); color: var(--background, #0b0f15); } .ds-seg-item.is-off { opacity: 0.4; text-decoration: line-through; cursor: not-allowed; } .ds-seg-item:focus-visible { outline: 2px solid var(--primary, #8fd3c4); outline-offset: 2px; }"
+    },
+    {
+      "name": "Quality Slider",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "6px track filled mint to the value, light thumb that grows while dragged.",
+      "html": "<input class=\"ds-range\" type=\"range\" min=\"1\" max=\"100\" value=\"78\" style=\"--fill: 78%\" aria-label=\"Quality\">",
+      "css": ".ds-range { appearance: none; width: 260px; height: 28px; background: transparent; cursor: pointer; } .ds-range::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--primary, #8fd3c4) var(--fill), rgb(255 255 255 / 0.1) var(--fill)); } .ds-range::-moz-range-track { height: 6px; border-radius: 3px; background: linear-gradient(90deg, var(--primary, #8fd3c4) var(--fill), rgb(255 255 255 / 0.1) var(--fill)); } .ds-range::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; margin-top: -8px; border-radius: 50%; background: var(--foreground, #eef1f8); box-shadow: 0 2px 10px rgb(0 0 0 / 0.5); transition: transform 160ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-range::-moz-range-thumb { width: 22px; height: 22px; border: 0; border-radius: 50%; background: var(--foreground, #eef1f8); } .ds-range:active::-webkit-slider-thumb { transform: scale(1.15); } .ds-range:focus-visible { outline: 2px solid var(--primary, #8fd3c4); outline-offset: 3px; }"
+    },
+    {
+      "name": "Kind Tabs",
+      "kind": "nav",
+      "refersTo": "chip-nav",
+      "description": "Glass pill tablist for Images, Video, Audio with a count badge.",
+      "html": "<div class=\"ds-tabs\" role=\"tablist\"><button class=\"ds-tab is-on\" role=\"tab\" aria-selected=\"true\">Images <span class=\"ds-badge\">3</span></button><button class=\"ds-tab\" role=\"tab\">Video</button><button class=\"ds-tab\" role=\"tab\">Audio</button></div>",
+      "css": ".ds-tabs { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid rgb(255 255 255 / 0.12); border-radius: 9999px; background: rgb(255 255 255 / 0.055); backdrop-filter: blur(26px) saturate(1.4); box-shadow: 0 1px 0 rgb(255 255 255 / 0.08) inset, 0 20px 50px rgb(0 0 0 / 0.35); } .ds-tab { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border: 0; border-radius: 9999px; background: transparent; color: var(--muted-foreground, #a3abc0); font-family: 'Sora Variable', 'Onest Variable', ui-sans-serif, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: color 150ms, background-color 150ms; } .ds-tab:hover { color: var(--foreground, #eef1f8); } .ds-tab.is-on { background: rgb(255 255 255 / 0.12); color: var(--foreground, #eef1f8); } .ds-tab:focus-visible { outline: 2px solid var(--primary, #8fd3c4); outline-offset: 3px; } .ds-badge { display: grid; place-items: center; height: 18px; min-width: 18px; padding: 0 6px; border-radius: 9999px; background: rgb(255 255 255 / 0.1); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; } .ds-tab.is-on .ds-badge { background: var(--primary, #8fd3c4); color: var(--primary-foreground, #0b1d1a); }"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "Outlined in its status colour, never filled.",
+      "html": "<span class=\"ds-status ds-done\">Done</span> <span class=\"ds-status ds-working\">Working</span> <span class=\"ds-status ds-failed\">Failed</span> <span class=\"ds-status ds-queued\">Queued</span>",
+      "css": ".ds-status { display: inline-flex; align-items: center; height: 28px; padding: 0 10px; border: 1px solid currentColor; border-radius: 9999px; font-family: 'Sora Variable', 'Onest Variable', ui-sans-serif, sans-serif; font-size: 12px; font-weight: 600; } .ds-done { color: var(--primary, #8fd3c4); } .ds-working { color: var(--warn, #e9cf8f); } .ds-failed { color: var(--destructive, #e99aa5); } .ds-queued { color: var(--muted-foreground, #a3abc0); }"
+    },
+    {
+      "name": "Glass Panel",
+      "kind": "card",
+      "refersTo": "glass-panel",
+      "description": "The one surface material: frosted glass over the aurora.",
+      "html": "<section class=\"ds-glass\"><h2 class=\"ds-glass-title\">Make your files smaller.</h2><p class=\"ds-glass-body\">Nothing is uploaded. Everything stays on your device.</p></section>",
+      "css": ".ds-glass { padding: 24px 20px; border: 1px solid rgb(255 255 255 / 0.12); border-radius: 24px; background: rgb(255 255 255 / 0.055); backdrop-filter: blur(26px) saturate(1.4); box-shadow: 0 1px 0 rgb(255 255 255 / 0.08) inset, 0 20px 50px rgb(0 0 0 / 0.35); color: var(--foreground, #eef1f8); font-family: 'Sora Variable', 'Onest Variable', ui-sans-serif, sans-serif; } .ds-glass-title { margin: 0; font-size: 34px; font-weight: 700; line-height: 1.05; letter-spacing: -0.035em; } .ds-glass-body { margin: 8px 0 0; font-size: 14px; font-weight: 500; color: var(--muted-foreground, #a3abc0); }"
+    },
+    {
+      "name": "Saving Figure",
+      "kind": "custom",
+      "refersTo": "glass-panel",
+      "description": "The dock's signature: an oversized saving whose sign alone carries the accent.",
+      "html": "<p class=\"ds-saving\"><span class=\"ds-saving-figure\"><span class=\"ds-saving-sign\">−</span>96%</span><span class=\"ds-saving-meta\"><span>4.0 MB → 154 KB</span><span class=\"ds-saving-sub\">3 of 3 files ready</span></span></p>",
+      "css": ".ds-saving { display: flex; align-items: center; gap: 24px; margin: 0; font-family: 'Sora Variable', 'Onest Variable', ui-sans-serif, sans-serif; color: var(--foreground, #eef1f8); } .ds-saving-figure { font-size: 60px; font-weight: 800; line-height: 1; letter-spacing: -0.06em; font-variant-numeric: tabular-nums; } .ds-saving-sign { color: var(--primary, #8fd3c4); } .ds-saving-meta { display: flex; flex-direction: column; font-size: 15px; font-variant-numeric: tabular-nums; } .ds-saving-sub { color: var(--muted-foreground, #a3abc0); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Polar Night",
+    "overview": "A calm night sky with a tool in it. The ground is near-black, a muted aurora hangs behind everything, and every working surface is one material: frosted glass that lets the aurora glow through. Colour is spent sparingly so the only things that stand out are the files and the saving. The user asked for nothing that hurts the eyes; that request is a system invariant, not a mood.\n\nDensity is moderate and single-column: one centred column of glass panels, each doing one job, with a glass dock pinned to the bottom of the window when there are results. Type is one family throughout, heavy and tightly tracked at display sizes, medium weight for reading. Motion is soft and short: rise-and-fade for the dialog, a small lift when the saving figure changes, a count-up on the figure itself.\n\nThe world refuses both the white-box-with-indigo default and loud neon dark mode.",
+    "keyCharacteristics": [
+      "Near-black ground with a heavily blurred, low-opacity aurora fixed behind the page.",
+      "Frosted glass is the only surface material; panels, tabs, dock and dialog all share it.",
+      "One accent (polar mint) for the primary action, progress and saving; amber and rose only carry status.",
+      "Selection is a light pill (starlight on night), never an accent fill.",
+      "Pills and rounded rectangles only; the edge-pinned dock is the one square-cornered surface.",
+      "Sora for everything, Onest filling the glyphs Sora lacks."
+    ],
+    "rules": [
+      { "name": "The One Mint Rule", "body": "Polar mint is the only accent. It marks the primary action, progress and saving; nothing else gets a hue.", "section": "colors" },
+      { "name": "The Outlined Status Rule", "body": "Status pills are outlined in their status colour on a transparent ground, never filled.", "section": "colors" },
+      { "name": "The Light Pill Rule", "body": "A chosen option (segment, language, final download) is a starlight pill with night text. Mint fills mean on, done or in progress (the primary action, progress bars, slider fill, the switch when on, the active tab's count), never chosen-among-options.", "section": "colors" },
+      { "name": "The Tabular Numbers Rule", "body": "Every size, percentage, count and dimension uses tabular figures so values do not jitter while files finish.", "section": "typography" },
+      { "name": "The Glyph Fallback Rule", "body": "Keep Onest in every Sora stack; the minus (−) and arrow (→) the product prints everywhere come from it.", "section": "typography" },
+      { "name": "The One Material Rule", "body": "Glass is the only surface. New panels use the same fill, rim, blur and shadow; no opaque cards. The only tint is mint at 10% (with a 30% mint border where bordered), reserved for the drop zone while dragging and the privacy note.", "section": "elevation" },
+      { "name": "The Aurora Stays Behind Rule", "body": "Aurora colour exists only in the fixed, blurred background layers. It never becomes a fill, border or gradient on a component.", "section": "elevation" },
+      { "name": "The Nested Radius Rule", "body": "An inner shape's radius is its container's radius minus the inset, so 24 → 18 → 16 → 14 → 10 steps down as elements nest.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do build every new surface from the glass material: glass fill, 1px glass edge, 26px backdrop blur, 24px radius, the Glass shadow.",
+      "Do keep polar mint for the one primary action, progress, saving and focus.",
+      "Do show selection as a starlight pill with night text.",
+      "Do outline status pills in their status colour: mist queued, amber working, mint done, rose failed.",
+      "Do use tabular figures for every size, percentage and count, and keep Onest in the font stack for − and →.",
+      "Do nest radii by subtracting the inset (24 → 18 → 16 → 14 → 10) and make anything pressable a pill.",
+      "Do keep motion soft and short on the soft ease (cubic-bezier(0.22, 1, 0.36, 1)), and collapse it under reduced motion."
+    ],
+    "donts": [
+      "Don't add a second accent or use aurora hues on components; the aurora stays blurred behind the glass.",
+      "Don't fill status pills or use amber and rose for anything but working, growth and failure.",
+      "Don't use opaque cards, tint panels in any colour but the 10% mint of the drag-over zone and privacy note, or stack extra shadows to create depth.",
+      "Don't use sharp corners on buttons, controls or floating panels; only the dock, pinned flush to the window edge, goes square.",
+      "Don't go bright or neon: no saturated glows, no high-chroma fills. The palette stays discreet by request.",
+      "Don't fall back to a white page with an indigo accent."
+    ]
+  }
+}

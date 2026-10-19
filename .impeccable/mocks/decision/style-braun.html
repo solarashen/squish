@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish · functional</title>
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--body:#e4e4e1;--face:#f3f3f1;--dark:#2a2a2a;--grey:#6a6a66;--orange:#e85d10;--green:#3aa760;--line:#cfcfcb}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--body);color:var(--dark);font:500 14px/1.45 "Albert Sans",sans-serif;display:grid;place-items:center}
+/* the whole tool is one object: a quiet appliance with a single orange key */
+.unit{width:1240px;height:760px;background:var(--face);border-radius:28px;box-shadow:0 1px 0 #fff inset,0 30px 60px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.08);display:grid;grid-template-rows:72px 1fr;overflow:hidden}
+.top{display:flex;align-items:center;gap:20px;padding:0 34px;border-bottom:1px solid var(--line)}
+.logo{font:800 22px "Albert Sans";letter-spacing:-.02em}
+.led{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(58,167,96,.18)}
+.top small{color:var(--grey)}
+.top nav{margin-left:auto;display:flex;gap:6px}
+.key{display:inline-grid;place-items:center;min-width:44px;height:34px;padding:0 14px;border-radius:9px;background:#fbfbfa;border:1px solid var(--line);box-shadow:0 2px 0 #d6d6d2;font-weight:600;font-size:13px}
+.key.on{background:var(--dark);color:#fff;border-color:var(--dark);box-shadow:0 2px 0 #000}
+.main{display:grid;grid-template-columns:1fr 1px 380px}
+.sep{background:var(--line)}
+.l{padding:30px 34px;display:flex;flex-direction:column;gap:22px}
+/* speaker-grille perforation marks the drop area */
+.drop{flex:none;height:250px;border-radius:20px;background:radial-gradient(circle,#c9c9c5 2.2px,transparent 2.6px) 0 0/16px 16px,#ececea;display:grid;place-items:center;text-align:center;position:relative}
+.drop .face{background:var(--face);border-radius:16px;padding:22px 30px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.drop b{display:block;font:700 22px "Albert Sans";letter-spacing:-.01em}
+.drop span{color:var(--grey)}
+.drop .key{margin-top:14px}
+.tabs{display:flex;gap:6px}
+.list{border-top:1px solid var(--line)}
+.f{display:grid;grid-template-columns:44px 1fr 120px 64px;gap:14px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.f i{width:44px;height:34px;border-radius:8px}
+.f small{color:var(--grey)}
+.meter{display:flex;gap:2px}.meter u{flex:1;height:10px;border-radius:2px;background:var(--line)}.meter u.on{background:var(--dark)}
+.f b{text-align:right;font-weight:800;font-size:16px}
+.r{padding:30px 34px;display:flex;flex-direction:column;gap:16px;background:#efefec}
+.display{background:var(--dark);color:#f3f3f1;border-radius:14px;padding:18px 20px}
+.display small{color:#a5a5a0;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.display .n{font:800 84px/.95 "Albert Sans";letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.display p{color:#cfcfca}
+.lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
+.row{display:flex;gap:6px}.row .key{flex:1}
+.dial{display:flex;align-items:center;gap:14px}
+.knob{width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#dcdcd8);border:1px solid var(--line);box-shadow:0 3px 6px rgba(0,0,0,.12);position:relative}
+.knob::after{content:"";position:absolute;left:50%;top:6px;width:3px;height:14px;margin-left:-1.5px;border-radius:2px;background:var(--orange);transform-origin:50% 21px;transform:rotate(100deg)}
+.scale{flex:1;display:flex;justify-content:space-between;color:var(--grey);font-size:12px;border-top:1px solid var(--line);padding-top:6px}
+.go{margin-top:auto;height:58px;border-radius:14px;background:var(--orange);color:#fff;display:grid;place-items:center;font:700 17px "Albert Sans";box-shadow:0 3px 0 #b8470b}
+</style>
+</head>
+<body>
+<div class="unit">
+ <div class="top"><span class="logo">squish</span><span class="led"></span><small>Local processing · nothing is uploaded</small>
+  <nav><span class="key">How it works</span><span class="key">About</span><span class="key on">EN</span><span class="key">HR</span></nav></div>
+ <div class="main">
+  <section class="l">
+   <div class="drop"><div class="face"><b>Drop files here</b><span>Images, video, audio · up to 50 · or Ctrl+V</span><br><span class="key on">Choose files</span></div></div>
+   <div class="tabs"><span class="key on">Images · 3</span><span class="key">Video</span><span class="key">Audio</span></div>
+   <div class="list">
+    <div class="f"><i style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><div>diploma_scan.png<br><small>9.1 → 2.6 MB · PNG → WebP</small></div><div class="meter"><u class="on"></u><u class="on"></u><u class="on"></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u></div><b>−71%</b></div>
+    <div class="f"><i style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><div>beach_split.jpg<br><small>6.8 → 1.4 MB · JPG → WebP</small></div><div class="meter"><u class="on"></u><u class="on"></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u></div><b>−79%</b></div>
+    <div class="f"><i style="background:linear-gradient(180deg,#f5d0d6,#c46a7c)"></i><div>cv_photo.jpg<br><small>1.9 → 0.4 MB · JPG → WebP</small></div><div class="meter"><u class="on"></u><u class="on"></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u><u></u></div><b>−79%</b></div>
+   </div>
+  </section>
+  <div class="sep"></div>
+  <aside class="r">
+   <div class="display"><small>Saved</small><div class="n">−76%</div><p>17.8 MB → 4.4 MB · 3 files</p></div>
+   <div><p class="lab">Format</p><div class="row"><span class="key">JPEG</span><span class="key on">WebP</span><span class="key">PNG</span><span class="key">AVIF</span></div></div>
+   <div><p class="lab">Quality</p><div class="dial"><div class="knob"></div><div class="scale"><span>10</span><span>50</span><span><b style="color:var(--dark)">78</b></span><span>100</span></div></div></div>
+   <div><p class="lab">Max width</p><div class="row"><span class="key">Original</span><span class="key on">1920</span><span class="key">1280</span></div></div>
+   <div class="go">Download all (.zip)</div>
+  </aside>
+ </div>
+</div>
+</body>
+</html>

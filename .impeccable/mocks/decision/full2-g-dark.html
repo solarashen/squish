@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish · dark</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c0b10;--s1:#131219;--s2:#1b1a23;--line:#2a2833;--fg:#f1eff7;--muted:#a19dae;--pink:#ff8fc7;--lemon:#ffe66d;--mint:#9be8bf;--red:#ff8a80}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font:500 15px/1.45 Onest,sans-serif;position:relative}
+/* one quiet light source at the top, painted as a background, never as a glow on elements */
+body::before{content:"";position:absolute;left:180px;top:-420px;width:1080px;height:700px;background:radial-gradient(closest-side,rgba(255,143,199,.22),rgba(140,110,255,.12) 55%,transparent);pointer-events:none}
+.page{position:relative;padding:20px 40px}
+header{display:flex;align-items:center;gap:22px;height:52px}
+.logo{font:800 24px Onest;letter-spacing:-.04em}.logo i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--pink);margin-left:3px}
+nav{display:flex;gap:4px}nav span{padding:7px 12px;border-radius:8px;color:var(--muted);font-size:14px}nav span:hover{color:var(--fg)}
+.loc{margin-left:auto;display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px}.loc i{width:7px;height:7px;border-radius:50%;background:var(--mint)}
+.lang{display:flex;border:1px solid var(--line);border-radius:9px;padding:2px}.lang b{padding:5px 11px;border-radius:7px;font-size:12px;color:var(--muted)}.lang b.on{background:var(--fg);color:var(--bg)}
+.grid{display:grid;grid-template-columns:1fr 380px;gap:20px;margin-top:22px}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:18px}
+.hero{padding:30px 32px}
+.hero h1{font:800 40px/1.02 Onest;letter-spacing:-.04em}
+.hero h1 span{color:var(--muted)}
+.steps{display:flex;gap:20px;margin-top:14px;font-size:13px;color:var(--muted)}
+.steps span{display:flex;align-items:center;gap:8px}.steps b{width:20px;height:20px;border-radius:6px;border:1px solid var(--line);display:grid;place-items:center;color:var(--fg);font-size:11px}
+/* drop zone: dashed hairline that brightens on hover; the only pink on screen is the primary action */
+.zone{margin-top:22px;border:1px dashed #4a4655;border-radius:14px;padding:26px;display:flex;align-items:center;gap:18px;background:repeating-linear-gradient(135deg,transparent 0 12px,rgba(255,255,255,.015) 12px 24px)}
+.up{width:48px;height:48px;border-radius:12px;background:var(--s2);border:1px solid var(--line);display:grid;place-items:center;font:700 20px Onest}
+.zone strong{display:block;font-size:17px}.zone span{color:var(--muted);font-size:13px}
+.zone .kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;font-size:12px;color:var(--fg)}
+.zone .up{font-size:20px;color:var(--fg)}.zone .btn{color:#1a0d14;font-size:15px}
+.btn{margin-left:auto;background:var(--pink);color:#1a0d14;border-radius:10px;padding:12px 18px;font-weight:700}
+.bar{display:flex;align-items:center;gap:10px;margin-top:18px}
+.tabs{display:flex;border:1px solid var(--line);border-radius:11px;padding:3px;background:var(--s1)}
+.tabs span{padding:7px 14px;border-radius:8px;font-size:14px;color:var(--muted);display:flex;gap:7px;align-items:center}.tabs .on{background:var(--s2);color:var(--fg);box-shadow:0 0 0 1px var(--line) inset}
+.tabs small{font-size:11px;background:var(--fg);color:var(--bg);border-radius:5px;padding:0 5px;font-weight:700}
+.bar .sum{margin-left:auto;color:var(--muted);font-size:13px}
+.files{margin-top:10px}
+.f{display:grid;grid-template-columns:44px 1.7fr 1fr 64px 88px 32px;gap:16px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}.f:last-child{border:0}
+.th{width:44px;height:44px;border-radius:10px}
+.f small{display:block;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.pg{height:4px;border-radius:2px;background:var(--s2)}.pg i{display:block;height:100%;border-radius:2px;background:var(--fg)}
+.pc{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.st{justify-self:end;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;color:var(--muted)}.st i{width:7px;height:7px;border-radius:50%}
+.x{color:var(--muted);text-align:center}
+.panel{padding:24px;display:flex;flex-direction:column;gap:16px}
+.panel h2{font-size:14px;color:var(--muted);font-weight:600}
+.big{font:800 92px/.9 Onest;letter-spacing:-.06em;font-variant-numeric:tabular-nums}
+.big span{background:var(--lemon);color:#141418;border-radius:14px;padding:6px 12px 2px;display:inline-block}
+.mut{color:var(--muted);font-size:14px}
+/* a tiny before/after bar: two widths, nothing more */
+.cmp{display:grid;gap:6px}.cmp div{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}.cmp u{height:8px;border-radius:4px;background:#3a3746}.cmp u.a{background:var(--fg)}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;padding:3px}.seg b{flex:1;text-align:center;padding:7px 0;border-radius:7px;font-size:13px;font-weight:600;color:var(--muted)}.seg b.on{background:var(--fg);color:var(--bg)}
+.sl{height:4px;border-radius:2px;background:var(--s2);position:relative;margin-top:12px}.sl::before{content:"";position:absolute;inset:0 22% 0 0;border-radius:2px;background:var(--fg)}.sl::after{content:"";position:absolute;left:78%;top:-7px;width:18px;height:18px;border-radius:50%;background:var(--fg);margin-left:-9px;border:3px solid var(--bg)}
+.dl{margin-top:auto;text-align:center;padding:14px;border-radius:11px;background:var(--fg);color:var(--bg);font-weight:700}
+.dl small{color:#45424f;font-weight:600;margin-left:6px}
+</style>
+</head>
+<body>
+<div class="page">
+ <header><span class="logo">squish<i></i></span><nav><span>How it works</span><span>About</span></nav><span class="loc"><i></i>Processed on this device</span><span class="lang"><b class="on">EN</b><b>HR</b></span></header>
+ <div class="grid">
+  <section>
+   <div class="card hero">
+    <h1>Smaller files. <span>Same look.</span></h1>
+    <div class="steps"><span><b>1</b>Add files</span><span><b>2</b>Pick format and quality</span><span><b>3</b>Download</span></div>
+    <div class="zone"><span class="up">↑</span><div><strong>Drop images, video or audio</strong><span>Up to 50 files · or paste with <span class="kbd">Ctrl</span> <span class="kbd">V</span></span></div><span class="btn">Choose files</span></div>
+   </div>
+   <div class="bar"><div class="tabs"><span class="on">Images <small>4</small></span><span>Video</span><span>Audio</span></div><span class="sum">2 done · 1 working · 1 failed</span></div>
+   <div class="card files">
+    <div class="f"><i class="th" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><div>diploma_scan.png<small>9.1 MB → 2.6 MB · PNG → WebP</small></div><div class="pg"><i style="width:100%"></i></div><span class="pc">−71%</span><span class="st"><i style="background:var(--mint)"></i>Done</span><span class="x">↓</span></div>
+    <div class="f"><i class="th" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><div>beach_split.jpg<small>6.8 MB → 1.4 MB · JPG → WebP</small></div><div class="pg"><i style="width:100%"></i></div><span class="pc">−79%</span><span class="st"><i style="background:var(--mint)"></i>Done</span><span class="x">↓</span></div>
+    <div class="f"><i class="th" style="background:linear-gradient(120deg,#cfd6df,#6b7686)"></i><div>screenshot_osijek.png<small>2.4 MB · converting</small></div><div class="pg"><i style="width:62%;background:var(--lemon)"></i></div><span class="pc" style="color:var(--muted)">62%</span><span class="st"><i style="background:var(--lemon)"></i>Working</span><span class="x">✕</span></div>
+    <div class="f"><i class="th" style="background:var(--s2)"></i><div>plitvice.heic<small style="color:var(--red)">Can't open HEIC here. Convert to JPG first.</small></div><div class="pg"></div><span class="pc">—</span><span class="st"><i style="background:var(--red)"></i>Failed</span><span class="x">↻</span></div>
+   </div>
+  </section>
+  <aside class="card panel">
+   <h2>Your images</h2>
+   <div class="big"><span>−76%</span></div>
+   <div class="cmp"><div><u style="width:100%"></u></div><div><u class="a" style="width:24%"></u>17.8 MB → 4.4 MB</div></div>
+   <div><label>Convert to</label><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b><b>AVIF</b></div></div>
+   <div><label>Quality · 78</label><div class="sl"></div></div>
+   <div><label>Max width</label><div class="seg"><b>Original</b><b class="on">1920</b><b>1280</b></div></div>
+   <span class="dl">Download all<small>2 files · .zip</small></span>
+  </aside>
+ </div>
+</div>
+</body>
+</html>

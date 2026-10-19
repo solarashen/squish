@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish · layout A, one column</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#ebeae6;--card:#f6f5f2;--red:#c8261a;--ink:#111;--grey:#55534e}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--paper);color:var(--ink);font:500 15px/1.45 Archivo,sans-serif}
+.d{font-family:Anton;text-transform:uppercase}
+header{height:70px;display:flex;align-items:center;gap:20px;padding:0 40px;border-bottom:4px solid var(--ink);position:relative;overflow:hidden}
+header::before{content:"";position:absolute;left:-40px;top:-20px;width:280px;height:120px;background:var(--red);transform:skewX(-24deg)}
+.logo{position:relative;font-size:40px;color:var(--paper)}
+nav{margin-left:auto;display:flex;gap:18px;font:800 12px Archivo;letter-spacing:.12em;text-transform:uppercase}
+nav b{background:var(--ink);color:var(--paper);padding:4px 8px}
+/* one centred column, read top to bottom: drop → settings strip → files; download pinned at the bottom */
+.col{width:920px;margin:0 auto;padding:26px 0 120px}
+.drop{position:relative;overflow:hidden;background:var(--card);border:4px dashed var(--ink);padding:30px;display:flex;align-items:center;gap:26px}
+.drop::after{content:"";position:absolute;right:-50px;top:-50px;width:140px;height:140px;background:var(--red);transform:rotate(45deg)}
+.arrow{width:72px;height:72px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font:44px Anton}
+.drop h1{font-size:42px;line-height:1}.drop p{color:var(--grey)}
+.btn{margin-left:auto;position:relative;z-index:1;background:var(--ink);color:var(--paper);font:800 13px Archivo;letter-spacing:.08em;text-transform:uppercase;padding:15px 20px;box-shadow:5px 5px 0 var(--red)}
+.strip{margin-top:18px;display:grid;grid-template-columns:auto 1fr 1fr 1fr;border:3px solid var(--ink);background:var(--card)}
+.strip>div{padding:12px 16px;border-left:3px solid var(--ink)}.strip>div:first-child{border:0;background:var(--ink);color:var(--paper);display:flex;align-items:center;font:800 12px Archivo;letter-spacing:.12em;text-transform:uppercase}
+.lab{font:800 11px Archivo;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
+.seg{display:flex}.seg b{flex:1;text-align:center;padding:6px 0;border:2px solid var(--ink);margin-left:-2px;font-weight:800;font-size:13px}.seg b:first-child{margin-left:0}.seg b.on{background:var(--ink);color:var(--paper)}
+.track{height:8px;background:#d3d1cb;position:relative;margin-top:12px}.track i{position:absolute;inset:0 22% 0 0;background:var(--red)}.track s{position:absolute;left:78%;top:-7px;width:10px;height:22px;background:var(--ink)}
+.tabs{display:flex;margin-top:26px;border-bottom:4px solid var(--ink)}.tabs span{font:800 13px Archivo;letter-spacing:.08em;text-transform:uppercase;padding:10px 20px;border:3px solid var(--ink);border-bottom:0;margin-right:-3px;background:var(--card)}.tabs .on{background:var(--ink);color:var(--paper)}
+.row{display:grid;grid-template-columns:48px 1fr 180px 70px 90px;gap:16px;align-items:center;padding:11px 16px;background:var(--card);border:3px solid var(--ink);border-top:0}
+.th{width:48px;height:38px;border:2px solid var(--ink)}.row small{color:var(--grey)}
+.bar{height:8px;background:#d3d1cb;position:relative}.bar i{position:absolute;inset:0 auto 0 0;background:var(--ink)}
+.pct{font:28px Anton;text-align:right}.st{justify-self:end;font:800 11px Archivo;letter-spacing:.1em;padding:4px 8px;background:var(--ink);color:var(--paper)}
+.dock{position:fixed;left:0;right:0;bottom:0;height:92px;background:var(--ink);color:var(--paper);display:flex;align-items:center;gap:30px;padding:0 260px}
+.dock .big{font:72px/1 Anton;color:var(--red)}
+.dock p{font-weight:600}.dock p span{color:#b9b6ae;display:block;font-weight:500}
+.dl{margin-left:auto;background:var(--red);padding:16px 26px;font:24px Anton;text-transform:uppercase}
+</style>
+</head>
+<body>
+<header><span class="logo d">Squish</span><nav><span>How it works</span><span>About</span><b>EN</b><span>HR</span></nav></header>
+<div class="col">
+ <div class="drop"><div class="arrow">↓</div><div><h1 class="d">Drop files here</h1><p>Images, video, audio · up to 50 · or Ctrl+V · nothing is uploaded</p></div><span class="btn">Choose files</span></div>
+ <div class="strip"><div>Settings</div>
+  <div><p class="lab">Convert to</p><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b><b>AVIF</b></div></div>
+  <div><p class="lab">Quality · 78</p><div class="track"><i></i><s></s></div></div>
+  <div><p class="lab">Max width</p><div class="seg"><b>Orig.</b><b class="on">1920</b><b>1280</b></div></div></div>
+ <div class="tabs"><span class="on">Images 3</span><span>Video</span><span>Audio</span></div>
+ <div class="row"><i class="th" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><div><b>diploma_scan.png</b><br><small>9.1 → 2.6 MB · PNG → WebP</small></div><div class="bar"><i style="width:100%"></i></div><span class="pct">−71%</span><span class="st">DONE</span></div>
+ <div class="row"><i class="th" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><div><b>beach_split.jpg</b><br><small>6.8 → 1.4 MB · JPG → WebP</small></div><div class="bar"><i style="width:100%"></i></div><span class="pct">−79%</span><span class="st">DONE</span></div>
+ <div class="row"><i class="th" style="background:linear-gradient(120deg,#cfd6df,#6b7686)"></i><div><b>screenshot.png</b><br><small>2.4 MB · converting</small></div><div class="bar"><i style="width:62%;background:var(--red)"></i></div><span class="pct" style="color:var(--grey)">62%</span><span class="st" style="background:#fff;color:var(--ink);border:2px solid var(--ink)">WORKING</span></div>
+</div>
+<div class="dock"><span class="big">−76%</span><p>17.8 MB → 4.4 MB<span>2 of 3 done</span></p><span class="dl">Download all ↓</span></div>
+</body>
+</html>

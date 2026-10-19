@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f4f6fb;--pink:#ff9ec4;--aqua:#8fdcd6;--blue:#9db8ff;--ink:#1d1b3a;--muted:#4f4d6b;--line:#1d1b3a}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--paper);color:var(--ink);font:500 15px/1.45 "Bricolage Grotesque",sans-serif}
+header{display:flex;align-items:center;gap:36px;padding:20px 48px;border-bottom:2px solid var(--line)}
+.logo{font:800 40px/1 "Bricolage Grotesque";letter-spacing:-.04em;position:relative}
+.logo span{position:relative;z-index:1}
+.logo::after{content:"";position:absolute;left:6px;right:-6px;bottom:2px;height:16px;background:var(--pink);mix-blend-mode:multiply}
+nav{display:flex;gap:24px;font-weight:600;color:var(--muted)}nav .on{color:var(--ink)}
+.loc{margin-left:auto;font-weight:600}
+.lang{display:flex;border:2px solid var(--line)}.lang b{padding:5px 12px;font-size:13px}.lang b.on{background:var(--ink);color:#fff}
+.grid{display:grid;grid-template-columns:400px 1fr;height:822px}
+.side{background:var(--aqua);padding:32px;border-right:2px solid var(--line)}
+.drop{background:#fff;border:2px solid var(--line);padding:24px;box-shadow:10px 10px 0 var(--pink)}
+.drop h2{font:800 30px/1 "Bricolage Grotesque";letter-spacing:-.03em}
+.drop p{color:var(--muted);margin:8px 0 16px}
+.btn{display:inline-block;background:var(--ink);color:#fff;padding:11px 20px;font-weight:700}
+label{display:block;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin:24px 0 8px}
+.seg{display:flex;border:2px solid var(--line);background:#fff}.seg b{flex:1;text-align:center;padding:8px 0;border-right:2px solid var(--line)}.seg b:last-child{border:0}.seg b.on{background:var(--pink)}
+.sl{height:10px;background:#fff;border:2px solid var(--line);position:relative}
+.sl::before{content:"";position:absolute;inset:0 22% 0 0;background:var(--blue)}
+.sl::after{content:"";position:absolute;left:78%;top:-9px;width:24px;height:24px;border-radius:50%;background:var(--pink);border:2px solid var(--line);margin-left:-12px}
+.in{background:#fff;border:2px solid var(--line);padding:8px 12px;font-weight:600}
+.main{padding:32px 44px}
+.hero{display:flex;align-items:center;gap:32px}
+.big{font:800 150px/.8 "Bricolage Grotesque";letter-spacing:-.05em;position:relative}
+.big span{position:relative;z-index:1}
+.big::before{content:"−71%";position:absolute;left:8px;top:8px;color:var(--blue);mix-blend-mode:multiply}
+.hm b{display:block;font-size:24px;font-weight:800}.hm span{color:var(--muted)}
+.dl{margin-left:auto;background:var(--pink);border:2px solid var(--line);padding:14px 22px;font-weight:800;font-size:17px}
+.list{margin-top:26px;border-top:2px solid var(--line)}
+.r{display:grid;grid-template-columns:56px 1.6fr .7fr .7fr 1.6fr 110px;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(29,27,58,.18);font-variant-numeric:tabular-nums}
+.r i{width:56px;height:42px;display:block}
+.r small{display:block;color:var(--muted);font-size:13px}
+.ov{position:relative;height:16px}
+.ov .a{position:absolute;left:0;top:0;height:16px;width:100%;background:var(--blue);opacity:.55}
+.ov .b{position:absolute;left:0;top:0;height:16px;background:var(--pink);mix-blend-mode:multiply}
+.tag{font-weight:700;font-size:13px;padding:4px 10px;border:2px solid var(--line);text-align:center}
+</style>
+</head>
+<body>
+<header><div class="logo"><span>squish</span></div><nav><span class="on">Convert</span><span>How it works</span><span>About</span></nav><div class="loc">Runs on your device. Nothing is uploaded.</div><div class="lang"><b class="on">EN</b><b>HR</b></div></header>
+<div class="grid">
+ <aside class="side">
+  <div class="drop"><h2>Drop images here</h2><p>JPEG, PNG, WebP, GIF, BMP. Up to 50.</p><span class="btn">Choose files</span></div>
+  <label>Convert to</label><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b><b>AVIF</b></div>
+  <label>Quality · 78</label><div class="sl"></div>
+  <label>Resize (px)</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="in">1920</div><div class="in">auto</div></div>
+ </aside>
+ <section class="main">
+  <div class="hero"><div class="big"><span>−71%</span></div><div class="hm"><b>24.6 MB → 7.1 MB</b><span>6 images · 4 done · 1 failed</span></div><span class="dl">Download all (.zip)</span></div>
+  <div class="list">
+   <div class="r"><i style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><span>beach_split.jpg<small>4032 × 3024 → 1920 × 1440</small></span><span>6.8 MB</span><b>1.4 MB</b><div class="ov"><i class="a"></i><i class="b" style="width:21%"></i></div><span class="tag" style="background:var(--aqua)">Done</span></div>
+   <div class="r"><i style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><span>diploma_scan.png<small>2480 × 3508 → 1358 × 1920</small></span><span>9.1 MB</span><b>2.6 MB</b><div class="ov"><i class="a"></i><i class="b" style="width:29%"></i></div><span class="tag" style="background:var(--aqua)">Done</span></div>
+   <div class="r"><i style="background:linear-gradient(140deg,#7bbf8f,#2f6b47)"></i><span>plitvice.heic<small>Format not supported by this browser</small></span><span>3.2 MB</span><b>—</b><div class="ov"><i class="a"></i></div><span class="tag" style="background:#ffc9b8">Retry</span></div>
+   <div class="r"><i style="background:linear-gradient(180deg,#f5d0d6,#c46a7c)"></i><span>cv_photo.jpg<small>1200 × 1600, no resize</small></span><span>1.9 MB</span><b>0.4 MB</b><div class="ov"><i class="a"></i><i class="b" style="width:21%"></i></div><span class="tag" style="background:var(--aqua)">Done</span></div>
+   <div class="r"><i style="background:linear-gradient(120deg,#cfd6df,#6b7686)"></i><span>screenshot_osijek.png<small>2880 × 1800 → 1920 × 1200</small></span><span>2.4 MB</span><b>0.9 MB</b><div class="ov"><i class="a"></i><i class="b" style="width:38%"></i></div><span class="tag" style="background:#fff3b0">Working</span></div>
+   <div class="r"><i style="background:linear-gradient(170deg,#ffe08a,#e8402a)"></i><span>poster_final.png<small>3000 × 4000 → 1440 × 1920</small></span><span>1.2 MB</span><b>—</b><div class="ov"><i class="a"></i></div><span class="tag" style="background:#fff">Queued</span></div>
+  </div>
+ </section>
+</div>
+</body>
+</html>

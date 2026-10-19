@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--sky:#cfe3ff;--mint:#c9f0dc;--peach:#ffd9c7;--lilac:#e2d6ff;--butter:#fff1b8;--ink:#23243a;--muted:#55586e;--blue:#3d5bd9;--line:rgba(35,36,58,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:#f7f8fc;color:var(--ink);font:500 15px/1.45 Barlow,sans-serif}
+header{height:72px;background:var(--sky);display:flex;align-items:center;gap:40px;padding:0 40px;border-bottom:1px solid var(--line)}
+.logo{font:800 34px/1 "Barlow Condensed";color:var(--blue)}
+nav{display:flex;gap:28px;font:700 15px "Barlow Condensed";letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+nav .on{color:var(--ink);border-bottom:3px solid var(--blue);padding-bottom:4px}
+.loc{margin-left:auto;font-weight:600;color:var(--ink)}
+.lang{display:flex;background:#fff;border-radius:999px;padding:3px;font:700 13px "Barlow Condensed";letter-spacing:.08em}
+.lang b{padding:5px 12px;border-radius:999px}.lang b.on{background:var(--blue);color:#fff}
+.sheet{display:grid;grid-template-columns:repeat(4,1fr);height:828px}
+.p{padding:30px;border-right:1px dashed var(--line)}
+.p1{background:var(--mint)}.p2{background:#fff;grid-column:span 3;padding:32px 40px}
+.drop{border:2px dashed var(--ink);border-radius:18px;background:rgba(255,255,255,.6);padding:26px;text-align:center}
+.drop h2{font:800 26px "Barlow Condensed"}
+.drop p{color:var(--muted);font-size:14px;margin:4px 0 14px}
+.btn{display:inline-block;background:var(--ink);color:#fff;border-radius:999px;padding:10px 20px;font:700 15px "Barlow Condensed";letter-spacing:.06em;text-transform:uppercase}
+label{display:block;font:700 13px "Barlow Condensed";letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:24px 0 8px}
+.seg{display:flex;background:#fff;border-radius:999px;padding:3px}
+.seg b{flex:1;text-align:center;padding:7px 0;border-radius:999px;font:700 15px "Barlow Condensed"}.seg b.on{background:var(--ink);color:#fff}
+.sl{height:8px;border-radius:4px;background:#fff;position:relative}
+.sl::before{content:"";position:absolute;inset:0 22% 0 0;border-radius:4px;background:var(--blue)}
+.sl::after{content:"";position:absolute;left:78%;top:-7px;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--blue);margin-left:-11px}
+.in{background:#fff;border-radius:12px;padding:9px 14px;font-weight:600}
+.top{display:flex;align-items:flex-end;gap:30px;padding-bottom:20px;border-bottom:2px solid var(--ink)}
+.big{font:800 140px/.82 "Barlow Condensed";letter-spacing:-.03em;color:var(--blue)}
+.meta b{font:700 22px "Barlow Condensed";display:block}.meta span{color:var(--muted)}
+.scale{margin-left:auto;text-align:right}.scale b{font:800 40px "Barlow Condensed"}
+.dl{background:var(--blue);color:#fff;border-radius:999px;padding:14px 24px;font:700 17px "Barlow Condensed";letter-spacing:.06em;text-transform:uppercase}
+table{width:100%;border-collapse:collapse;margin-top:16px}
+th{text-align:left;font:700 13px "Barlow Condensed";letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:8px 10px}
+td{padding:11px 10px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.t{display:block;width:52px;height:40px;border-radius:8px}
+.n{font-weight:600}.n small{display:block;color:var(--muted);font-weight:500;font-size:13px}
+.fold{display:flex;gap:3px;width:200px;height:14px}.fold i{flex:1;border-radius:3px;background:var(--blue)}.fold i.o{background:#e7e9f3}
+.st{font:700 13px "Barlow Condensed";letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:999px;color:var(--ink)}
+.ok{background:var(--mint)}.wk{background:var(--butter)}.er{background:var(--peach)}.q{background:var(--lilac)}
+</style>
+</head>
+<body>
+<header><div class="logo">squish</div><nav><span class="on">Convert</span><span>How it works</span><span>About</span></nav><div class="loc">Processed on your device. Nothing is uploaded.</div><div class="lang"><b class="on">EN</b><b>HR</b></div></header>
+<main class="sheet">
+ <aside class="p p1">
+  <div class="drop"><h2>Drop images here</h2><p>JPEG, PNG, WebP, GIF, BMP. Up to 50 files.</p><span class="btn">Choose files</span></div>
+  <label>Convert to</label><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b><b>AVIF</b></div>
+  <label>Quality · 78</label><div class="sl"></div>
+  <label>Resize (px)</label><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="in">1920</div><div class="in">auto</div></div>
+ </aside>
+ <section class="p p2">
+  <div class="top"><div class="big">−71%</div><div class="meta"><b>24.6 MB → 7.1 MB</b><span>6 images, 4 done, 1 failed</span></div><div class="scale"><b>1 : 3.5</b></div><span class="dl">Download all (.zip)</span></div>
+  <table>
+   <tr><th></th><th>File</th><th>Before</th><th>After</th><th>Folded size</th><th>Scale</th><th>Status</th></tr>
+   <tr><td><i class="t" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i></td><td class="n">beach_split.jpg<small>4032 × 3024 → 1920 × 1440</small></td><td>6.8 MB</td><td>1.4 MB</td><td><div class="fold"><i></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i></div></td><td>1 : 4.9</td><td><span class="st ok">Done</span></td></tr>
+   <tr><td><i class="t" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i></td><td class="n">diploma_scan.png<small>2480 × 3508 → 1358 × 1920</small></td><td>9.1 MB</td><td>2.6 MB</td><td><div class="fold"><i></i><i></i><i class="o"></i><i class="o"></i><i class="o"></i></div></td><td>1 : 3.5</td><td><span class="st ok">Done</span></td></tr>
+   <tr><td><i class="t" style="background:linear-gradient(140deg,#7bbf8f,#2f6b47)"></i></td><td class="n">plitvice.heic<small>Format not supported by this browser</small></td><td>3.2 MB</td><td>—</td><td><div class="fold"><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i></div></td><td>—</td><td><span class="st er">Retry</span></td></tr>
+   <tr><td><i class="t" style="background:linear-gradient(180deg,#f5d0d6,#c46a7c)"></i></td><td class="n">cv_photo.jpg<small>1200 × 1600, no resize</small></td><td>1.9 MB</td><td>0.4 MB</td><td><div class="fold"><i></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="o"></i></div></td><td>1 : 4.8</td><td><span class="st ok">Done</span></td></tr>
+   <tr><td><i class="t" style="background:linear-gradient(120deg,#cfd6df,#6b7686)"></i></td><td class="n">screenshot_osijek.png<small>2880 × 1800 → 1920 × 1200</small></td><td>2.4 MB</td><td>0.9 MB</td><td><div class="fold"><i></i><i></i><i class="o"></i><i class="o"></i><i class="o"></i></div></td><td>1 : 2.7</td><td><span class="st wk">Working…</span></td></tr>
+   <tr><td><i class="t" style="background:linear-gradient(170deg,#ffe08a,#e8402a)"></i></td><td class="n">poster_final.png<small>3000 × 4000 → 1440 × 1920</small></td><td>1.2 MB</td><td>—</td><td><div class="fold"><i></i><i></i><i></i><i></i><i></i></div></td><td>—</td><td><span class="st q">Queued</span></td></tr>
+  </table>
+ </section>
+</main>
+</body>
+</html>

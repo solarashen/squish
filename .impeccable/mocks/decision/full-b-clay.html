@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ffe6ee;--card:#fff5f8;--ink:#3a2440;--muted:#6b5470;--pink:#d63a72;--blue:#b9e3ff;--mint:#c4f2da;--lemon:#fff1a8;--lilac:#ddd0ff;--peach:#ffd3c2}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:700 15px/1.45 Nunito,sans-serif}
+.cl{background:var(--card);border-radius:32px;box-shadow:inset -8px -8px 16px rgba(214,58,114,.14),inset 8px 8px 16px #fff,10px 14px 26px rgba(214,58,114,.20)}
+.pf{border-radius:999px;box-shadow:inset -4px -5px 8px rgba(0,0,0,.12),inset 4px 4px 8px rgba(255,255,255,.7),0 6px 14px rgba(214,58,114,.22)}
+header{display:flex;align-items:center;gap:32px;padding:26px 48px 10px}
+.logo{font:700 40px/1 Fredoka;color:var(--pink);letter-spacing:-.01em}
+nav{display:flex;gap:24px;color:var(--muted)}nav .on{color:var(--ink)}
+.loc{margin-left:auto;background:var(--card);padding:9px 16px}
+.lang{display:flex;gap:6px}.lang b{padding:7px 14px;background:var(--card);font-size:13px}.lang b.on{background:var(--pink);color:#fff}
+.wrap{display:grid;grid-template-columns:1fr 410px;gap:32px;padding:20px 48px}
+.drop{height:330px;display:flex;align-items:center;gap:40px;padding:0 56px}
+.balls{position:relative;width:220px;height:220px;flex:none}
+.ball{position:absolute;border-radius:50%;box-shadow:inset -10px -12px 20px rgba(0,0,0,.14),inset 10px 10px 16px rgba(255,255,255,.8),0 14px 26px rgba(214,58,114,.22)}
+.drop h1{font:700 52px/1.02 Fredoka;letter-spacing:-.02em}
+.drop p{color:var(--muted);font-size:17px;margin:10px 0 22px;font-weight:600}
+.btn{display:inline-block;padding:14px 26px;font:600 18px Fredoka;background:var(--pink);color:#fff;margin-right:10px}
+.btn.l{background:#fff;color:var(--ink)}
+.files{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}
+.f{border-radius:26px;padding:14px;display:flex;align-items:center;gap:12px;box-shadow:inset -6px -6px 12px rgba(0,0,0,.07),inset 6px 6px 12px rgba(255,255,255,.7),6px 10px 18px rgba(214,58,114,.16)}
+.th{width:56px;height:56px;border-radius:18px;flex:none;display:block;box-shadow:inset -4px -4px 8px rgba(0,0,0,.15)}
+.f b{display:block;font:600 15px Fredoka}.f span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.f em{margin-left:auto;font:700 20px Fredoka;font-style:normal}
+.side{padding:28px;display:flex;flex-direction:column;gap:20px}
+.side h2{font:700 22px Fredoka}
+.big{font:700 96px/.9 Fredoka;color:var(--pink);letter-spacing:-.03em}
+.sub{color:var(--muted)}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+.seg{display:flex;gap:8px}.seg b{flex:1;text-align:center;padding:9px 0;background:#fff}.seg b.on{background:var(--lilac)}
+.sl{height:14px;border-radius:7px;background:#fff;box-shadow:inset 2px 2px 5px rgba(0,0,0,.1);position:relative}
+.sl::before{content:"";position:absolute;inset:0 22% 0 0;border-radius:7px;background:var(--blue)}
+.sl::after{content:"";position:absolute;left:78%;top:-9px;width:32px;height:32px;border-radius:50%;background:#fff;margin-left:-16px;box-shadow:inset -4px -5px 8px rgba(0,0,0,.12),0 4px 10px rgba(214,58,114,.3)}
+.in{background:#fff;padding:10px 16px}
+.dl{text-align:center;padding:16px;background:var(--pink);color:#fff;font:600 19px Fredoka}
+</style>
+</head>
+<body>
+<header><div class="logo">squish</div><nav><span class="on">Convert</span><span>How it works</span><span>About</span></nav><div class="loc pf">Stays on your device</div><div class="lang"><b class="on pf">EN</b><b class="pf">HR</b></div></header>
+<div class="wrap">
+ <section>
+  <div class="cl drop">
+   <div class="balls">
+    <span class="ball" style="width:150px;height:150px;left:0;top:30px;background:var(--blue)"></span>
+    <span class="ball" style="width:96px;height:96px;left:120px;top:0;background:var(--lemon)"></span>
+    <span class="ball" style="width:70px;height:70px;left:130px;top:130px;background:var(--mint)"></span>
+   </div>
+   <div><h1>Drop images in. Squish them small.</h1><p>Convert, resize and compress up to 50 images right in your browser.</p><span class="btn pf">Choose images</span><span class="btn l pf">Paste</span></div>
+  </div>
+  <div class="files">
+   <div class="f" style="background:var(--mint)"><i class="th" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><div><b>beach_split.jpg</b><span>6.8 → 1.4 MB</span></div><em>−79%</em></div>
+   <div class="f" style="background:var(--blue)"><i class="th" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><div><b>diploma_scan.png</b><span>9.1 → 2.6 MB</span></div><em>−71%</em></div>
+   <div class="f" style="background:var(--peach)"><i class="th" style="background:linear-gradient(140deg,#7bbf8f,#2f6b47)"></i><div><b>plitvice.heic</b><span>Can't read HEIC</span></div><em>retry</em></div>
+   <div class="f" style="background:var(--lemon)"><i class="th" style="background:linear-gradient(120deg,#cfd6df,#6b7686)"></i><div><b>screenshot.png</b><span>Squishing…</span></div><em>62%</em></div>
+   <div class="f" style="background:var(--mint)"><i class="th" style="background:linear-gradient(180deg,#f5d0d6,#c46a7c)"></i><div><b>cv_photo.jpg</b><span>1.9 → 0.4 MB</span></div><em>−79%</em></div>
+   <div class="f" style="background:var(--lilac)"><i class="th" style="background:linear-gradient(170deg,#ffe08a,#e8402a)"></i><div><b>poster_final.png</b><span>Waiting</span></div><em>…</em></div>
+  </div>
+ </section>
+ <aside class="cl side">
+  <h2>Your batch</h2>
+  <div><div class="big">−71%</div><p class="sub">24.6 MB → 7.1 MB · 6 images</p></div>
+  <div><label>Convert to</label><div class="seg"><b class="pf">JPEG</b><b class="on pf">WebP</b><b class="pf">PNG</b></div></div>
+  <div><label>Quality · 78</label><div class="sl"></div></div>
+  <div><label>Max width</label><div class="in pf">1920 px</div></div>
+  <span class="dl pf">Download all (.zip)</span>
+ </aside>
+</div>
+</body>
+</html>

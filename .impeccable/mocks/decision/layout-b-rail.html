@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish · layout B, control rail</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#ebeae6;--card:#f6f5f2;--red:#c8261a;--ink:#111;--grey:#55534e}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--paper);color:var(--ink);font:500 15px/1.45 Archivo,sans-serif;display:grid;grid-template-columns:340px 1fr}
+.d{font-family:Anton;text-transform:uppercase}
+/* left: a black control rail, like the masthead of a poster turned on its side */
+.rail{background:var(--ink);color:var(--paper);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.rail::before{content:"";position:absolute;left:-60px;top:-40px;width:420px;height:150px;background:var(--red);transform:rotate(-14deg)}
+.logo{position:relative;font-size:64px;line-height:1;padding:24px 28px 0}
+.kinds{position:relative;margin-top:44px;display:flex;flex-direction:column}
+.kinds span{display:flex;justify-content:space-between;padding:14px 28px;font:800 13px Archivo;letter-spacing:.12em;text-transform:uppercase;border-top:1px solid #333}
+.kinds .on{background:var(--paper);color:var(--ink);clip-path:polygon(0 0,100% 0,calc(100% - 18px) 100%,0 100%)}
+.kinds b{font:16px Anton;color:var(--red)}
+.set{padding:22px 28px}
+.lab{font:800 11px Archivo;letter-spacing:.12em;text-transform:uppercase;color:#bdbab3;margin:14px 0 6px;display:flex;justify-content:space-between}.lab em{font:16px Anton;font-style:normal;color:var(--paper)}
+.seg{display:flex}.seg b{flex:1;text-align:center;padding:8px 0;border:2px solid #77746d;margin-left:-2px;font-weight:800;font-size:13px}.seg b:first-child{margin-left:0}.seg b.on{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.track{height:8px;background:#333;position:relative;margin:12px 0}.track i{position:absolute;inset:0 22% 0 0;background:var(--red)}.track s{position:absolute;left:78%;top:-8px;width:10px;height:24px;background:var(--paper)}
+.res{margin-top:auto;padding:0 28px}
+.big{font:110px/.85 Anton;color:var(--red)}.res p{color:#cfccc4;margin:6px 0 16px}
+.dl{display:block;background:var(--red);padding:18px 28px;font:24px Anton;text-transform:uppercase}
+/* right: the work surface */
+.main{display:flex;flex-direction:column;padding:0 44px 30px}
+.top{height:76px;display:flex;align-items:center;gap:20px;border-bottom:4px solid var(--ink);margin-bottom:26px}
+.top p{font-weight:700}.top p i{display:inline-block;width:10px;height:10px;background:var(--red);transform:rotate(45deg);margin-right:8px}
+nav{margin-left:auto;display:flex;gap:18px;font:800 12px Archivo;letter-spacing:.12em;text-transform:uppercase}nav b{background:var(--ink);color:var(--paper);padding:4px 8px}
+.drop{position:relative;overflow:hidden;background:var(--card);border:4px dashed var(--ink);padding:26px 30px;display:flex;align-items:center;gap:24px}
+.drop::after{content:"";position:absolute;right:-50px;bottom:-50px;width:130px;height:130px;background:var(--red);transform:rotate(45deg)}
+.arrow{width:64px;height:64px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font:40px Anton}
+.drop h1{font-size:40px;line-height:1}.drop p{color:var(--grey)}
+.btn{margin-left:auto;position:relative;z-index:1;background:var(--ink);color:var(--paper);font:800 13px Archivo;letter-spacing:.08em;text-transform:uppercase;padding:15px 20px;box-shadow:5px 5px 0 var(--red)}
+/* files as a grid of cards: thumbnail first, number second */
+.grid{margin-top:24px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.card{background:var(--card);border:3px solid var(--ink)}
+.card .img{height:120px;border-bottom:3px solid var(--ink);position:relative}
+.card .img b{position:absolute;left:0;bottom:0;background:var(--ink);color:var(--paper);font:30px Anton;padding:2px 10px}
+.card .img b.r{background:var(--red)}
+.card .t{padding:10px 12px}.card small{color:var(--grey)}
+.card .bar{height:6px;background:#d3d1cb}.card .bar i{display:block;height:100%;background:var(--red)}
+.add{border:3px dashed var(--ink);display:grid;place-items:center;font:48px Anton;color:var(--grey)}
+</style>
+</head>
+<body>
+<aside class="rail">
+ <div class="logo d">Squish</div>
+ <div class="kinds"><span class="on">Images <b>3</b></span><span>Video</span><span>Audio</span></div>
+ <div class="set">
+  <p class="lab">Convert to</p><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b><b>AVIF</b></div>
+  <p class="lab">Quality <em>78</em></p><div class="track"><i></i><s></s></div>
+  <p class="lab">Max width</p><div class="seg"><b>Orig.</b><b class="on">1920</b><b>1280</b></div>
+ </div>
+ <div class="res"><div class="big">−76%</div><p>17.8 MB → 4.4 MB · 2 of 3 done</p></div>
+ <span class="dl">Download all ↓</span>
+</aside>
+<main class="main">
+ <div class="top"><p><i></i>Nothing leaves your device</p><nav><span>How it works</span><span>About</span><b>EN</b><span>HR</span></nav></div>
+ <div class="drop"><div class="arrow">↓</div><div><h1 class="d">Drop files here</h1><p>Images, video, audio · up to 50 · or Ctrl+V</p></div><span class="btn">Choose files</span></div>
+ <div class="grid">
+  <div class="card"><div class="img" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"><b>−71%</b></div><div class="t"><b>diploma_scan.png</b><br><small>9.1 → 2.6 MB · WebP</small></div></div>
+  <div class="card"><div class="img" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"><b>−79%</b></div><div class="t"><b>beach_split.jpg</b><br><small>6.8 → 1.4 MB · WebP</small></div></div>
+  <div class="card"><div class="img" style="background:linear-gradient(120deg,#cfd6df,#6b7686)"><b class="r">62%</b></div><div class="bar"><i style="width:62%"></i></div><div class="t"><b>screenshot.png</b><br><small>Converting…</small></div></div>
+  <div class="add">+</div>
+ </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish · constructivism</title>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Archivo:wght@500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#e9e8e4;--red:#c8261a;--ink:#111;--grey:#5c5a55}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--paper);color:var(--ink);font:500 15px/1.4 Archivo,sans-serif;position:relative}
+.band{position:absolute;left:-120px;top:150px;width:1100px;height:190px;background:var(--red);transform:rotate(-9deg);transform-origin:left}
+.word{position:absolute;left:46px;top:140px;font:900 230px/.8 "Big Shoulders Display";color:var(--paper);transform:rotate(-9deg);transform-origin:left;letter-spacing:-.01em}
+.disc{position:absolute;right:420px;top:-120px;width:330px;height:330px;border-radius:50%;background:var(--ink)}
+.bar{position:absolute;left:0;top:410px;width:100%;height:10px;background:var(--ink)}
+nav{position:absolute;right:48px;top:30px;display:flex;gap:0}
+nav a{font:800 13px Archivo;letter-spacing:.12em;text-transform:uppercase;padding:10px 16px;border:3px solid var(--ink);margin-left:-3px;background:var(--paper)}
+nav a.on{background:var(--ink);color:var(--paper)}
+.claim{position:absolute;left:700px;top:270px;width:330px;font:700 30px/1 "Big Shoulders Display";text-transform:uppercase;transform:rotate(-9deg)}
+.claim span{color:var(--red)}
+/* working area below the bar */
+.work{position:absolute;left:48px;right:48px;top:450px;bottom:36px;display:grid;grid-template-columns:1.25fr 1fr 360px;gap:0}
+.col{border:3px solid var(--ink);margin-left:-3px;padding:22px;position:relative;background:var(--paper)}
+.k{font:800 12px Archivo;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px;display:flex;gap:10px;align-items:center}
+.k b{background:var(--red);color:var(--paper);padding:2px 8px}
+.drop{height:calc(100% - 34px);border:3px dashed var(--ink);display:flex;flex-direction:column;justify-content:center;padding:22px;position:relative;overflow:hidden}
+.drop::after{content:"";position:absolute;right:-40px;bottom:-40px;width:150px;height:150px;background:var(--red);transform:rotate(45deg)}
+.drop h2{font:900 52px/.85 "Big Shoulders Display";text-transform:uppercase}
+.drop p{margin-top:12px;max-width:30ch}
+.btn{display:inline-block;margin-top:18px;background:var(--ink);color:var(--paper);font:800 14px Archivo;letter-spacing:.1em;text-transform:uppercase;padding:13px 20px;align-self:flex-start;position:relative;z-index:1}
+.tabs{display:flex;margin-bottom:14px}
+.tabs span{flex:1;text-align:center;font:800 12px Archivo;letter-spacing:.1em;text-transform:uppercase;padding:9px 0;border:3px solid var(--ink);margin-left:-3px}
+.tabs span:first-child{margin-left:0}.tabs .on{background:var(--red);color:var(--paper)}
+.row{display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:2px solid var(--ink)}
+.row i{font:900 26px "Big Shoulders Display";font-style:normal;color:var(--red)}
+.row b{display:block;font-weight:800}.row small{color:var(--grey)}
+.row em{font:900 30px "Big Shoulders Display";font-style:normal}
+.panel{background:var(--ink);color:var(--paper)}
+.big{font:900 150px/.78 "Big Shoulders Display";color:var(--red);letter-spacing:-.02em}
+.sum{font-weight:600;margin:10px 0 16px}
+.lab{font:800 11px Archivo;letter-spacing:.14em;text-transform:uppercase;margin:12px 0 6px;color:#bdbab3}
+.seg{display:flex}.seg b{flex:1;text-align:center;padding:8px 0;border:2px solid var(--paper);margin-left:-2px;font:800 13px Archivo}.seg b:first-child{margin-left:0}.seg b.on{background:var(--paper);color:var(--ink)}
+.track{height:10px;background:#333;position:relative;margin-top:8px}.track i{position:absolute;inset:0 22% 0 0;background:var(--red)}.track s{position:absolute;left:78%;top:-7px;width:8px;height:24px;background:var(--paper)}
+.dl{display:block;margin-top:18px;background:var(--red);color:var(--paper);text-align:center;font:900 26px "Big Shoulders Display";letter-spacing:.04em;text-transform:uppercase;padding:12px}
+</style>
+</head>
+<body>
+<div class="disc"></div>
+<div class="band"></div>
+<div class="word">SQUISH</div>
+<nav><a>How it works</a><a>About</a><a class="on">EN</a><a>HR</a></nav>
+<p class="claim">Big files in. <span>Small files out.</span> Nothing leaves your device.</p>
+<div class="bar"></div>
+<div class="work">
+ <div class="col"><p class="k"><b>01</b>Add files</p>
+  <div class="drop"><h2>Drop files<br>here</h2><p>Images, video and audio. Up to 50 at once. Or press Ctrl+V.</p><span class="btn">Choose files</span></div>
+ </div>
+ <div class="col"><p class="k"><b>02</b>Your files</p>
+  <div class="tabs"><span class="on">Images 3</span><span>Video</span><span>Audio</span></div>
+  <div class="row"><i>1</i><div><b>diploma_scan.png</b><small>9.1 → 2.6 MB · WebP</small></div><em>−71%</em></div>
+  <div class="row"><i>2</i><div><b>beach_split.jpg</b><small>6.8 → 1.4 MB · WebP</small></div><em>−79%</em></div>
+  <div class="row"><i>3</i><div><b>cv_photo.jpg</b><small>1.9 → 0.4 MB · WebP</small></div><em>−79%</em></div>
+ </div>
+ <div class="col panel"><p class="k"><b>03</b>Settings &amp; result</p>
+  <div class="big">−76%</div><p class="sum">17.8 MB → 4.4 MB</p>
+  <p class="lab">Convert to</p><div class="seg"><b>JPEG</b><b class="on">WEBP</b><b>PNG</b><b>AVIF</b></div>
+  <p class="lab">Quality 78</p><div class="track"><i></i><s></s></div>
+  <span class="dl">Download all ↓</span>
+ </div>
+</div>
+</body>
+</html>

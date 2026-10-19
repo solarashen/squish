@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish · layout C, before and after</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#ebeae6;--card:#f6f5f2;--red:#c8261a;--ink:#111;--grey:#55534e}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--paper);color:var(--ink);font:500 15px/1.45 Archivo,sans-serif}
+.d{font-family:Anton;text-transform:uppercase}
+header{height:70px;display:flex;align-items:center;gap:20px;padding:0 40px}
+.logo{font-size:42px}
+.logo i{display:inline-block;width:14px;height:14px;background:var(--red);transform:rotate(45deg);margin-left:6px}
+nav{margin-left:auto;display:flex;gap:18px;font:800 12px Archivo;letter-spacing:.12em;text-transform:uppercase}nav b{background:var(--ink);color:var(--paper);padding:4px 8px}
+/* the screen is split like a constructivist diptych: BEFORE (paper) on the left, AFTER (black) on the right,
+   a red wedge between them carries the settings: the transformation sits literally between the two */
+.stage{position:relative;height:830px;display:grid;grid-template-columns:1fr 1fr}
+.before{padding:20px 175px 30px 40px}
+.after{background:var(--ink);color:var(--paper);padding:20px 40px 30px 175px}
+.h{display:flex;justify-content:space-between;align-items:baseline;border-bottom:4px solid currentColor;padding-bottom:8px;margin-bottom:16px}
+.h h2{font-size:56px;line-height:1}.h span{font:800 12px Archivo;letter-spacing:.12em;text-transform:uppercase}
+.drop{border:4px dashed var(--ink);background:var(--card);padding:22px;text-align:center}
+.drop .arrow{width:56px;height:56px;margin:0 auto 8px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font:34px Anton}
+.drop h1{font-size:34px;line-height:1}.drop p{color:var(--grey);font-size:14px}
+.btn{display:inline-block;margin-top:12px;background:var(--ink);color:var(--paper);font:800 12px Archivo;letter-spacing:.08em;text-transform:uppercase;padding:12px 18px;box-shadow:4px 4px 0 var(--red)}
+.tabs{display:flex;gap:14px;margin:18px 0 6px;font:800 12px Archivo;letter-spacing:.1em;text-transform:uppercase}.tabs span{color:var(--grey)}.tabs .on{color:var(--ink);border-bottom:3px solid var(--red)}
+.f{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:9px 0;border-bottom:2px solid #cfcdc7}
+.th{width:44px;height:34px;border:2px solid currentColor}.f small{color:var(--grey)}
+.f em{font:24px Anton;font-style:normal}
+.after .f{border-color:#333}.after small{color:#b9b6ae}
+.wedge{position:absolute;left:50%;top:40px;width:300px;margin-left:-150px;background:var(--red);color:#fff;padding:22px 26px 34px;clip-path:polygon(0 0,100% 0,100% 88%,50% 100%,0 88%);z-index:2}
+.wedge .t{font:28px/1 Anton;text-transform:uppercase;margin-bottom:6px}
+.lab{font:800 11px Archivo;letter-spacing:.12em;text-transform:uppercase;margin:12px 0 6px;display:flex;justify-content:space-between;opacity:.9}.lab em{font:16px Anton;font-style:normal}
+.seg{display:flex}.seg b{flex:1;text-align:center;padding:7px 0;border:2px solid #fff;margin-left:-2px;font-weight:800;font-size:12px}.seg b:first-child{margin-left:0}.seg b.on{background:#fff;color:var(--red)}
+.track{height:8px;background:rgba(0,0,0,.25);position:relative;margin:12px 0 4px}.track i{position:absolute;inset:0 22% 0 0;background:#fff}.track s{position:absolute;left:78%;top:-8px;width:10px;height:24px;background:var(--ink)}
+.big{font:120px/.85 Anton;color:var(--red);margin:6px 0 8px}
+.dl{display:flex;justify-content:space-between;margin-top:18px;background:var(--red);padding:16px 20px;font:24px Anton;text-transform:uppercase}
+</style>
+</head>
+<body>
+<header><span class="logo d">Squish<i></i></span><nav><span>How it works</span><span>About</span><b>EN</b><span>HR</span></nav></header>
+<div class="stage">
+ <section class="before">
+  <div class="h"><h2 class="d">Before</h2><span>17.8 MB</span></div>
+  <div class="drop"><div class="arrow">↓</div><h1 class="d">Drop files here</h1><p>Images, video, audio · up to 50 · or Ctrl+V</p><span class="btn">Choose files</span></div>
+  <div class="tabs"><span class="on">Images 3</span><span>Video</span><span>Audio</span></div>
+  <div class="f"><i class="th" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><div><b>diploma_scan.png</b><br><small>PNG · 2480×3508</small></div><em>9.1 MB</em></div>
+  <div class="f"><i class="th" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><div><b>beach_split.jpg</b><br><small>JPG · 4032×3024</small></div><em>6.8 MB</em></div>
+  <div class="f"><i class="th" style="background:linear-gradient(120deg,#cfd6df,#6b7686)"></i><div><b>cv_photo.jpg</b><br><small>JPG · 1200×1600</small></div><em>1.9 MB</em></div>
+ </section>
+ <div class="wedge">
+  <p class="t">Squish with</p>
+  <p class="lab">Format</p><div class="seg"><b>JPG</b><b class="on">WEBP</b><b>PNG</b><b>AVIF</b></div>
+  <p class="lab">Quality <em>78</em></p><div class="track"><i></i><s></s></div>
+  <p class="lab">Max width</p><div class="seg"><b>Orig.</b><b class="on">1920</b><b>1280</b></div>
+ </div>
+ <section class="after">
+  <div class="h"><h2 class="d">After</h2><span>4.4 MB</span></div>
+  <div class="big">−76%</div>
+  <div class="f"><i class="th" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><div><b>diploma_scan.webp</b><br><small>WebP · 1358×1920</small></div><em>2.6 MB ↓</em></div>
+  <div class="f"><i class="th" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><div><b>beach_split.webp</b><br><small>WebP · 1920×1440</small></div><em>1.4 MB ↓</em></div>
+  <div class="f"><i class="th" style="background:linear-gradient(180deg,#f5d0d6,#c46a7c)"></i><div><b>cv_photo.webp</b><br><small>WebP · 1200×1600</small></div><em>0.4 MB ↓</em></div>
+  <div class="dl"><span>Download all</span><span>.zip ↓</span></div>
+ </section>
+</div>
+</body>
+</html>

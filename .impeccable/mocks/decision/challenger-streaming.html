@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f13;--s1:#1a1c22;--s2:#252832;--fg:#f4f5f7;--muted:#a3a8b5;--mint:#2ee6a6;--err:#ff6b5b}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font:500 15px/1.45 Manrope,sans-serif}
+header{display:flex;align-items:center;gap:36px;padding:22px 56px}
+.logo{font:800 30px/1 Manrope;letter-spacing:-.03em}
+.logo b{color:var(--mint)}
+nav{display:flex;gap:26px;color:var(--muted);font-weight:600}nav .on{color:var(--fg)}
+.priv{margin-left:auto;color:var(--muted);font-size:14px}
+.lang{display:flex;background:var(--s1);border-radius:8px;padding:3px;font-weight:700;font-size:13px}
+.lang b{padding:6px 12px;border-radius:6px}.lang b.on{background:var(--fg);color:var(--bg)}
+.bar{margin:6px 56px 0;background:var(--s1);border-radius:14px;padding:16px 22px;display:flex;align-items:center;gap:28px}
+.bar label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px}
+.seg{display:flex;background:var(--s2);border-radius:8px;padding:3px}
+.seg b{padding:6px 14px;border-radius:6px;font-weight:700;font-size:14px;color:var(--muted)}.seg b.on{background:var(--mint);color:#06281c}
+.sl{width:200px;height:6px;border-radius:3px;background:var(--s2);position:relative;margin-top:8px}
+.sl::before{content:"";position:absolute;inset:0 22% 0 0;border-radius:3px;background:var(--mint)}
+.sl::after{content:"";position:absolute;left:78%;top:-6px;width:18px;height:18px;border-radius:50%;background:#fff;margin-left:-9px}
+.in{background:var(--s2);border-radius:8px;padding:6px 12px;font-weight:700;font-size:14px}
+.go{margin-left:auto;background:var(--mint);color:#06281c;font-weight:800;padding:12px 22px;border-radius:10px}
+.go2{border:1.5px solid #4a4f5c;padding:11px 18px;border-radius:10px;font-weight:700}
+.sum{display:flex;align-items:baseline;gap:18px;padding:30px 56px 16px}
+.sum h1{font:800 44px/1 Manrope;letter-spacing:-.03em}
+.sum h1 em{font-style:normal;color:var(--mint)}
+.sum span{color:var(--muted)}
+.row{display:flex;gap:16px;padding:0 56px;align-items:flex-start}
+.t{width:200px;height:260px;border-radius:12px;opacity:.45;flex:none;position:relative}
+.t.f{width:420px;height:420px;opacity:1;box-shadow:0 18px 40px rgba(0,0,0,.55);outline:3px solid var(--mint);outline-offset:4px}
+.info{position:absolute;left:0;right:0;bottom:0;padding:22px;border-radius:0 0 12px 12px;background:linear-gradient(transparent,rgba(8,9,12,.92) 38%)}
+.info h2{font:800 22px Manrope;letter-spacing:-.01em}
+.chips{display:flex;gap:8px;margin:10px 0}
+.chip{background:rgba(255,255,255,.14);padding:4px 10px;border-radius:6px;font-size:13px;font-weight:700}
+.chip.m{background:var(--mint);color:#06281c}
+.sz{display:flex;gap:14px;align-items:baseline;font-variant-numeric:tabular-nums}
+.sz s{color:var(--muted)}.sz b{font-size:26px;font-weight:800}
+.t small{position:absolute;left:12px;bottom:12px;font-weight:700;font-size:13px;background:rgba(8,9,12,.75);padding:3px 8px;border-radius:6px}
+.t.e small{color:var(--err)}
+.add{width:200px;height:260px;border-radius:12px;border:2px dashed #4a4f5c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);font-weight:700;flex:none}
+.add b{font-size:40px;color:var(--fg);font-weight:500}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">squish<b>.</b></div>
+ <nav><span class="on">Convert</span><span>How it works</span><span>About</span></nav>
+ <div class="priv">Runs in your browser. Nothing is uploaded.</div>
+ <div class="lang"><b class="on">EN</b><b>HR</b></div>
+</header>
+<div class="bar">
+ <div><label>Format</label><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b><b>AVIF</b></div></div>
+ <div><label>Quality 78</label><div class="sl"></div></div>
+ <div><label>Max size</label><span class="in">1920 × auto</span></div>
+ <span class="go2">Add images</span>
+ <span class="go">Download all · 7.1 MB</span>
+</div>
+<div class="sum"><h1>6 images, <em>71% lighter</em></h1><span>24.6 MB → 7.1 MB · 1 needs attention</span></div>
+<div class="row">
+ <div class="t" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"><small>−79%</small></div>
+ <div class="t f" style="background:linear-gradient(200deg,#e8c27a,#b5562e 70%)">
+  <div class="info"><h2>diploma_scan.png</h2><div class="chips"><span class="chip">PNG → WebP</span><span class="chip">2480 × 3508 → 1358 × 1920</span><span class="chip m">Done</span></div>
+  <div class="sz"><s>9.1 MB</s><b>2.6 MB</b><span>−71%</span></div></div>
+ </div>
+ <div class="t e" style="background:linear-gradient(140deg,#7bbf8f,#2f6b47)"><small>HEIC not supported</small></div>
+ <div class="t" style="background:linear-gradient(180deg,#f5d0d6,#c46a7c)"><small>−79%</small></div>
+ <div class="add"><b>+</b>Add more</div>
+</div>
+</body>
+</html>

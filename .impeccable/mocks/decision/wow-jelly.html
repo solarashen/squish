@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish · jelly</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Onest:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#141418;--muted:#4f5260;--pink:#ff8fc7;--lemon:#ffe66d;--mint:#b8f0d0;--peach:#ffcbbd;--bg:#f7f7f9}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:500 15px/1.45 Onest,sans-serif}
+header{display:flex;align-items:center;gap:14px;padding:26px 48px 0}
+.logo{font:800 38px/1 "Baloo 2"}.logo i{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--pink)}
+.pill{border-radius:999px;background:#fff;padding:8px 16px;font-weight:600;box-shadow:inset -3px -4px 7px rgba(0,0,0,.12),inset 3px 3px 6px rgba(255,255,255,.75),0 4px 10px rgba(20,20,24,.12)}
+.r{margin-left:auto;display:flex;gap:8px}.ink{background:var(--ink);color:#fff}
+.wrap{display:grid;grid-template-columns:1fr 380px;gap:28px;padding:22px 48px}
+/* the stage: every file is a jelly blob whose area is its file size */
+.stage{position:relative;height:720px;border-radius:32px;background:#fff;border:1px solid rgba(20,20,24,.08);overflow:hidden}
+.stage .floor{position:absolute;left:0;right:0;bottom:0;height:150px;background:linear-gradient(transparent,rgba(184,240,208,.35))}
+.title{position:absolute;left:40px;top:34px}
+.title h1{font:800 52px/.95 "Baloo 2";letter-spacing:-.02em}
+.title p{color:var(--muted);margin-top:8px;font-size:16px}
+.blob{position:absolute;bottom:96px;display:grid;place-items:center;text-align:center}
+.ghost{position:absolute;bottom:0;border:2.5px dashed rgba(20,20,24,.28);border-radius:50% 50% 46% 46%/58% 58% 42% 42%}
+.jelly{position:absolute;bottom:0;border-radius:50% 50% 46% 46%/58% 58% 42% 42%;box-shadow:inset -14px -18px 28px rgba(0,0,0,.14),inset 14px 14px 22px rgba(255,255,255,.8),0 18px 30px rgba(20,20,24,.12);animation:squash 3.2s cubic-bezier(.22,1,.36,1) infinite;transform-origin:50% 100%}
+@keyframes squash{0%,18%{transform:scale(var(--from))}32%{transform:scale(calc(var(--from)*1.08),calc(var(--from)*.7))}48%{transform:scale(.94,1.08)}60%{transform:scale(1.03,.97)}70%,100%{transform:scale(1)}}
+.tag{position:absolute;white-space:nowrap;font:800 30px "Baloo 2";bottom:calc(var(--h) + 14px)}
+.tag small{display:block;font:600 13px Onest;color:var(--muted)}
+.name{position:absolute;bottom:-40px;white-space:nowrap;font-weight:600;font-size:14px}
+.zone{position:absolute;right:30px;top:30px;width:300px;border:2.5px dashed rgba(20,20,24,.3);border-radius:24px;padding:20px;text-align:center;background:rgba(255,255,255,.7)}
+.zone b{display:block;font:800 22px "Baloo 2"}.zone span{color:var(--muted);font-size:14px}
+.up{display:inline-grid;place-items:center;width:52px;height:52px;border-radius:50%;background:var(--pink);margin-bottom:8px;font:700 28px Onest;box-shadow:inset -3px -4px 7px rgba(0,0,0,.14),inset 3px 3px 6px rgba(255,255,255,.75),0 4px 10px rgba(20,20,24,.14)}
+.legend{position:absolute;left:40px;bottom:26px;display:flex;gap:18px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-right:6px}
+.panel{background:#fff;border-radius:32px;padding:28px;border:1px solid rgba(20,20,24,.08);display:flex;flex-direction:column;gap:18px}
+.panel h2{font:800 22px "Baloo 2"}
+.big{font:800 92px/.9 "Baloo 2";letter-spacing:-.03em}.big span{display:inline-block;line-height:.95;background:var(--lemon);border-radius:18px;padding:12px 14px 0}
+.mut{color:var(--muted)}
+label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin-bottom:8px}
+.seg{display:flex;gap:6px}.seg b{flex:1;text-align:center;padding:9px 0;border-radius:999px;background:#fff;font-weight:600;box-shadow:inset -3px -4px 7px rgba(0,0,0,.1),inset 3px 3px 6px rgba(255,255,255,.75),0 4px 10px rgba(20,20,24,.1)}.seg b.on{background:var(--ink);color:#fff}
+.sl{height:14px;border-radius:7px;background:rgba(20,20,24,.08);position:relative}.sl::before{content:"";position:absolute;inset:0 22% 0 0;border-radius:7px;background:var(--mint)}.sl::after{content:"";position:absolute;left:78%;top:-9px;width:32px;height:32px;border-radius:50%;background:var(--pink);margin-left:-16px;box-shadow:inset -4px -5px 8px rgba(0,0,0,.14),0 4px 10px rgba(20,20,24,.2)}
+.dl{margin-top:auto;text-align:center;padding:16px;border-radius:999px;background:var(--ink);color:#fff;font:800 18px "Baloo 2"}
+</style>
+</head>
+<body>
+<header><div class="logo">squish<i></i></div><span class="pill" style="margin-left:20px">How it works</span><span class="pill">About</span><div class="r"><span class="pill ink">EN</span><span class="pill">HR</span></div></header>
+<div class="wrap">
+ <section class="stage">
+  <div class="title"><h1>Watch them squish.</h1><p>Every file is a blob as big as its size. Dashed line = before.</p></div>
+  <div class="zone"><span class="up">↑</span><b>Drop more files</b><span>or choose from your device</span></div>
+  <div class="floor"></div>
+  <!-- sizes: area proportional to MB -->
+  <div class="blob" style="left:70px;width:300px;--h:150px">
+   <div class="ghost" style="width:300px;height:250px"></div>
+   <div class="jelly" style="width:150px;height:126px;background:var(--pink);--from:2"></div>
+   <div class="tag" style="--h:126px">−71%<small>9.1 → 2.6 MB</small></div>
+   <div class="name">diploma_scan.png</div>
+  </div>
+  <div class="blob" style="left:430px;width:250px;--h:110px">
+   <div class="ghost" style="width:250px;height:210px"></div>
+   <div class="jelly" style="width:112px;height:96px;background:var(--lemon);--from:2.2;animation-delay:.4s"></div>
+   <div class="tag" style="--h:96px">−79%<small>6.8 → 1.4 MB</small></div>
+   <div class="name">beach_split.jpg</div>
+  </div>
+  <div class="blob" style="left:740px;width:150px;--h:60px">
+   <div class="ghost" style="width:140px;height:118px"></div>
+   <div class="jelly" style="width:62px;height:54px;background:var(--mint);--from:2.25;animation-delay:.8s"></div>
+   <div class="tag" style="--h:54px">−79%<small>1.9 → 0.4 MB</small></div>
+   <div class="name">cv_photo.jpg</div>
+  </div>
+  <div class="legend"><span><i style="border:2px dashed rgba(20,20,24,.35)"></i>original size</span><span><i style="background:var(--pink)"></i>after squish</span></div>
+ </section>
+ <aside class="panel">
+  <h2>Your images</h2>
+  <div class="big"><span>−76%</span></div>
+  <p class="mut">17.8 MB → 4.4 MB · 3 files</p>
+  <div><label>Convert to</label><div class="seg"><b>JPEG</b><b class="on">WebP</b><b>PNG</b></div></div>
+  <div><label>Quality · 78</label><div class="sl"></div></div>
+  <div><label>Max width</label><div class="seg"><b>Original</b><b class="on">1920</b><b>1280</b></div></div>
+  <span class="dl">Download all (.zip)</span>
+ </aside>
+</div>
+</body>
+</html>

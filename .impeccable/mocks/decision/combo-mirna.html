@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>squish</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f6f8;--card:#ffffff;--line:#e3e5ea;--ink:#141418;--muted:#565a66;--lemon:#ffe66d;--mint:#b8f0d0;--pink:#ff8fc7;--pink-ink:#9e1f5c;--err:#ffd0c2}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1440px;height:900px;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:500 15px/1.45 Onest,sans-serif}
+/* clay only on things you can press */
+.press{border-radius:999px;box-shadow:inset -3px -4px 7px rgba(0,0,0,.13),inset 3px 3px 6px rgba(255,255,255,.75),0 4px 10px rgba(20,20,24,.12)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px}
+header{margin:22px 40px 0;padding:12px 20px;display:flex;align-items:center;gap:34px}
+.logo{font:700 28px/1 Fredoka;letter-spacing:-.01em}
+.logo i{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--pink);margin-left:2px}
+nav{display:flex;gap:24px;color:var(--muted)}nav .on{color:var(--ink);font-weight:600}
+.loc{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+.loc i{width:8px;height:8px;border-radius:50%;background:#2a9d63}
+.lang{display:flex;gap:6px}.lang b{padding:6px 13px;font-size:13px;font-weight:700;background:#fff}.lang b.on{background:var(--ink);color:#fff}
+.wrap{display:grid;grid-template-columns:1fr 400px;gap:24px;padding:22px 40px}
+.drop{height:290px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;border:2px dashed #c9ccd4;background:#fbfbfc}
+.drop h1{font-size:38px;font-weight:700;letter-spacing:-.03em}
+.drop p{color:var(--muted);font-size:16px}
+.acts{display:flex;gap:10px;margin-top:8px}
+.btn{padding:12px 22px;font-weight:700;background:var(--pink);color:var(--ink)}
+.btn.l{background:#fff}
+.files{margin-top:20px;padding:6px 20px}
+.f{display:grid;grid-template-columns:48px 1.7fr 1fr 80px 100px;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.f:last-child{border:0}
+.th{width:48px;height:38px;border-radius:10px;display:block}
+.n{font-weight:600}.n small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+.prog{height:8px;border-radius:4px;background:#eceef2}.prog i{display:block;height:100%;border-radius:4px;background:var(--ink)}
+.pct{font-weight:700;text-align:right}
+.chip{justify-self:end;font-size:13px;font-weight:600;padding:4px 12px;border-radius:999px;color:var(--ink)}
+.side{padding:26px;display:flex;flex-direction:column;gap:20px}
+.side h2{font-size:17px;font-weight:700}
+.big{font-size:84px;font-weight:800;letter-spacing:-.05em;line-height:.9}
+.big span{background:var(--lemon);padding:0 8px;border-radius:12px}
+.sub{color:var(--muted);margin-top:16px}
+label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px}
+.seg{display:flex;gap:6px}.seg b{flex:1;text-align:center;padding:8px 0;font-weight:600;background:#fff}.seg b.on{background:var(--ink);color:#fff}
+.sl{height:8px;border-radius:4px;background:#eceef2;position:relative}
+.sl::before{content:"";position:absolute;inset:0 22% 0 0;border-radius:4px;background:var(--ink)}
+.knob{position:absolute;left:78%;top:-10px;width:28px;height:28px;margin-left:-14px;background:var(--pink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.in{border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-weight:600}
+.dl{text-align:center;padding:15px;font-weight:700;background:var(--ink);color:#fff}
+</style>
+</head>
+<body>
+<header class="card"><div class="logo">squish<i></i></div><nav><span class="on">Convert</span><span>How it works</span><span>About</span></nav><div class="loc"><i></i>Everything stays on your device</div><div class="lang"><b class="on press">EN</b><b class="press">HR</b></div></header>
+<div class="wrap">
+ <section>
+  <div class="card drop"><h1>Drop your images here</h1><p>Convert, resize and compress up to 50 images. Nothing is uploaded.</p><div class="acts"><span class="btn press">Choose images</span><span class="btn l press">Paste from clipboard</span></div></div>
+  <div class="card files">
+   <div class="f"><i class="th" style="background:linear-gradient(160deg,#9fc3e8,#3f6aa8)"></i><span class="n">beach_split.jpg<small>6.8 MB → 1.4 MB · JPG → WebP</small></span><div class="prog"><i style="width:100%"></i></div><span class="pct">−79%</span><span class="chip" style="background:var(--mint)">Done</span></div>
+   <div class="f"><i class="th" style="background:linear-gradient(200deg,#e8c27a,#b5562e)"></i><span class="n">diploma_scan.png<small>9.1 MB → 2.6 MB · PNG → WebP</small></span><div class="prog"><i style="width:100%"></i></div><span class="pct">−71%</span><span class="chip" style="background:var(--mint)">Done</span></div>
+   <div class="f"><i class="th" style="background:linear-gradient(140deg,#7bbf8f,#2f6b47)"></i><span class="n">plitvice.heic<small>This browser can't read HEIC. Convert it to JPG first.</small></span><div class="prog"></div><span class="pct">—</span><span class="chip" style="background:var(--err)">Failed</span></div>
+   <div class="f"><i class="th" style="background:linear-gradient(120deg,#cfd6df,#6b7686)"></i><span class="n">screenshot_osijek.png<small>2.4 MB · processing</small></span><div class="prog"><i style="width:62%"></i></div><span class="pct">62%</span><span class="chip" style="background:var(--lemon)">Working</span></div>
+  </div>
+ </section>
+ <aside class="card side">
+  <h2>Your batch</h2>
+  <div><div class="big"><span>−71%</span></div><p class="sub">24.6 MB → 7.1 MB · 6 images</p></div>
+  <div><label>Convert to</label><div class="seg"><b class="press">JPEG</b><b class="on press">WebP</b><b class="press">PNG</b></div></div>
+  <div><label>Quality · 78</label><div class="sl"><span class="knob press"></span></div></div>
+  <div class="two"><div><label>Max width</label><div class="in">1920 px</div></div><div><label>Max height</label><div class="in">auto</div></div></div>
+  <span class="dl press">Download all (.zip)</span>
+ </aside>
+</div>
+</body>
+</html>
