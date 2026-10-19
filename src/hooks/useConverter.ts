@@ -6,10 +6,12 @@ import type { AllSettings, AudioFormat, Item, MediaKind, OutputFormat, VideoForm
 
 export const MAX_FILES=50
 
+const DEFAULT_TARGET={ mode:"quality" as const, sizeKb:500, percent:50 }
+
 const DEFAULT_SETTINGS:AllSettings={
-  image:{ format:"image/webp", quality:78, maxWidth:1920, maxHeight:null },
-  video:{ format:"mp4", quality:"medium", maxHeight:720, removeAudio:false },
-  audio:{ format:"mp3", bitrate:128 },
+  image:{ format:"image/webp", quality:78, maxWidth:1920, maxHeight:null, target:DEFAULT_TARGET },
+  video:{ format:"mp4", quality:"medium", maxHeight:720, removeAudio:false, target:{ ...DEFAULT_TARGET, sizeKb:10240 } },
+  audio:{ format:"mp3", bitrate:128, target:{ ...DEFAULT_TARGET, sizeKb:2048 } },
 }
 
 export type Encoders={

@@ -3,7 +3,7 @@ import { Segmented } from "@/components/ui/segmented"
 import type { Encoders } from "@/hooks/useConverter"
 import { useI18n } from "@/i18n/I18nProvider"
 import { FORMAT_LABELS } from "@/lib/files"
-import type { AllSettings, AudioFormat, MediaKind, OutputFormat, VideoFormat, VideoQuality } from "@/lib/types"
+import type { AllSettings, AudioFormat, MediaKind, OutputFormat, Target, TargetMode, VideoFormat, VideoQuality } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 const IMAGE_FORMATS:OutputFormat[]=["image/jpeg","image/webp","image/png","image/avif"]
@@ -44,6 +44,84 @@ function SizeInput({ id, label, value, onChange }:{ id:string; label:string; val
   )
 }
 
+type Unit="KB"|"MB"
+
+// Shared by all kinds: compress by the quality controls, to a fixed size, or by a percentage.
+function TargetControl({ kind, target, set, note }:{ kind:MediaKind; target:Target; set:(t:Target)=>void; note?:string }) {
+  const { t }=useI18n()
+  const [unit,setUnit]=useState<Unit>(kind==="image"?"KB":"MB")
+  const modes:TargetMode[]=["quality","size","percent"]
+  const labels={ quality:t.targetQuality, size:t.targetSize, percent:t.targetPercent }
+  const factor=unit==="MB"?1024:1
+  const shown=Math.round(target.sizeKb/factor*100)/100
+  const id="target-"+kind
+  return (
+    <div className="col-span-full grid items-start gap-x-5 gap-y-4 border-t border-border pt-4 md:grid-cols-[1.2fr_2fr]">
+      <Segmented
+        label={t.compressBy}
+        value={target.mode}
+        onChange={(mode)=>set({ ...target, mode })}
+        options={modes.map((m)=>({ value:m, label:labels[m] }))}
+      />
+      {target.mode==="size"&&(
+        <div className="min-w-0">
+          <label htmlFor={id} className={caption}>{t.targetSizeLabel}</label>
+          <div className="flex gap-2">
+            <div className="flex h-11 min-w-0 flex-1 items-center rounded-[14px] border border-border bg-white/[0.05] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary">
+              <input
+                id={id}
+                // Uncontrolled, so half-typed numbers like "1." survive; the key resets it when the unit changes.
+                key={unit}
+                inputMode="decimal"
+                defaultValue={shown}
+                onChange={(e)=>{
+                  const value=Number(e.target.value.replace(",",".").replace(/[^\d.]/g,""))
+                  if (Number.isFinite(value)&&value>0) set({ ...target, sizeKb:value*factor })
+                }}
+                className="h-full w-full min-w-0 bg-transparent pl-3.5 text-sm font-semibold tabular-nums outline-none"
+              />
+            </div>
+            <div className="flex rounded-[14px] border border-border bg-white/[0.05] p-1">
+              {(["KB","MB"] as Unit[]).map((u)=>(
+                <button
+                  key={u}
+                  type="button"
+                  aria-pressed={unit===u}
+                  onClick={()=>setUnit(u)}
+                  className={cn("h-9 cursor-pointer rounded-[10px] px-3 text-[13px] font-semibold transition-colors", unit===u?"bg-foreground text-background":"text-muted-foreground hover:text-foreground")}
+                >
+                  {u}
+                </button>
+              ))}
+            </div>
+          </div>
+          <p className="mt-1.5 text-xs text-muted-foreground">{note??(kind==="image"?t.targetHintImage:t.targetHintMedia)}</p>
+        </div>
+      )}
+      {target.mode==="percent"&&(
+        <div className="min-w-0">
+          <div className="mb-0.5 flex items-baseline justify-between">
+            <label htmlFor={id} className="text-xs font-semibold text-muted-foreground">{t.targetPercentLabel}</label>
+            <output htmlFor={id} className="text-sm font-bold tabular-nums">{"−"+target.percent+"%"}</output>
+          </div>
+          <input
+            id={id}
+            type="range"
+            min={10}
+            max={90}
+            step={5}
+            value={target.percent}
+            onChange={(e)=>set({ ...target, percent:Number(e.target.value) })}
+            className="squish-range"
+            style={{ ["--fill" as string]:((target.percent-10)/80)*100+"%" }}
+          />
+          <p className="text-xs text-muted-foreground">{note??(kind==="image"?t.targetHintImage:t.targetHintMedia)}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function unavailable<T extends string>(all:T[],support:Record<T,boolean>|undefined,labels:Record<T,string>) {
   return support?all.filter((f)=>!support[f]).map((f)=>labels[f]):[]
 }
@@ -51,6 +129,7 @@ function unavailable<T extends string>(all:T[],support:Record<T,boolean>|undefin
 function ImageSettings({ settings, set, encoders }:{ settings:AllSettings["image"]; set:(s:AllSettings["image"])=>void; encoders?:Record<OutputFormat,boolean> }) {
   const { t }=useI18n()
   const lossless=settings.format==="image/png"
+  const targeted=settings.target.mode!=="quality"
   const missing=unavailable(IMAGE_FORMATS,encoders,FORMAT_LABELS)
   // Presets cover the common case; "Custom" opens free width and height fields.
   const [custom,setCustom]=useState(false)
@@ -70,7 +149,7 @@ function ImageSettings({ settings, set, encoders }:{ settings:AllSettings["image
       <div>
         <div className="mb-0.5 flex items-baseline justify-between">
           <label htmlFor="quality" className="text-xs font-semibold text-muted-foreground">{t.quality}</label>
-          <output htmlFor="quality" className="text-sm font-bold tabular-nums">{lossless?"–":settings.quality}</output>
+          <output htmlFor="quality" className="text-sm font-bold tabular-nums">{lossless||targeted?"–":settings.quality}</output>
         </div>
         <input
           id="quality"
@@ -78,12 +157,12 @@ function ImageSettings({ settings, set, encoders }:{ settings:AllSettings["image
           min={1}
           max={100}
           value={settings.quality}
-          disabled={lossless}
+          disabled={lossless||targeted}
           onChange={(e)=>set({ ...settings, quality:Number(e.target.value) })}
           className="squish-range"
           style={{ ["--fill" as string]:((settings.quality-1)/99)*100+"%" }}
         />
-        {lossless&&<p className="text-xs text-muted-foreground">{t.qualityLossless}</p>}
+        {lossless&&!targeted&&<p className="text-xs text-muted-foreground">{t.qualityLossless}</p>}
       </div>
       <div className="grid gap-3">
         <Segmented
@@ -106,6 +185,7 @@ function ImageSettings({ settings, set, encoders }:{ settings:AllSettings["image
           </div>
         )}
       </div>
+      <TargetControl kind="image" target={settings.target} set={(target)=>set({ ...settings, target })} />
     </>
   )
 }
@@ -126,7 +206,7 @@ function VideoSettings({ settings, set, encoders }:{ settings:AllSettings["video
         label={t.quality}
         value={settings.quality}
         onChange={(quality)=>set({ ...settings, quality })}
-        options={qualities.map((q)=>({ value:q, label:t.videoQuality[q] }))}
+        options={qualities.map((q)=>({ value:q, label:t.videoQuality[q], disabled:settings.target.mode!=="quality" }))}
       />
       <Segmented
         label={t.resolution}
@@ -149,6 +229,7 @@ function VideoSettings({ settings, set, encoders }:{ settings:AllSettings["video
       </label>
       {missing.length>0&&<Note>{t.formatsUnavailable(missing.join(", "))}</Note>}
       <Note>{t.mediaNote}</Note>
+      <TargetControl kind="video" target={settings.target} set={(target)=>set({ ...settings, target })} />
     </>
   )
 }
@@ -169,10 +250,11 @@ function AudioSettings({ settings, set, encoders }:{ settings:AllSettings["audio
         label={t.bitrate+" ("+t.kbps+")"}
         value={String(settings.bitrate)}
         onChange={(v)=>set({ ...settings, bitrate:Number(v) })}
-        options={BITRATES.map((b)=>({ value:String(b), label:String(b), disabled:wav }))}
+        options={BITRATES.map((b)=>({ value:String(b), label:String(b), disabled:wav||settings.target.mode!=="quality" }))}
       />
       {missing.length>0&&<Note>{t.formatsUnavailable(missing.join(", "))}</Note>}
       {wav&&<Note>{t.wavNote}</Note>}
+      <TargetControl kind="audio" target={settings.target} set={(target)=>set({ ...settings, target })} note={wav?t.targetWav:undefined} />
     </>
   )
 }

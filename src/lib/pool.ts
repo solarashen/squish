@@ -49,7 +49,7 @@ class WorkerPool {
     this.idle.push(worker)
     if (pending) {
       if (data.ok) {
-        pending.resolve({ blob:data.blob, width:data.width, height:data.height, sourceWidth:data.sourceWidth, sourceHeight:data.sourceHeight })
+        pending.resolve({ blob:data.blob, width:data.width, height:data.height, sourceWidth:data.sourceWidth, sourceHeight:data.sourceHeight, missed:data.missed })
       } else {
         pending.reject(new EncodeError(data.code as ErrorCode))
       }

@@ -69,7 +69,8 @@ function Row({ item, onRetry, onRemove }:{ item:Item; onRetry:()=>void; onRemove
         <p className="text-xs break-words text-muted-foreground tabular-nums md:truncate">{detail}</p>
         {dims&&<p className="text-xs break-words text-muted-foreground tabular-nums md:truncate">{dims}</p>}
         {item.status==="error"&&item.error&&<p className="mt-0.5 text-xs font-semibold text-destructive">{errors[item.error]}</p>}
-        {change!==null&&change<0&&<p className="mt-0.5 text-xs font-semibold text-warn">{t.larger}</p>}
+        {item.result?.missed&&<p className="mt-0.5 text-xs font-semibold text-warn">{t.targetMissed}</p>}
+        {change!==null&&change<0&&!item.result?.missed&&<p className="mt-0.5 text-xs font-semibold text-warn">{t.larger}</p>}
       </div>
 
       <div className="col-span-3 h-1.5 overflow-hidden rounded-full bg-white/8 md:col-span-1" aria-hidden>
