@@ -31,7 +31,7 @@ export function Segmented<T extends string>({ label, options, value, onChange }:
                 "flex h-9 items-center justify-center truncate rounded-[10px] px-1 text-[13px] font-semibold text-muted-foreground transition-colors duration-150",
                 "peer-checked:bg-foreground peer-checked:text-background",
                 "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary",
-                o.disabled?"opacity-40 line-through":"cursor-pointer hover:text-foreground",
+                o.disabled?"opacity-40 line-through":"cursor-pointer hover:text-foreground peer-checked:hover:text-background",
               )}
             >
               {o.label}

@@ -30,11 +30,7 @@ export function Header({ onOpen }:{ onOpen:(page:InfoPage)=>void }) {
           {t.navAbout}
         </button>
       </nav>
-      <p className="order-4 flex w-full items-center gap-2 text-[13px] text-muted-foreground md:order-none md:ml-auto md:w-auto">
-        <span aria-hidden className="size-2 rounded-full bg-primary" />
-        {t.localNote}
-      </p>
-      <div role="group" aria-label={t.langLabel} className="ml-auto flex rounded-full border border-border bg-secondary p-[3px] md:ml-3">
+      <div role="group" aria-label={t.langLabel} className="ml-auto flex rounded-full border border-border bg-secondary p-[3px]">
         {langs.map((l)=>(
           <button
             key={l}

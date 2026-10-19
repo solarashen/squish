@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { Dock } from "@/components/Dock"
 import { DropCard, type DragState } from "@/components/DropCard"
 import { FileList } from "@/components/FileList"
-import { Footer } from "@/components/Footer"
 import { Header } from "@/components/Header"
 import { InfoDialog, type InfoPage } from "@/components/InfoDialog"
 import { KindTabs } from "@/components/KindTabs"
@@ -144,7 +143,7 @@ export default function App() {
   return (
     <>
       <Header onOpen={setInfo} />
-      <main id="top" className="mx-auto flex max-w-[940px] flex-col gap-3.5 px-4 pt-2 sm:px-6">
+      <main id="top" className={"mx-auto flex max-w-[940px] flex-col gap-3.5 px-4 pt-2 sm:px-6 "+(visible.length?"pb-36":"pb-16")}>
         <DropCard drag={drag} notice={notice} onFiles={take} onPaste={pasteFromButton} />
         <KindTabs value={kind} onChange={setKind} counts={counts} />
         <SettingsStrip kind={kind} settings={settings} setSettings={setSettings} encoders={encoders} />
@@ -156,7 +155,6 @@ export default function App() {
         </div>
       </main>
       {visible.length>0&&<Dock kind={kind} items={visible} onClear={()=>clear(kind)} />}
-      <Footer onOpen={setInfo} className={visible.length?"pb-32 sm:pb-36":"pb-10"} />
       <InfoDialog page={info} onClose={()=>setInfo(null)} />
     </>
   )
