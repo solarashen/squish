@@ -41,7 +41,7 @@ export function Presets({ settings, set }:{ settings:ImageSettings; set:(s:Image
   )
 }
 
-function Range({ id, label, value, min, max, step=1, display, onChange }:{
+export function Range({ id, label, value, min, max, step=1, display, onChange }:{
   id:string; label:string; value:number; min:number; max:number; step?:number; display?:string; onChange:(v:number)=>void
 }) {
   return (

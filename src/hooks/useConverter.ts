@@ -4,7 +4,7 @@ import { EXTENSIONS, FORMAT_LABELS, kindOf } from "@/lib/files"
 import { encode } from "@/lib/pool"
 import { prepareImage } from "@/lib/prepare"
 import { forget, load, mergeDefaults, save } from "@/lib/storage"
-import type { AllSettings, AudioFormat, ImageEdit, Item, MediaKind, MediaResult, OutputFormat, VideoCodecChoice, VideoFormat } from "@/lib/types"
+import type { AllSettings, AudioFormat, ImageEdit, Item, MediaEdit, MediaKind, MediaResult, OutputFormat, VideoCodecChoice, VideoFormat } from "@/lib/types"
 
 export const MAX_FILES=50
 
@@ -20,8 +20,9 @@ const DEFAULT_SETTINGS:AllSettings={
   video:{
     output:"video", format:"mp4", codec:"auto", quality:"medium", maxHeight:720, removeAudio:false, target:{ ...DEFAULT_TARGET, sizeKb:10240 },
     audioFormat:"mp3", audioBitrate:192, gifFps:12, gifWidth:480, framePosition:0.5, frameFormat:"image/jpeg",
+    rotate:0, flip:false, fps:null, speed:1,
   },
-  audio:{ format:"mp3", bitrate:128, target:{ ...DEFAULT_TARGET, sizeKb:2048 } },
+  audio:{ format:"mp3", bitrate:128, target:{ ...DEFAULT_TARGET, sizeKb:2048 }, fadeIn:0, fadeOut:0, normalize:false, mono:false, sampleRate:null },
   pdf:{ format:"image/jpeg", quality:85, scale:2 },
 }
 
@@ -152,16 +153,16 @@ export function useConverter(remember:boolean) {
           engine="pdf.js"
           result=await pdfToImages(item.file,all.pdf,onProgress,controller.signal)
         } else if (kind==="audio") {
-          result=await media.convertAudio(item.file,all.audio,onProgress,controller.signal)
+          result=await media.convertAudio(item.file,all.audio,onProgress,controller.signal,item.mediaEdit)
         } else if (all.video.output==="audio") {
-          result=await media.extractAudio(item.file,all.video,onProgress,controller.signal)
+          result=await media.extractAudio(item.file,all.video,onProgress,controller.signal,item.mediaEdit)
         } else if (all.video.output==="gif") {
           engine="WebCodecs + gifenc"
-          result=await media.videoToGif(item.file,all.video,onProgress,controller.signal)
+          result=await media.videoToGif(item.file,all.video,onProgress,controller.signal,item.mediaEdit)
         } else if (all.video.output==="frame") {
-          result=await media.videoFrame(item.file,all.video)
+          result=await media.videoFrame(item.file,all.video,item.mediaEdit)
         } else {
-          result=await media.convertVideo(item.file,all.video,onProgress,controller.signal)
+          result=await media.convertVideo(item.file,all.video,onProgress,controller.signal,item.mediaEdit)
         }
         patch(id,version,{ status:"done", error:undefined, result, progress:1, engine })
       } catch (error) {
@@ -223,6 +224,14 @@ export function useConverter(remember:boolean) {
     process(next)
   },[process,setItems])
 
+  const setMediaEdit=useCallback((id:string,mediaEdit:MediaEdit|undefined)=>{
+    const target=itemsRef.current.find((it)=>it.id===id)
+    if (!target) return
+    const next={ ...target, mediaEdit, version:target.version+1, status:"queued" as const, progress:undefined }
+    setItems(itemsRef.current.map((it)=>it.id===id?next:it))
+    process(next)
+  },[process,setItems])
+
   const remove=useCallback((id:string)=>{
     aborts.current.get(id)?.abort()
     const target=itemsRef.current.find((it)=>it.id===id)
@@ -238,5 +247,5 @@ export function useConverter(remember:boolean) {
     setItems(itemsRef.current.filter((it)=>it.kind!==kind))
   },[setItems])
 
-  return { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit }
+  return { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit, setMediaEdit }
 }

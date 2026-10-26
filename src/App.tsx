@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Binary, Copy, Crop, Info, Palette, SplitSquareHorizontal, Star } from "lucide-react"
+import { Binary, Copy, Crop, Info, Palette, Scissors, SplitSquareHorizontal, Star } from "lucide-react"
 import { Dock } from "@/components/Dock"
 import { CompareDialog } from "@/components/CompareDialog"
 import { DropCard, type DragState } from "@/components/DropCard"
 import { EditDialog } from "@/components/EditDialog"
+import { MediaEditDialog } from "@/components/MediaEditDialog"
 import { FileList } from "@/components/FileList"
 import { Header } from "@/components/Header"
 import { InfoDialog, type InfoPage } from "@/components/InfoDialog"
@@ -32,12 +33,13 @@ function namePasted(blob:Blob) {
 export default function App() {
   const { t }=useI18n()
   const general=useGeneral()
-  const { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit }=useConverter(general.remember)
+  const { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit, setMediaEdit }=useConverter(general.remember)
   const [options,setOptions]=useState(false)
   const [comparing,setComparing]=useState<Item|null>(null)
   const [inspecting,setInspecting]=useState<Item|null>(null)
   const [colours,setColours]=useState<Item|null>(null)
   const [editing,setEditing]=useState<Item|null>(null)
+  const [trimming,setTrimming]=useState<Item|null>(null)
   // A short message at the bottom of the screen, e.g. after copying.
   const [toast,setToast]=useState<string|null>(null)
   useEffect(()=>{
@@ -178,6 +180,9 @@ export default function App() {
     if (item.kind==="image"&&!/^video\//.test(settings.image.format)) {
       actions.push({ id:"edit", label:t.edit, icon:Crop, onSelect:()=>setEditing(item) })
     }
+    if (item.kind==="video"||item.kind==="audio") {
+      actions.push({ id:"trim", label:item.kind==="video"?t.trimVideo:t.trimAudio, icon:Scissors, onSelect:()=>setTrimming(item) })
+    }
     // Side-by-side only makes sense when the result is a picture the browser can show.
     if (item.kind==="image"&&blob&&/^image\/(jpeg|png|webp|avif|gif|bmp)$/.test(blob.type)) {
       actions.push({ id:"compare", label:t.compare, icon:SplitSquareHorizontal, onSelect:()=>setComparing(item) })
@@ -234,6 +239,7 @@ export default function App() {
       <CompareDialog item={comparing} onClose={()=>setComparing(null)} />
       <PhotoInfoDialog item={inspecting} onClose={()=>setInspecting(null)} />
       <EditDialog item={editing} onClose={()=>setEditing(null)} onApply={(edit)=>editing&&setEdit(editing.id,edit)} />
+      <MediaEditDialog item={trimming} onClose={()=>setTrimming(null)} onApply={(edit)=>trimming&&setMediaEdit(trimming.id,edit)} />
       <PaletteDialog item={colours} onClose={()=>setColours(null)} onCopied={(hex)=>setToast(t.copied+": "+hex)} />
       <OptionsDialog
         open={options}

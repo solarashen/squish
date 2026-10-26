@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { AdjustPanel, Presets } from "@/components/ImageExtras"
+import { AudioTools, VideoPresets, VideoTools } from "@/components/MediaExtras"
 import { Segmented } from "@/components/ui/segmented"
 import type { Encoders } from "@/hooks/useConverter"
 import { useI18n } from "@/i18n/I18nProvider"
@@ -350,6 +351,7 @@ function VideoSettings({ settings, set, encoders, codecs, audio }:{
   const setFormat=(format:VideoFormat)=>set({ ...settings, format, codec:settings.codec==="auto"||CONTAINER_CODECS[format].includes(settings.codec)?settings.codec:"auto" })
   return (
     <>
+      <VideoPresets settings={settings} set={set} />
       {turnInto}
       <Segmented
         label={t.convertTo}
@@ -391,6 +393,7 @@ function VideoSettings({ settings, set, encoders, codecs, audio }:{
       {missing.length>0&&<Note>{t.formatsUnavailable(missing.join(", "))}</Note>}
       <Note>{t.mediaNote}</Note>
       <TargetControl kind="video" target={settings.target} set={(target)=>set({ ...settings, target })} />
+      <VideoTools settings={settings} set={set} />
     </>
   )
 }
@@ -421,6 +424,7 @@ function AudioSettings({ settings, set, encoders }:{ settings:AllSettings["audio
         {lossless&&<Hint>{t.losslessAudio}</Hint>}
       </div>
       <TargetControl kind="audio" target={settings.target} set={(target)=>set({ ...settings, target })} note={lossless?t.targetWav:undefined} />
+      <AudioTools settings={settings} set={set} />
     </>
   )
 }

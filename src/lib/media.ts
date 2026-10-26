@@ -29,8 +29,9 @@ import {
 } from "mediabunny"
 import { registerFlacEncoder } from "@mediabunny/flac-encoder"
 import { registerMp3Encoder } from "@mediabunny/mp3-encoder"
+import { envelopeProcessor, isFlat, normalizeGain, speedProcessor, type Envelope } from "./audiofx"
 import { TARGET_SLACK, targetBytes } from "./target"
-import type { AudioFormat, AudioSettings, ErrorCode, MediaResult, StillFormat, VideoCodecChoice, VideoFormat, VideoSettings } from "./types"
+import type { AudioFormat, AudioSettings, ErrorCode, MediaEdit, MediaResult, StillFormat, VideoCodecChoice, VideoFormat, VideoSettings } from "./types"
 
 // Video and audio cannot go through a canvas efficiently, so they use WebCodecs (the browser's
 // built-in hardware encoders) through the mediabunny library. Everything still runs locally.
@@ -137,7 +138,17 @@ async function run(conversion:Conversion,onProgress:(p:number)=>void,signal:Abor
   }
 }
 
-export async function convertVideo(file:Blob,settings:VideoSettings,onProgress:(p:number)=>void,signal:AbortSignal):Promise<MediaResult> {
+// Width ÷ height of the crop shapes offered for video.
+export const ASPECTS:Record<string,number>={ "1:1":1, "4:3":4/3, "16:9":16/9, "9:16":9/16, "4:5":4/5 }
+
+// The trim range in seconds, clamped to the file; end is undefined when the file plays to the end.
+function trimRange(edit:MediaEdit|undefined,length:number) {
+  const start=Math.max(0,Math.min(edit?.start??0,length))
+  const end=edit?.end!=null&&edit.end<length?Math.max(start+0.1,edit.end):undefined
+  return { start, end, span:(end??length)-start }
+}
+
+export async function convertVideo(file:Blob,settings:VideoSettings,onProgress:(p:number)=>void,signal:AbortSignal,edit?:MediaEdit):Promise<MediaResult> {
   const input=openInput(file)
   try {
     const track=await input.getPrimaryVideoTrack().catch(()=>{
@@ -148,31 +159,56 @@ export async function convertVideo(file:Blob,settings:VideoSettings,onProgress:(
     const sourceHeight=track.displayHeight
     const format=videoMuxer(settings.format)
     const audioCodec=await getFirstEncodableAudioCodec(format.getSupportedAudioCodecs())
-    const keepAudio=!settings.removeAudio&&!!audioCodec&&!!(await input.getPrimaryAudioTrack().catch(()=>null))
+    const audioTrack=await input.getPrimaryAudioTrack().catch(()=>null)
+    const keepAudio=!settings.removeAudio&&!!audioCodec&&!!audioTrack
+
+    const length=await input.computeDuration().catch(()=>0)
+    const { start, end, span }=trimRange(edit,length)
+    const speed=settings.speed||1
+
+    // Rotation happens first, so a quarter turn swaps width and height before the crop.
+    const quarter=settings.rotate===90||settings.rotate===270
+    const turnedW=quarter?sourceHeight:sourceWidth
+    const turnedH=quarter?sourceWidth:sourceHeight
+    let crop:{ left:number; top:number; width:number; height:number }|undefined
+    const ratio=edit?.aspect?ASPECTS[edit.aspect]:undefined
+    if (ratio) {
+      let w=turnedW
+      let h=Math.round(w/ratio)
+      if (h>turnedH) {
+        h=turnedH
+        w=Math.round(h*ratio)
+      }
+      w-=w%2
+      h-=h%2
+      crop={ left:Math.round((turnedW-w)/2), top:Math.round((turnedH-h)/2), width:w, height:h }
+    }
+    const frameW=crop?.width??turnedW
+    const frameH=crop?.height??turnedH
 
     // Scale down to the chosen height, never up.
-    let height=sourceHeight
-    if (settings.maxHeight&&sourceHeight>settings.maxHeight) height=settings.maxHeight
+    let height=frameH
+    if (settings.maxHeight&&frameH>settings.maxHeight) height=settings.maxHeight
 
     // With a target size, the budget sets the bitrate: bits available ÷ seconds of footage.
     const budget=targetBytes(settings.target,file.size)
-    const length=budget===null?0:await input.computeDuration().catch(()=>0)
+    const seconds=span/speed
     let videoBitrate:number|null=null
     let audioBitrate=128000
-    if (budget!==null&&length>0) {
+    if (budget!==null&&seconds>0) {
       // 5% is left for the container (headers, index, timestamps).
-      const total=budget*8/length*0.95
+      const total=budget*8/seconds*0.95
       audioBitrate=keepAudio?Math.min(128000,Math.max(32000,total*0.12)):0
       videoBitrate=Math.max(40000,total-audioBitrate)
       // Too few bits for many pixels looks worse than fewer, sharper pixels, so lower the resolution
       // until each pixel gets about 0.08 bits per frame at 30 fps.
-      const fitHeight=Math.sqrt(videoBitrate/(0.08*30)*sourceHeight/sourceWidth)
+      const fitHeight=Math.sqrt(videoBitrate/(0.08*30)*frameH/frameW)
       height=Math.min(height,Math.max(144,fitHeight))
     }
 
     // Encoders want even dimensions.
     height=Math.max(2,Math.round(height/2)*2)
-    const width=Math.max(2,Math.round(sourceWidth*height/sourceHeight/2)*2)
+    const width=Math.max(2,Math.round(frameW*height/frameH/2)*2)
 
     const codec=await pickVideoCodec(format,settings.codec,width,height)
     if (!codec) throw new MediaError("codec")
@@ -182,14 +218,39 @@ export async function convertVideo(file:Blob,settings:VideoSettings,onProgress:(
       input,
       output,
       showWarnings:false,
-      video:{ codec, width, height, fit:"contain", forceTranscode:true, quality:videoBitrate?new Quality({ bitrate:Math.round(videoBitrate) }):new Quality({ quality:settings.quality, preferBitrate:true }) },
-      audio:!keepAudio||!audioCodec?{ discard:true }:{ codec:audioCodec, quality:budget===null?new Quality({ quality:"medium" }):new Quality({ bitrate:Math.round(audioBitrate) }) },
+      trim:{ start, end },
+      video:{
+        codec,
+        width,
+        height,
+        fit:"contain",
+        forceTranscode:true,
+        rotate:settings.rotate,
+        flip:settings.flip||undefined,
+        crop,
+        // Frames are dropped before the speed change, so the rate is picked on the original timeline.
+        frameRate:settings.fps?settings.fps*speed:undefined,
+        allowTransformationMetadata:false,
+        quality:videoBitrate?new Quality({ bitrate:Math.round(videoBitrate) }):new Quality({ quality:settings.quality, preferBitrate:true }),
+        // A different speed only changes when each frame is shown.
+        process:speed===1?undefined:(sample)=>{
+          sample.setTimestamp(sample.timestamp/speed)
+          sample.setDuration(sample.duration/speed)
+          return sample
+        },
+      },
+      audio:!keepAudio||!audioCodec
+        ?{ discard:true }
+        :{
+          codec:audioCodec,
+          quality:budget===null?new Quality({ quality:"medium" }):new Quality({ bitrate:Math.round(audioBitrate) }),
+          ...(speed===1?{}:{ process:speedProcessor(speed), forceTranscode:true }),
+        },
     })
     await run(conversion,onProgress,signal)
 
     const buffer=output.target.buffer
     if (!buffer) throw new MediaError("encode")
-    const duration=await input.computeDuration().catch(()=>undefined)
     const blob=new Blob([buffer],{ type:format.mimeType })
     return {
       blob,
@@ -199,7 +260,7 @@ export async function convertVideo(file:Blob,settings:VideoSettings,onProgress:(
       height,
       sourceWidth,
       sourceHeight,
-      duration,
+      duration:seconds,
       missed:budget!==null&&blob.size>budget*TARGET_SLACK,
     }
   } finally {
@@ -207,7 +268,7 @@ export async function convertVideo(file:Blob,settings:VideoSettings,onProgress:(
   }
 }
 
-export async function convertAudio(file:Blob,settings:AudioSettings,onProgress:(p:number)=>void,signal:AbortSignal):Promise<MediaResult> {
+export async function convertAudio(file:Blob,settings:AudioSettings,onProgress:(p:number)=>void,signal:AbortSignal,edit?:MediaEdit):Promise<MediaResult> {
   const input=openInput(file)
   try {
     const track=await input.getPrimaryAudioTrack().catch(()=>{
@@ -219,12 +280,19 @@ export async function convertAudio(file:Blob,settings:AudioSettings,onProgress:(
     const codec=await pickAudioCodec(settings.format,format)
     if (!codec) throw new MediaError("codec")
 
+    const length=await input.computeDuration().catch(()=>0)
+    const { start, end, span }=trimRange(edit,length)
+
     // With a target size, the bitrate is the budget spread over the length of the track.
     const budget=targetBytes(settings.target,file.size)
     let kbps=settings.bitrate
-    if (budget!==null) {
-      const length=await input.computeDuration().catch(()=>0)
-      if (length>0) kbps=fitBitrate(settings.format,budget*8/length*0.97/1000)
+    if (budget!==null&&span>0) kbps=fitBitrate(settings.format,budget*8/span*0.97/1000)
+
+    const envelope:Envelope={
+      fadeIn:settings.fadeIn??0,
+      fadeOut:settings.fadeOut??0,
+      length:span,
+      gain:settings.normalize?await normalizeGain(track,start,end):1,
     }
 
     const output=new Output({ format, target:new BufferTarget() })
@@ -232,10 +300,14 @@ export async function convertAudio(file:Blob,settings:AudioSettings,onProgress:(
       input,
       output,
       showWarnings:false,
+      trim:{ start, end },
       video:{ discard:true },
       audio:{
         codec,
         forceTranscode:true,
+        numberOfChannels:settings.mono?1:undefined,
+        sampleRate:settings.sampleRate??undefined,
+        process:isFlat(envelope)?undefined:envelopeProcessor(envelope),
         // WAV and FLAC are lossless, so a bitrate makes no sense there.
         ...(LOSSLESS_AUDIO.includes(settings.format)?{}:{ quality:new Quality({ bitrate:kbps*1000 }) }),
       },
@@ -244,13 +316,12 @@ export async function convertAudio(file:Blob,settings:AudioSettings,onProgress:(
 
     const buffer=output.target.buffer
     if (!buffer) throw new MediaError("encode")
-    const duration=await input.computeDuration().catch(()=>undefined)
     const blob=new Blob([buffer],{ type:AUDIO_MIME[settings.format] })
     return {
       blob,
       ext:settings.format,
       label:AUDIO_LABELS[settings.format],
-      duration,
+      duration:span,
       missed:budget!==null&&blob.size>budget*TARGET_SLACK,
     }
   } finally {
@@ -259,8 +330,9 @@ export async function convertAudio(file:Blob,settings:AudioSettings,onProgress:(
 }
 
 // The sound of a video, saved as an audio file. convertAudio already ignores the picture.
-export function extractAudio(file:Blob,settings:VideoSettings,onProgress:(p:number)=>void,signal:AbortSignal) {
-  return convertAudio(file,{ format:settings.audioFormat, bitrate:settings.audioBitrate, target:settings.target },onProgress,signal)
+export function extractAudio(file:Blob,settings:VideoSettings,onProgress:(p:number)=>void,signal:AbortSignal,edit?:MediaEdit) {
+  const audio:AudioSettings={ format:settings.audioFormat, bitrate:settings.audioBitrate, target:settings.target, fadeIn:0, fadeOut:0, normalize:false, mono:false, sampleRate:null }
+  return convertAudio(file,audio,onProgress,signal,edit)
 }
 
 async function openVideo(file:Blob) {
@@ -279,12 +351,13 @@ function stillBlob(canvas:HTMLCanvasElement|OffscreenCanvas,type:string,quality=
 }
 
 // One still picture from the clip, at a position between its start (0) and end (1).
-export async function videoFrame(file:Blob,settings:VideoSettings):Promise<MediaResult> {
+export async function videoFrame(file:Blob,settings:VideoSettings,edit?:MediaEdit):Promise<MediaResult> {
   const { input, track }=await openVideo(file)
   try {
     const length=await input.computeDuration()
-    const first=await track.getFirstTimestamp()
-    const span=Math.max(0,length-first)
+    const range=trimRange(edit,length)
+    const first=Math.max(await track.getFirstTimestamp(),range.start)
+    const span=Math.max(0,(range.end??length)-first)
     const at=first+Math.min(Math.max(0,span-0.05),span*settings.framePosition)
     const sink=new CanvasSink(track)
     const frame=await sink.getCanvas(at)??await sink.getCanvas(first)
@@ -308,16 +381,18 @@ export async function videoFrame(file:Blob,settings:VideoSettings):Promise<Media
 // Frames past this limit are dropped and the GIF simply ends there.
 const MAX_GIF_FRAMES=600
 
-export async function videoToGif(file:Blob,settings:VideoSettings,onProgress:(p:number)=>void,signal:AbortSignal):Promise<MediaResult> {
+export async function videoToGif(file:Blob,settings:VideoSettings,onProgress:(p:number)=>void,signal:AbortSignal,edit?:MediaEdit):Promise<MediaResult> {
   const { GIFEncoder, quantize, applyPalette }=await import("gifenc")
   const { input, track }=await openVideo(file)
   try {
     const length=await input.computeDuration()
-    const first=await track.getFirstTimestamp()
+    const range=trimRange(edit,length)
+    const first=Math.max(await track.getFirstTimestamp(),range.start)
+    const last=range.end??length
     const width=Math.min(settings.gifWidth,track.displayWidth)
     const height=Math.max(1,Math.round(track.displayHeight*width/track.displayWidth))
     const step=1/settings.gifFps
-    const count=Math.min(MAX_GIF_FRAMES,Math.max(1,Math.floor((length-first)/step)))
+    const count=Math.min(MAX_GIF_FRAMES,Math.max(1,Math.floor((last-first)/step)))
     const times=Array.from({ length:count },(_,i)=>first+i*step)
     const sink=new CanvasSink(track,{ width, height, fit:"fill" })
     const gif=GIFEncoder()

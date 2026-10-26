@@ -79,6 +79,14 @@ export type VideoSettings={
   // used when output is "frame": where in the clip, 0–1
   framePosition:number
   frameFormat:StillFormat
+  // turn the picture, in degrees
+  rotate:0|90|180|270
+  // mirror left to right
+  flip:boolean
+  // frames per second, null keeps the original
+  fps:number|null
+  // playback speed: 0.5 is slow motion, 2 is twice as fast
+  speed:number
 }
 
 export type AudioSettings={
@@ -86,6 +94,14 @@ export type AudioSettings={
   // kbps, ignored for WAV
   bitrate:number
   target:Target
+  // seconds of fade at the start and end, 0 for none
+  fadeIn:number
+  fadeOut:number
+  // raise the loudest peak to -1 dBFS
+  normalize:boolean
+  mono:boolean
+  // Hz, null keeps the original
+  sampleRate:number|null
 }
 
 export type PdfSettings={
@@ -136,6 +152,15 @@ export type ImageEdit={
   crop:{ x:number; y:number; w:number; h:number }|null
 }
 
+// Changes made to one video or audio file in the editor.
+export type MediaEdit={
+  // seconds from the start of the file
+  start:number
+  end:number|null
+  // crop a video to this shape, centred; null keeps the full frame
+  aspect:string|null
+}
+
 export type ItemStatus="queued"|"working"|"done"|"error"
 
 export type Item={
@@ -159,4 +184,6 @@ export type Item={
   version:number
   // crop, rotation and flip set in the editor for this one file
   edit?:ImageEdit
+  // trim (and for video, crop shape) set in the editor for this one file
+  mediaEdit?:MediaEdit
 }
