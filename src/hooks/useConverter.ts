@@ -4,7 +4,7 @@ import { EXTENSIONS, FORMAT_LABELS, kindOf } from "@/lib/files"
 import { encode } from "@/lib/pool"
 import { prepareImage } from "@/lib/prepare"
 import { forget, load, mergeDefaults, save } from "@/lib/storage"
-import type { AllSettings, AudioFormat, Item, MediaKind, MediaResult, OutputFormat, VideoCodecChoice, VideoFormat } from "@/lib/types"
+import type { AllSettings, AudioFormat, ImageEdit, Item, MediaKind, MediaResult, OutputFormat, VideoCodecChoice, VideoFormat } from "@/lib/types"
 
 export const MAX_FILES=50
 
@@ -124,7 +124,7 @@ export function useConverter(remember:boolean) {
               patch(id,version,{ previewUrl:URL.createObjectURL(blob), converted:true })
             }
           }
-          return encode(blob,s,item.file.size)
+          return encode(blob,s,item.file.size,item.edit)
         })
         .then((r)=>patch(id,version,{ status:"done", error:undefined, result:{ ...r, ext:EXTENSIONS[s.format], label:FORMAT_LABELS[s.format] }, engine:r.engine??"Canvas" }))
         .catch((error)=>{
@@ -214,6 +214,15 @@ export function useConverter(remember:boolean) {
     process(next)
   },[process,setItems])
 
+  // Saves the editor's changes for one file and converts just that file again.
+  const setEdit=useCallback((id:string,edit:ImageEdit|undefined)=>{
+    const target=itemsRef.current.find((it)=>it.id===id)
+    if (!target) return
+    const next={ ...target, edit, version:target.version+1, status:"queued" as const, progress:undefined }
+    setItems(itemsRef.current.map((it)=>it.id===id?next:it))
+    process(next)
+  },[process,setItems])
+
   const remove=useCallback((id:string)=>{
     aborts.current.get(id)?.abort()
     const target=itemsRef.current.find((it)=>it.id===id)
@@ -229,5 +238,5 @@ export function useConverter(remember:boolean) {
     setItems(itemsRef.current.filter((it)=>it.kind!==kind))
   },[setItems])
 
-  return { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats }
+  return { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit }
 }

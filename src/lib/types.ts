@@ -127,6 +127,15 @@ export type MediaResult={
   pages?:number
 }
 
+// Changes made to one image in the editor. The picture is rotated and flipped first, then cropped;
+// the crop is a fraction (0–1) of the rotated picture, so it does not depend on its pixel size.
+export type ImageEdit={
+  rotate:0|90|180|270
+  flipH:boolean
+  flipV:boolean
+  crop:{ x:number; y:number; w:number; h:number }|null
+}
+
 export type ItemStatus="queued"|"working"|"done"|"error"
 
 export type Item={
@@ -148,4 +157,6 @@ export type Item={
   error?:ErrorCode
   // bumps every time settings change, so stale results can be dropped
   version:number
+  // crop, rotation and flip set in the editor for this one file
+  edit?:ImageEdit
 }

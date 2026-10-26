@@ -61,7 +61,10 @@ function Row({ item, name, actions, onRetry, onRemove }:{ item:Item; name:string
     <li className="grid grid-cols-[44px_1fr_auto] items-center gap-x-4 gap-y-2 border-b border-border py-[11px] last:border-0 md:grid-cols-[44px_minmax(0,1.6fr)_minmax(80px,1fr)_64px_auto_auto]">
       <Thumb key={item.previewUrl} item={item} />
       <div className="min-w-0">
-        <p className="truncate text-[15px] font-semibold" title={item.file.name}>{item.file.name}</p>
+        <p className="flex items-center gap-2 text-[15px] font-semibold" title={item.file.name}>
+          <span className="truncate">{item.file.name}</span>
+          {item.edit&&<span className="flex-none rounded-full border border-primary/40 px-2 py-px text-[11px] font-bold text-primary">{t.edited}</span>}
+        </p>
         <p className="my-1 flex items-center gap-2 md:hidden">
           {change!==null&&<span className={cn("text-sm font-bold tabular-nums",change<0?"text-warn":"text-primary")}>{formatChange(change)}</span>}
           <span className={cn("inline-flex h-6 items-center rounded-full border border-current px-2.5 text-[12px] font-semibold",status.cls)}>{status.label}</span>

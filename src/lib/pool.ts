@@ -1,5 +1,5 @@
 import { encodeImage, EncodeError } from "./encode"
-import type { EncodeResult, ErrorCode, Settings } from "./types"
+import type { EncodeResult, ErrorCode, ImageEdit, Settings } from "./types"
 import type { WorkerRequest, WorkerResponse } from "./encode.worker"
 
 type Pending={ resolve:(r:EncodeResult)=>void; reject:(e:EncodeError)=>void }
@@ -24,9 +24,9 @@ class WorkerPool {
     }
   }
 
-  run(file:Blob,settings:Settings,sourceSize:number):Promise<EncodeResult> {
+  run(file:Blob,settings:Settings,sourceSize:number,edit?:ImageEdit):Promise<EncodeResult> {
     return new Promise((resolve,reject)=>{
-      const request={ jobId:this.nextJob++, file, settings, sourceSize }
+      const request={ jobId:this.nextJob++, file, settings, sourceSize, edit }
       this.queue.push({ request, pending:{ resolve, reject } })
       this.pump()
     })
@@ -60,11 +60,11 @@ class WorkerPool {
 
 let pool:WorkerPool|null=null
 
-export function encode(file:Blob,settings:Settings,sourceSize=file.size):Promise<EncodeResult> {
-  if (!workersSupported) return encodeImage(file,settings,sourceSize)
+export function encode(file:Blob,settings:Settings,sourceSize=file.size,edit?:ImageEdit):Promise<EncodeResult> {
+  if (!workersSupported) return encodeImage(file,settings,sourceSize,edit)
   if (!pool) {
     const cores=navigator.hardwareConcurrency||4
     pool=new WorkerPool(Math.max(1,Math.min(4,cores-1)))
   }
-  return pool.run(file,settings,sourceSize)
+  return pool.run(file,settings,sourceSize,edit)
 }

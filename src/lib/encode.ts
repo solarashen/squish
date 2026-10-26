@@ -3,7 +3,8 @@ import type { CanvasFormat, EncodeResult, ErrorCode, OutputFormat, Settings } fr
 import { applyAdjust, drawWatermark, hasWatermark } from "./effects"
 import { libavif, mozjpeg, oxipng } from "./wasm"
 import { writeBmp, writeGif, writeIco, writePdf } from "./writers"
-import type { Adjust, Watermark } from "./types"
+import { applyEdit, isEdited } from "./edit"
+import type { Adjust, ImageEdit, Watermark } from "./types"
 
 // Largest canvas area that every current browser can allocate safely (16 384 × 16 384 is the iOS limit).
 const MAX_PIXELS=16384*16384
@@ -176,7 +177,7 @@ async function encodeToBudget(bitmap:ImageBitmap,width:number,height:number,form
 // The whole pipeline: decode → draw on canvas at the new size → encode to the chosen format.
 // sourceSize is the size of the file the person dropped, which differs from the blob when a HEIC or
 // SVG was turned into a PNG first; percentage targets are measured against it.
-export async function encodeImage(file:Blob,settings:Settings,sourceSize=file.size):Promise<EncodeResult> {
+export async function encodeImage(file:Blob,settings:Settings,sourceSize=file.size,edit?:ImageEdit):Promise<EncodeResult> {
   let bitmap:ImageBitmap
   try {
     bitmap=await createImageBitmap(file,{ imageOrientation:"from-image" })
@@ -184,16 +185,23 @@ export async function encodeImage(file:Blob,settings:Settings,sourceSize=file.si
     throw new EncodeError("decode")
   }
 
+  const sourceWidth=bitmap.width
+  const sourceHeight=bitmap.height
+  // Crop, rotation and flip from the editor come first; everything after works on the edited picture.
+  if (isEdited(edit)) {
+    const edited=await applyEdit(bitmap,edit!)
+    bitmap.close()
+    bitmap=edited
+  }
+
   try {
-    const sourceWidth=bitmap.width
-    const sourceHeight=bitmap.height
-    const { width, height }=targetSize(sourceWidth,sourceHeight,settings.maxWidth,settings.maxHeight)
+    const { width, height }=targetSize(bitmap.width,bitmap.height,settings.maxWidth,settings.maxHeight)
     if (width*height>MAX_PIXELS) throw new EncodeError("too-large")
 
     // An icon file holds fixed sizes (16–256 px), so resizing and targets do not apply.
     if (settings.format==="image/x-icon") {
-      const blob=await writeIco(bitmap,sourceWidth,sourceHeight)
-      const side=Math.min(256,Math.max(sourceWidth,sourceHeight))
+      const blob=await writeIco(bitmap,bitmap.width,bitmap.height)
+      const side=Math.min(256,Math.max(bitmap.width,bitmap.height))
       return { blob, width:side, height:side, sourceWidth, sourceHeight }
     }
 
