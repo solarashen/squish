@@ -3,7 +3,7 @@ import { Download, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCountUp } from "@/hooks/useCountUp"
 import { useI18n } from "@/i18n/I18nProvider"
-import { downloadZip, formatChange } from "@/lib/files"
+import { downloadBlob, downloadZip, formatChange } from "@/lib/files"
 import type { Item, MediaKind } from "@/lib/types"
 
 // The result of the active tab, pinned to the bottom of the window: saving, sizes and the download.
@@ -12,6 +12,13 @@ export function Dock({ kind, items, onClear }:{ kind:MediaKind; items:Item[]; on
   const [zipping,setZipping]=useState(false)
 
   const done=items.filter((it)=>it.status==="done"&&it.result)
+  // Images saved as PDF download as one joined document instead of a ZIP of one-page PDFs.
+  const asOnePdf=kind==="image"&&done.length>0&&done.every((it)=>it.result!.ext==="pdf")
+  const download=async ()=>{
+    if (!asOnePdf) return downloadZip(done,t.zipName[kind])
+    const { mergePdfs }=await import("@/lib/writers")
+    downloadBlob(await mergePdfs(done.map((it)=>it.result!.blob)),"squish.pdf")
+  }
   const before=done.reduce((sum,it)=>sum+it.file.size,0)
   const after=done.reduce((sum,it)=>sum+it.result!.blob.size,0)
   const saving=before?(1-after/before)*100:0
@@ -47,15 +54,15 @@ export function Dock({ kind, items, onClear }:{ kind:MediaKind; items:Item[]; on
             onClick={async ()=>{
               setZipping(true)
               try {
-                await downloadZip(done,t.zipName[kind])
+                await download()
               } finally {
                 setZipping(false)
               }
             }}
           >
             <Download aria-hidden className="size-[18px]" strokeWidth={2.4} />
-            <span className="hidden sm:inline">{t.downloadAll}</span>
-            <span className="sm:hidden">ZIP</span>
+            <span className="hidden sm:inline">{asOnePdf?t.downloadPdf:t.downloadAll}</span>
+            <span className="sm:hidden">{asOnePdf?"PDF":"ZIP"}</span>
           </Button>
         </div>
       </div>

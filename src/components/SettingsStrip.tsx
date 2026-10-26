@@ -3,17 +3,24 @@ import { Segmented } from "@/components/ui/segmented"
 import type { Encoders } from "@/hooks/useConverter"
 import { useI18n } from "@/i18n/I18nProvider"
 import { FORMAT_LABELS } from "@/lib/files"
-import type { AllSettings, AudioFormat, MediaKind, OutputFormat, Target, TargetMode, VideoFormat, VideoQuality } from "@/lib/types"
+import type { AllSettings, AudioFormat, MediaKind, OutputFormat, StillFormat, Target, TargetMode, VideoCodecChoice, VideoFormat, VideoOutput, VideoQuality } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
-const IMAGE_FORMATS:OutputFormat[]=["image/jpeg","image/webp","image/png","image/avif"]
-const VIDEO_FORMATS:VideoFormat[]=["mp4","webm"]
-const VIDEO_LABELS:Record<VideoFormat,string>={ mp4:"MP4", webm:"WebM" }
-const AUDIO_FORMATS:AudioFormat[]=["mp3","m4a","ogg","wav"]
-const AUDIO_LABELS:Record<AudioFormat,string>={ mp3:"MP3", m4a:"M4A", ogg:"OGG", wav:"WAV" }
+const IMAGE_FORMATS:OutputFormat[]=["image/jpeg","image/webp","image/png","image/avif","image/gif","image/bmp","image/x-icon","application/pdf","video/mp4","video/webm"]
+const STILL_FORMATS:StillFormat[]=["image/jpeg","image/png","image/webp"]
+const VIDEO_FORMATS:VideoFormat[]=["mp4","webm","mov","mkv","ts"]
+const VIDEO_LABELS:Record<VideoFormat,string>={ mp4:"MP4", webm:"WebM", mov:"MOV", mkv:"MKV", ts:"TS" }
+const CODECS:VideoCodecChoice[]=["auto","avc","hevc","vp9","av1"]
+const CODEC_LABELS:Record<VideoCodecChoice,string>={ auto:"Auto", avc:"H.264", hevc:"HEVC", vp9:"VP9", av1:"AV1" }
+const AUDIO_FORMATS:AudioFormat[]=["mp3","m4a","aac","ogg","opus","flac","wav"]
+const AUDIO_LABELS:Record<AudioFormat,string>={ mp3:"MP3", m4a:"M4A", aac:"AAC", ogg:"OGG", opus:"Opus", flac:"FLAC", wav:"WAV" }
+const LOSSLESS_AUDIO:AudioFormat[]=["flac","wav"]
 const RESOLUTIONS=[null,1080,720,480]
 const BITRATES=[64,128,192,320]
 const SIZE_PRESETS=[1920,1280]
+const GIF_FPS=[8,12,15,24]
+const GIF_WIDTHS=[320,480,640,960]
+const PDF_SCALES=[1,2,3]
 
 const caption="mb-2 block text-xs font-semibold text-muted-foreground"
 
@@ -126,81 +133,216 @@ function unavailable<T extends string>(all:T[],support:Record<T,boolean>|undefin
   return support?all.filter((f)=>!support[f]).map((f)=>labels[f]):[]
 }
 
+function Hint({ children }:{ children:string }) {
+  return <p className="mt-1.5 text-xs text-muted-foreground">{children}</p>
+}
+
+function QualitySlider({ id, value, disabled, onChange, note }:{ id:string; value:number; disabled?:boolean; onChange:(v:number)=>void; note?:string }) {
+  const { t }=useI18n()
+  return (
+    <div>
+      <div className="mb-0.5 flex items-baseline justify-between">
+        <label htmlFor={id} className="text-xs font-semibold text-muted-foreground">{t.quality}</label>
+        <output htmlFor={id} className="text-sm font-bold tabular-nums">{disabled?"–":value}</output>
+      </div>
+      <input
+        id={id}
+        type="range"
+        min={1}
+        max={100}
+        value={value}
+        disabled={disabled}
+        onChange={(e)=>onChange(Number(e.target.value))}
+        className="squish-range"
+        style={{ ["--fill" as string]:((value-1)/99)*100+"%" }}
+      />
+      {note&&<p className="text-xs text-muted-foreground">{note}</p>}
+    </div>
+  )
+}
+
 function ImageSettings({ settings, set, encoders }:{ settings:AllSettings["image"]; set:(s:AllSettings["image"])=>void; encoders?:Record<OutputFormat,boolean> }) {
   const { t }=useI18n()
-  const lossless=settings.format==="image/png"
+  const f=settings.format
+  const animated=f==="video/mp4"||f==="video/webm"
+  const icon=f==="image/x-icon"
+  const lossless=f==="image/png"||f==="image/bmp"
   const targeted=settings.target.mode!=="quality"
   const missing=unavailable(IMAGE_FORMATS,encoders,FORMAT_LABELS)
   // Presets cover the common case; "Custom" opens free width and height fields.
   const [custom,setCustom]=useState(false)
   const preset=settings.maxHeight===null&&(settings.maxWidth===null||SIZE_PRESETS.includes(settings.maxWidth))
   const size=custom||!preset?"custom":settings.maxWidth===null?"orig":String(settings.maxWidth)
+  const formatNote=animated?t.animatedNote:icon?t.icoNote:f==="application/pdf"?t.pdfOutNote:missing.length?t.formatsUnavailable(missing.join(", ")):null
   return (
     <>
       <div>
         <Segmented
           label={t.convertTo}
-          value={settings.format}
+          value={f}
+          columns={5}
           onChange={(format)=>set({ ...settings, format })}
-          options={IMAGE_FORMATS.map((f)=>({ value:f, label:FORMAT_LABELS[f], disabled:encoders?!encoders[f]:false, title:encoders&&!encoders[f]?t.notSupported:undefined }))}
+          options={IMAGE_FORMATS.map((o)=>({ value:o, label:FORMAT_LABELS[o], disabled:encoders?!encoders[o]:false, title:encoders&&!encoders[o]?t.notSupported:undefined }))}
         />
-        {missing.length>0&&<p className="mt-1.5 text-xs text-muted-foreground">{t.formatsUnavailable(missing.join(", "))}</p>}
+        {formatNote&&<Hint>{formatNote}</Hint>}
       </div>
-      <div>
-        <div className="mb-0.5 flex items-baseline justify-between">
-          <label htmlFor="quality" className="text-xs font-semibold text-muted-foreground">{t.quality}</label>
-          <output htmlFor="quality" className="text-sm font-bold tabular-nums">{lossless||targeted?"–":settings.quality}</output>
+      <QualitySlider
+        id="quality"
+        value={settings.quality}
+        disabled={lossless||targeted||animated||icon}
+        onChange={(quality)=>set({ ...settings, quality })}
+        note={f==="image/png"&&!targeted?t.qualityLossless:undefined}
+      />
+      {!animated&&!icon&&(
+        <div className="grid gap-3">
+          <Segmented
+            label={t.maxSize}
+            value={size}
+            onChange={(v)=>{
+              setCustom(v==="custom")
+              if (v!=="custom") set({ ...settings, maxWidth:v==="orig"?null:Number(v), maxHeight:null })
+            }}
+            options={[
+              { value:"orig", label:t.original },
+              ...SIZE_PRESETS.map((w)=>({ value:String(w), label:String(w) })),
+              { value:"custom", label:t.custom },
+            ]}
+          />
+          {size==="custom"&&(
+            <div className="grid grid-cols-2 gap-3">
+              <SizeInput id="max-w" label={t.maxWidth} value={settings.maxWidth} onChange={(maxWidth)=>set({ ...settings, maxWidth })} />
+              <SizeInput id="max-h" label={t.maxHeight} value={settings.maxHeight} onChange={(maxHeight)=>set({ ...settings, maxHeight })} />
+            </div>
+          )}
         </div>
-        <input
-          id="quality"
-          type="range"
-          min={1}
-          max={100}
-          value={settings.quality}
-          disabled={lossless||targeted}
-          onChange={(e)=>set({ ...settings, quality:Number(e.target.value) })}
-          className="squish-range"
-          style={{ ["--fill" as string]:((settings.quality-1)/99)*100+"%" }}
-        />
-        {lossless&&!targeted&&<p className="text-xs text-muted-foreground">{t.qualityLossless}</p>}
-      </div>
-      <div className="grid gap-3">
-        <Segmented
-          label={t.maxSize}
-          value={size}
-          onChange={(v)=>{
-            setCustom(v==="custom")
-            if (v!=="custom") set({ ...settings, maxWidth:v==="orig"?null:Number(v), maxHeight:null })
-          }}
-          options={[
-            { value:"orig", label:t.original },
-            ...SIZE_PRESETS.map((w)=>({ value:String(w), label:String(w) })),
-            { value:"custom", label:t.custom },
-          ]}
-        />
-        {size==="custom"&&(
-          <div className="grid grid-cols-2 gap-3">
-            <SizeInput id="max-w" label={t.maxWidth} value={settings.maxWidth} onChange={(maxWidth)=>set({ ...settings, maxWidth })} />
-            <SizeInput id="max-h" label={t.maxHeight} value={settings.maxHeight} onChange={(maxHeight)=>set({ ...settings, maxHeight })} />
-          </div>
-        )}
-      </div>
-      <TargetControl kind="image" target={settings.target} set={(target)=>set({ ...settings, target })} />
+      )}
+      {animated||icon
+        ?<Note>{t.targetOff}</Note>
+        :<TargetControl kind="image" target={settings.target} set={(target)=>set({ ...settings, target })} />}
     </>
   )
 }
 
-function VideoSettings({ settings, set, encoders }:{ settings:AllSettings["video"]; set:(s:AllSettings["video"])=>void; encoders?:Record<VideoFormat,boolean> }) {
+// Which codecs each container can hold.
+const CONTAINER_CODECS:Record<VideoFormat,VideoCodecChoice[]>={
+  mp4:["avc","hevc","vp9","av1"],
+  mov:["avc","hevc","vp9","av1"],
+  webm:["vp9","av1"],
+  mkv:["avc","hevc","vp9","av1"],
+  ts:["avc","hevc"],
+}
+
+function VideoSettings({ settings, set, encoders, codecs, audio }:{
+  settings:AllSettings["video"]
+  set:(s:AllSettings["video"])=>void
+  encoders?:Record<VideoFormat,boolean>
+  codecs?:Record<VideoCodecChoice,boolean>
+  audio?:Record<AudioFormat,boolean>
+}) {
   const { t }=useI18n()
+  const outputs:VideoOutput[]=["video","audio","gif","frame"]
+  const outputLabels={ video:t.outputVideo, audio:t.outputAudio, gif:t.outputGif, frame:t.outputFrame }
+  const turnInto=(
+    <Segmented
+      label={t.output}
+      value={settings.output}
+      columns={2}
+      onChange={(output)=>set({ ...settings, output })}
+      options={outputs.map((o)=>({ value:o, label:outputLabels[o] }))}
+    />
+  )
+
+  if (settings.output==="audio") {
+    const lossless=LOSSLESS_AUDIO.includes(settings.audioFormat)
+    return (
+      <>
+        {turnInto}
+        <div>
+          <Segmented
+            label={t.convertTo}
+            value={settings.audioFormat}
+            columns={4}
+            onChange={(audioFormat)=>set({ ...settings, audioFormat })}
+            options={AUDIO_FORMATS.map((a)=>({ value:a, label:AUDIO_LABELS[a], disabled:audio?!audio[a]:false }))}
+          />
+        </div>
+        <div>
+          <Segmented
+            label={t.bitrate+" ("+t.kbps+")"}
+            value={String(settings.audioBitrate)}
+            onChange={(v)=>set({ ...settings, audioBitrate:Number(v) })}
+            options={BITRATES.map((b)=>({ value:String(b), label:String(b), disabled:lossless||settings.target.mode!=="quality" }))}
+          />
+          {lossless&&<Hint>{t.losslessAudio}</Hint>}
+        </div>
+        <TargetControl kind="video" target={settings.target} set={(target)=>set({ ...settings, target })} note={lossless?t.targetWav:t.targetHintMedia} />
+      </>
+    )
+  }
+
+  if (settings.output==="gif") {
+    return (
+      <>
+        {turnInto}
+        <Segmented
+          label={t.gifFps}
+          value={String(settings.gifFps)}
+          onChange={(v)=>set({ ...settings, gifFps:Number(v) })}
+          options={GIF_FPS.map((n)=>({ value:String(n), label:String(n) }))}
+        />
+        <div>
+          <Segmented
+            label={t.gifWidth+" ("+t.px+")"}
+            value={String(settings.gifWidth)}
+            onChange={(v)=>set({ ...settings, gifWidth:Number(v) })}
+            options={GIF_WIDTHS.map((n)=>({ value:String(n), label:String(n) }))}
+          />
+          <Hint>{t.gifNote}</Hint>
+        </div>
+      </>
+    )
+  }
+
+  if (settings.output==="frame") {
+    const positions=[{ value:"0", label:t.frameStart }, { value:"0.5", label:t.frameMiddle }, { value:"1", label:t.frameEnd }]
+    return (
+      <>
+        {turnInto}
+        <Segmented
+          label={t.framePosition}
+          value={String(settings.framePosition)}
+          onChange={(v)=>set({ ...settings, framePosition:Number(v) })}
+          options={positions}
+        />
+        <Segmented
+          label={t.convertTo}
+          value={settings.frameFormat}
+          onChange={(frameFormat)=>set({ ...settings, frameFormat })}
+          options={STILL_FORMATS.map((s)=>({ value:s, label:FORMAT_LABELS[s] }))}
+        />
+      </>
+    )
+  }
+
   const missing=unavailable(VIDEO_FORMATS,encoders,VIDEO_LABELS)
   const qualities:VideoQuality[]=["low","medium","high"]
+  const allowed=CONTAINER_CODECS[settings.format]
+  // A codec the new container cannot hold falls back to Auto.
+  const setFormat=(format:VideoFormat)=>set({ ...settings, format, codec:settings.codec==="auto"||CONTAINER_CODECS[format].includes(settings.codec)?settings.codec:"auto" })
   return (
     <>
+      {turnInto}
       <Segmented
         label={t.convertTo}
         value={settings.format}
-        onChange={(format)=>set({ ...settings, format })}
-        options={VIDEO_FORMATS.map((f)=>({ value:f, label:VIDEO_LABELS[f], disabled:encoders?!encoders[f]:false }))}
+        onChange={setFormat}
+        options={VIDEO_FORMATS.map((v)=>({ value:v, label:VIDEO_LABELS[v], disabled:encoders?!encoders[v]:false }))}
+      />
+      <Segmented
+        label={t.codec}
+        value={settings.codec}
+        onChange={(codec)=>set({ ...settings, codec })}
+        options={CODECS.map((c)=>({ value:c, label:c==="auto"?t.codecAuto:CODEC_LABELS[c], disabled:c!=="auto"&&(!allowed.includes(c)||(codecs?!codecs[c]:false)) }))}
       />
       <Segmented
         label={t.quality}
@@ -237,32 +379,66 @@ function VideoSettings({ settings, set, encoders }:{ settings:AllSettings["video
 function AudioSettings({ settings, set, encoders }:{ settings:AllSettings["audio"]; set:(s:AllSettings["audio"])=>void; encoders?:Record<AudioFormat,boolean> }) {
   const { t }=useI18n()
   const missing=unavailable(AUDIO_FORMATS,encoders,AUDIO_LABELS)
-  const wav=settings.format==="wav"
+  const lossless=LOSSLESS_AUDIO.includes(settings.format)
+  return (
+    <>
+      <div>
+        <Segmented
+          label={t.convertTo}
+          value={settings.format}
+          columns={4}
+          onChange={(format)=>set({ ...settings, format })}
+          options={AUDIO_FORMATS.map((a)=>({ value:a, label:AUDIO_LABELS[a], disabled:encoders?!encoders[a]:false }))}
+        />
+        {missing.length>0&&<Hint>{t.formatsUnavailable(missing.join(", "))}</Hint>}
+      </div>
+      <div>
+        <Segmented
+          label={t.bitrate+" ("+t.kbps+")"}
+          value={String(settings.bitrate)}
+          onChange={(v)=>set({ ...settings, bitrate:Number(v) })}
+          options={BITRATES.map((b)=>({ value:String(b), label:String(b), disabled:lossless||settings.target.mode!=="quality" }))}
+        />
+        {lossless&&<Hint>{t.losslessAudio}</Hint>}
+      </div>
+      <TargetControl kind="audio" target={settings.target} set={(target)=>set({ ...settings, target })} note={lossless?t.targetWav:undefined} />
+    </>
+  )
+}
+
+function PdfSettings({ settings, set }:{ settings:AllSettings["pdf"]; set:(s:AllSettings["pdf"])=>void }) {
+  const { t }=useI18n()
   return (
     <>
       <Segmented
         label={t.convertTo}
         value={settings.format}
         onChange={(format)=>set({ ...settings, format })}
-        options={AUDIO_FORMATS.map((f)=>({ value:f, label:AUDIO_LABELS[f], disabled:encoders?!encoders[f]:false }))}
+        options={STILL_FORMATS.map((s)=>({ value:s, label:FORMAT_LABELS[s] }))}
+      />
+      <QualitySlider
+        id="pdf-quality"
+        value={settings.quality}
+        disabled={settings.format==="image/png"}
+        onChange={(quality)=>set({ ...settings, quality })}
+        note={settings.format==="image/png"?t.qualityLossless:undefined}
       />
       <Segmented
-        label={t.bitrate+" ("+t.kbps+")"}
-        value={String(settings.bitrate)}
-        onChange={(v)=>set({ ...settings, bitrate:Number(v) })}
-        options={BITRATES.map((b)=>({ value:String(b), label:String(b), disabled:wav||settings.target.mode!=="quality" }))}
+        label={t.pdfScale}
+        value={String(settings.scale)}
+        onChange={(v)=>set({ ...settings, scale:Number(v) })}
+        options={PDF_SCALES.map((n)=>({ value:String(n), label:n*72+" dpi" }))}
       />
-      {missing.length>0&&<Note>{t.formatsUnavailable(missing.join(", "))}</Note>}
-      {wav&&<Note>{t.wavNote}</Note>}
-      <TargetControl kind="audio" target={settings.target} set={(target)=>set({ ...settings, target })} note={wav?t.targetWav:undefined} />
+      <Note>{t.pdfNote}</Note>
     </>
   )
 }
 
 const COLUMNS:Record<MediaKind,string>={
-  image:"md:grid-cols-[1.2fr_1fr_1fr]",
-  video:"sm:grid-cols-2 lg:grid-cols-[0.8fr_1.2fr_1.5fr_auto]",
+  image:"md:grid-cols-[1.35fr_0.85fr_1.3fr]",
+  video:"sm:grid-cols-2 lg:grid-cols-3",
   audio:"md:grid-cols-[1.2fr_1fr]",
+  pdf:"md:grid-cols-3",
 }
 
 // One horizontal glass strip holding the settings of the active kind.
@@ -276,8 +452,9 @@ export function SettingsStrip({ kind, settings, setSettings, encoders }:{
   return (
     <section aria-label={t.settingsLabel} className={cn("glass grid items-start gap-x-5 gap-y-5 px-5 py-[18px] sm:px-[22px]",COLUMNS[kind])}>
       {kind==="image"&&<ImageSettings settings={settings.image} set={(s)=>setSettings("image",s)} encoders={encoders.image} />}
-      {kind==="video"&&<VideoSettings settings={settings.video} set={(s)=>setSettings("video",s)} encoders={encoders.video} />}
+      {kind==="video"&&<VideoSettings settings={settings.video} set={(s)=>setSettings("video",s)} encoders={encoders.video} codecs={encoders.codecs} audio={encoders.audio} />}
       {kind==="audio"&&<AudioSettings settings={settings.audio} set={(s)=>setSettings("audio",s)} encoders={encoders.audio} />}
+      {kind==="pdf"&&<PdfSettings settings={settings.pdf} set={(s)=>setSettings("pdf",s)} />}
     </section>
   )
 }

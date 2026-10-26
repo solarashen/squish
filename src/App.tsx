@@ -107,7 +107,7 @@ export default function App() {
   },[take,t])
 
   const visible=items.filter((it)=>it.kind===kind)
-  const counts={ image:0, video:0, audio:0 }
+  const counts={ image:0, video:0, audio:0, pdf:0 }
   for (const it of items) counts[it.kind]++
 
   // The aurora behind the page answers what happens: it brightens while files are dragged over

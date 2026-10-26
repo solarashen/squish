@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   // Pre-bundle the lazily imported media libraries, so the dev server never reloads mid-session.
   optimizeDeps: {
-    include: ["mediabunny", "@mediabunny/mp3-encoder"],
+    include: ["mediabunny", "@mediabunny/mp3-encoder","@mediabunny/flac-encoder"],
   },
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },

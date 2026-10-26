@@ -1,5 +1,6 @@
 import { targetBytes } from "./target"
-import type { EncodeResult, ErrorCode, OutputFormat, Settings } from "./types"
+import type { CanvasFormat, EncodeResult, ErrorCode, OutputFormat, Settings } from "./types"
+import { writeBmp, writeGif, writeIco, writePdf } from "./writers"
 
 // Largest canvas area that every current browser can allocate safely (16 384 × 16 384 is the iOS limit).
 const MAX_PIXELS=16384*16384
@@ -22,7 +23,7 @@ function makeCanvas(width:number,height:number):AnyCanvas {
   return canvas
 }
 
-function canvasToBlob(canvas:AnyCanvas,type:OutputFormat,quality:number):Promise<Blob> {
+function canvasToBlob(canvas:AnyCanvas,type:string,quality:number):Promise<Blob> {
   if ("convertToBlob" in canvas) return canvas.convertToBlob({ type, quality })
   return new Promise((resolve,reject)=>{
     canvas.toBlob((blob)=>blob?resolve(blob):reject(new EncodeError("encode")),type,quality)
@@ -44,8 +45,9 @@ function draw(bitmap:ImageBitmap,width:number,height:number,format:OutputFormat)
   const canvas=makeCanvas(width,height)
   const ctx=canvas.getContext("2d") as OffscreenCanvasRenderingContext2D|CanvasRenderingContext2D|null
   if (!ctx) throw new EncodeError("encode")
-  // JPEG has no alpha channel, so transparent pixels would turn black without a white backdrop.
-  if (format==="image/jpeg") {
+  // JPEG, BMP and the JPEG inside a PDF have no alpha channel, so transparent pixels would turn
+  // black without a white backdrop.
+  if (format==="image/jpeg"||format==="image/bmp"||format==="application/pdf") {
     ctx.fillStyle="#ffffff"
     ctx.fillRect(0,0,width,height)
   }
@@ -55,7 +57,15 @@ function draw(bitmap:ImageBitmap,width:number,height:number,format:OutputFormat)
   return canvas
 }
 
+const CANVAS_FORMATS:OutputFormat[]=["image/jpeg","image/webp","image/png","image/avif"]
+// Formats where quality has no effect, so only the pixel count can bring the size down.
+const LOSSLESS:OutputFormat[]=["image/png","image/bmp"]
+
 async function toBlob(canvas:AnyCanvas,format:OutputFormat,quality:number) {
+  if (format==="image/gif") return writeGif(canvas,quality)
+  if (format==="image/bmp") return writeBmp(canvas)
+  if (format==="application/pdf") return writePdf(canvas,quality)
+  if (!CANVAS_FORMATS.includes(format)) throw new EncodeError("unsupported-output")
   const blob=await canvasToBlob(canvas,format,quality)
   // Browsers silently fall back to PNG when they cannot encode the requested type.
   if (blob.type!==format) throw new EncodeError("unsupported-output")
@@ -84,7 +94,7 @@ async function fitQuality(canvas:AnyCanvas,format:OutputFormat,budget:number) {
 
 // Aims the image at a byte budget: first lower the quality, then shrink the pixels until it fits.
 async function encodeToBudget(bitmap:ImageBitmap,width:number,height:number,format:OutputFormat,budget:number) {
-  const lossless=format==="image/png"
+  const lossless=LOSSLESS.includes(format)
   let w=width
   let h=height
   let smallest:{ blob:Blob; width:number; height:number }|null=null
@@ -128,7 +138,9 @@ async function encodeToBudget(bitmap:ImageBitmap,width:number,height:number,form
 }
 
 // The whole pipeline: decode → draw on canvas at the new size → encode to the chosen format.
-export async function encodeImage(file:Blob,settings:Settings):Promise<EncodeResult> {
+// sourceSize is the size of the file the person dropped, which differs from the blob when a HEIC or
+// SVG was turned into a PNG first; percentage targets are measured against it.
+export async function encodeImage(file:Blob,settings:Settings,sourceSize=file.size):Promise<EncodeResult> {
   let bitmap:ImageBitmap
   try {
     bitmap=await createImageBitmap(file,{ imageOrientation:"from-image" })
@@ -142,7 +154,14 @@ export async function encodeImage(file:Blob,settings:Settings):Promise<EncodeRes
     const { width, height }=targetSize(sourceWidth,sourceHeight,settings.maxWidth,settings.maxHeight)
     if (width*height>MAX_PIXELS) throw new EncodeError("too-large")
 
-    const budget=targetBytes(settings.target,file.size)
+    // An icon file holds fixed sizes (16–256 px), so resizing and targets do not apply.
+    if (settings.format==="image/x-icon") {
+      const blob=await writeIco(bitmap,sourceWidth,sourceHeight)
+      const side=Math.min(256,Math.max(sourceWidth,sourceHeight))
+      return { blob, width:side, height:side, sourceWidth, sourceHeight }
+    }
+
+    const budget=targetBytes(settings.target,sourceSize)
     if (budget!==null) {
       const hit=await encodeToBudget(bitmap,width,height,settings.format,budget)
       return { ...hit, sourceWidth, sourceHeight }
@@ -157,8 +176,14 @@ export async function encodeImage(file:Blob,settings:Settings):Promise<EncodeRes
 
 // Encodes a 1 × 1 canvas to find out which output formats this browser can actually write.
 export async function detectEncoders():Promise<Record<OutputFormat,boolean>> {
-  const formats:OutputFormat[]=["image/jpeg","image/png","image/webp","image/avif"]
-  const result={} as Record<OutputFormat,boolean>
+  const formats:CanvasFormat[]=["image/jpeg","image/png","image/webp","image/avif"]
+  // GIF, BMP, ICO and PDF are written in JavaScript and always work; animated video needs WebCodecs.
+  const video=typeof VideoEncoder!=="undefined"
+  const result:Record<OutputFormat,boolean>={
+    "image/jpeg":false, "image/png":false, "image/webp":false, "image/avif":false,
+    "image/gif":true, "image/bmp":true, "image/x-icon":true, "application/pdf":true,
+    "video/mp4":video, "video/webm":video,
+  }
   await Promise.all(formats.map(async (type)=>{
     try {
       const canvas=makeCanvas(2,2)

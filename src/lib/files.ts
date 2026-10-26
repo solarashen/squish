@@ -6,6 +6,12 @@ export const EXTENSIONS:Record<OutputFormat,string>={
   "image/webp":"webp",
   "image/png":"png",
   "image/avif":"avif",
+  "image/gif":"gif",
+  "image/bmp":"bmp",
+  "image/x-icon":"ico",
+  "application/pdf":"pdf",
+  "video/mp4":"mp4",
+  "video/webm":"webm",
 }
 
 export const FORMAT_LABELS:Record<OutputFormat,string>={
@@ -13,18 +19,39 @@ export const FORMAT_LABELS:Record<OutputFormat,string>={
   "image/webp":"WebP",
   "image/png":"PNG",
   "image/avif":"AVIF",
+  "image/gif":"GIF",
+  "image/bmp":"BMP",
+  "image/x-icon":"ICO",
+  "application/pdf":"PDF",
+  "video/mp4":"MP4",
+  "video/webm":"WebM",
 }
 
 const VIDEO_EXT=/\.(mp4|m4v|mov|webm|mkv|avi|ogv|3gp|ts|mts)$/i
 const AUDIO_EXT=/\.(mp3|m4a|aac|wav|ogg|oga|opus|flac|weba|wma|aiff?)$/i
-const IMAGE_EXT=/\.(heic|heif|avif|jxl)$/i
+const IMAGE_EXT=/\.(heic|heif|avif|jxl|svg)$/i
+const HEIC_EXT=/\.(heic|heif)$/i
 
 // Sorts a dropped file into a tab by MIME type, falling back to the extension.
 export function kindOf(file:File):MediaKind|null {
+  if (file.type==="application/pdf"||/\.pdf$/i.test(file.name)) return "pdf"
   if (file.type.startsWith("image/")||IMAGE_EXT.test(file.name)) return "image"
   if (file.type.startsWith("video/")||VIDEO_EXT.test(file.name)) return "video"
   if (file.type.startsWith("audio/")||AUDIO_EXT.test(file.name)) return "audio"
   return null
+}
+
+export function isHeic(file:File) {
+  return file.type==="image/heic"||file.type==="image/heif"||HEIC_EXT.test(file.name)
+}
+
+export function isSvg(file:File) {
+  return file.type==="image/svg+xml"||/\.svg$/i.test(file.name)
+}
+
+// GIF, WebP and PNG (APNG) are the image formats that can hold animation.
+export function mayBeAnimated(file:File) {
+  return /^image\/(gif|webp|png|apng)$/.test(file.type)||/\.(gif|webp|apng)$/i.test(file.name)
 }
 
 export function outputName(name:string,ext:string) {

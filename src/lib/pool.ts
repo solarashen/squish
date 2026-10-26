@@ -24,9 +24,9 @@ class WorkerPool {
     }
   }
 
-  run(file:Blob,settings:Settings):Promise<EncodeResult> {
+  run(file:Blob,settings:Settings,sourceSize:number):Promise<EncodeResult> {
     return new Promise((resolve,reject)=>{
-      const request={ jobId:this.nextJob++, file, settings }
+      const request={ jobId:this.nextJob++, file, settings, sourceSize }
       this.queue.push({ request, pending:{ resolve, reject } })
       this.pump()
     })
@@ -60,11 +60,11 @@ class WorkerPool {
 
 let pool:WorkerPool|null=null
 
-export function encode(file:Blob,settings:Settings):Promise<EncodeResult> {
-  if (!workersSupported) return encodeImage(file,settings)
+export function encode(file:Blob,settings:Settings,sourceSize=file.size):Promise<EncodeResult> {
+  if (!workersSupported) return encodeImage(file,settings,sourceSize)
   if (!pool) {
     const cores=navigator.hardwareConcurrency||4
     pool=new WorkerPool(Math.max(1,Math.min(4,cores-1)))
   }
-  return pool.run(file,settings)
+  return pool.run(file,settings,sourceSize)
 }

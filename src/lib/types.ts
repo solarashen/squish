@@ -1,8 +1,16 @@
-export type MediaKind="image"|"video"|"audio"
+export type MediaKind="image"|"video"|"audio"|"pdf"
 
-export type OutputFormat="image/jpeg"|"image/webp"|"image/png"|"image/avif"
-export type VideoFormat="mp4"|"webm"
-export type AudioFormat="mp3"|"m4a"|"ogg"|"wav"
+// Formats the canvas itself can write.
+export type CanvasFormat="image/jpeg"|"image/webp"|"image/png"|"image/avif"
+// Everything an image can become: canvas formats, formats written by hand or by a small library,
+// a one-page PDF, and (for animated GIF, WebP or PNG) a video.
+export type OutputFormat=CanvasFormat|"image/gif"|"image/bmp"|"image/x-icon"|"application/pdf"|"video/mp4"|"video/webm"
+export type VideoFormat="mp4"|"webm"|"mov"|"mkv"|"ts"
+export type VideoCodecChoice="auto"|"avc"|"hevc"|"vp9"|"av1"
+// What a video becomes: another video, only its sound, an animated GIF, or one still frame.
+export type VideoOutput="video"|"audio"|"gif"|"frame"
+export type AudioFormat="mp3"|"m4a"|"aac"|"ogg"|"opus"|"flac"|"wav"
+export type StillFormat="image/jpeg"|"image/png"|"image/webp"
 export type VideoQuality="low"|"medium"|"high"
 
 // "Quality" uses the normal controls; "size" aims every file at a fixed size,
@@ -27,12 +35,23 @@ export type Settings={
 }
 
 export type VideoSettings={
+  output:VideoOutput
   format:VideoFormat
+  codec:VideoCodecChoice
   quality:VideoQuality
   // output height in px, null keeps the original resolution
   maxHeight:number|null
   removeAudio:boolean
   target:Target
+  // used when output is "audio"
+  audioFormat:AudioFormat
+  audioBitrate:number
+  // used when output is "gif"
+  gifFps:number
+  gifWidth:number
+  // used when output is "frame": where in the clip, 0–1
+  framePosition:number
+  frameFormat:StillFormat
 }
 
 export type AudioSettings={
@@ -42,9 +61,16 @@ export type AudioSettings={
   target:Target
 }
 
-export type AllSettings={ image:Settings; video:VideoSettings; audio:AudioSettings }
+export type PdfSettings={
+  format:StillFormat
+  quality:number
+  // render scale: 1 = 72 dpi, 2 = 144 dpi, 3 = 216 dpi
+  scale:number
+}
 
-export type ErrorCode="decode"|"encode"|"unsupported-output"|"too-large"|"no-track"|"codec"
+export type AllSettings={ image:Settings; video:VideoSettings; audio:AudioSettings; pdf:PdfSettings }
+
+export type ErrorCode="decode"|"encode"|"unsupported-output"|"too-large"|"no-track"|"codec"|"not-animated"
 
 export type EncodeResult={
   blob:Blob
@@ -68,6 +94,8 @@ export type MediaResult={
   // seconds, audio and video only
   duration?:number
   missed?:boolean
+  // PDF input: how many pages were turned into images
+  pages?:number
 }
 
 export type ItemStatus="queued"|"working"|"done"|"error"
@@ -77,6 +105,8 @@ export type Item={
   kind:MediaKind
   file:File
   previewUrl:string
+  // true once a HEIC or SVG preview was swapped for its decoded PNG
+  converted?:boolean
   status:ItemStatus
   // 0–1 while a video or audio file is converting
   progress?:number

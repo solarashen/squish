@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { detectEncoders, EncodeError } from "@/lib/encode"
 import { EXTENSIONS, FORMAT_LABELS, kindOf } from "@/lib/files"
 import { encode } from "@/lib/pool"
-import type { AllSettings, AudioFormat, Item, MediaKind, OutputFormat, VideoFormat } from "@/lib/types"
+import { prepareImage } from "@/lib/prepare"
+import type { AllSettings, AudioFormat, Item, MediaKind, MediaResult, OutputFormat, VideoCodecChoice, VideoFormat } from "@/lib/types"
 
 export const MAX_FILES=50
 
@@ -10,15 +11,23 @@ const DEFAULT_TARGET={ mode:"quality" as const, sizeKb:500, percent:50 }
 
 const DEFAULT_SETTINGS:AllSettings={
   image:{ format:"image/webp", quality:78, maxWidth:1920, maxHeight:null, target:DEFAULT_TARGET },
-  video:{ format:"mp4", quality:"medium", maxHeight:720, removeAudio:false, target:{ ...DEFAULT_TARGET, sizeKb:10240 } },
+  video:{
+    output:"video", format:"mp4", codec:"auto", quality:"medium", maxHeight:720, removeAudio:false, target:{ ...DEFAULT_TARGET, sizeKb:10240 },
+    audioFormat:"mp3", audioBitrate:192, gifFps:12, gifWidth:480, framePosition:0.5, frameFormat:"image/jpeg",
+  },
   audio:{ format:"mp3", bitrate:128, target:{ ...DEFAULT_TARGET, sizeKb:2048 } },
+  pdf:{ format:"image/jpeg", quality:85, scale:2 },
 }
 
 export type Encoders={
   image:Record<OutputFormat,boolean>
   video:Record<VideoFormat,boolean>
+  codecs:Record<VideoCodecChoice,boolean>
   audio:Record<AudioFormat,boolean>
 }
+
+// Image outputs that are videos (from animated GIF, WebP or APNG) go through WebCodecs, not the canvas.
+const isVideoOutput=(format:OutputFormat)=>format==="video/mp4"||format==="video/webm"
 
 export type AddReport={ skipped:number; skippedOverLimit:number; firstKind:MediaKind|null }
 
@@ -59,20 +68,31 @@ export function useConverter() {
     if (encoders.video) return
     loadMedia()
       .then((m)=>m.detectMediaEncoders())
-      .then(({ video, audio })=>setEncoders((e)=>({ ...e, video, audio })))
+      .then(({ video, codecs, audio })=>setEncoders((e)=>({ ...e, video, codecs, audio })))
   },[encoders.video])
 
   const process=useCallback((item:Item)=>{
     const { id, version, kind }=item
     aborts.current.get(id)?.abort()
 
-    if (kind==="image") {
+    if (kind==="image"&&!isVideoOutput(settingsRef.current.image.format)) {
       const s=settingsRef.current.image
       patch(id,version,{ status:"working" })
-      encode(item.file,s)
+      prepareImage(item.file)
+        .then((blob)=>{
+          // HEIC and SVG previews cannot show in an <img> everywhere, so the decoded PNG becomes the thumbnail.
+          if (blob!==item.file) {
+            const current=itemsRef.current.find((it)=>it.id===id)
+            if (current&&current.previewUrl.startsWith("blob:")&&!current.converted) {
+              URL.revokeObjectURL(current.previewUrl)
+              patch(id,version,{ previewUrl:URL.createObjectURL(blob), converted:true })
+            }
+          }
+          return encode(blob,s,item.file.size)
+        })
         .then((r)=>patch(id,version,{ status:"done", error:undefined, result:{ ...r, ext:EXTENSIONS[s.format], label:FORMAT_LABELS[s.format] } }))
         .catch((error)=>{
-          const code=error instanceof EncodeError?error.code:"encode"
+          const code=error instanceof EncodeError?error.code:"decode"
           patch(id,version,{ status:"error", error:code, result:undefined })
         })
       return
@@ -86,13 +106,28 @@ export function useConverter() {
       const media=await loadMedia()
       try {
         const onProgress=(p:number)=>patch(id,version,{ progress:p })
-        const result=kind==="video"
-          ?await media.convertVideo(item.file,settingsRef.current.video,onProgress,controller.signal)
-          :await media.convertAudio(item.file,settingsRef.current.audio,onProgress,controller.signal)
+        const all=settingsRef.current
+        let result:MediaResult
+        if (kind==="image") {
+          result=await media.animatedToVideo(item.file,all.image.format==="video/webm"?"webm":"mp4",onProgress,controller.signal)
+        } else if (kind==="pdf") {
+          const { pdfToImages }=await import("@/lib/pdf")
+          result=await pdfToImages(item.file,all.pdf,onProgress,controller.signal)
+        } else if (kind==="audio") {
+          result=await media.convertAudio(item.file,all.audio,onProgress,controller.signal)
+        } else if (all.video.output==="audio") {
+          result=await media.extractAudio(item.file,all.video,onProgress,controller.signal)
+        } else if (all.video.output==="gif") {
+          result=await media.videoToGif(item.file,all.video,onProgress,controller.signal)
+        } else if (all.video.output==="frame") {
+          result=await media.videoFrame(item.file,all.video)
+        } else {
+          result=await media.convertVideo(item.file,all.video,onProgress,controller.signal)
+        }
         patch(id,version,{ status:"done", error:undefined, result, progress:1 })
       } catch (error) {
-        if (error instanceof media.Canceled) return
-        const code=error instanceof media.MediaError?error.code:"encode"
+        if (error instanceof media.Canceled||controller.signal.aborted) return
+        const code=error instanceof media.MediaError?error.code:"decode"
         patch(id,version,{ status:"error", error:code, result:undefined })
       } finally {
         if (aborts.current.get(id)===controller) aborts.current.delete(id)

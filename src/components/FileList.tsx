@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react"
-import { Download, Film, ImageOff, Music, RotateCcw, X } from "lucide-react"
+import { Download, FileText, Film, ImageOff, Music, RotateCcw, X } from "lucide-react"
 import { useI18n } from "@/i18n/I18nProvider"
 import { downloadBlob, formatChange, formatDuration, outputName, sourceLabel } from "@/lib/files"
 import type { Item } from "@/lib/types"
@@ -7,10 +7,10 @@ import { cn } from "@/lib/utils"
 
 function Thumb({ item }:{ item:Item }) {
   const [broken,setBroken]=useState(false)
-  if (item.kind==="audio"||broken) {
-    const Icon=item.kind==="audio"?Music:item.kind==="video"?Film:ImageOff
+  if (item.kind==="audio"||item.kind==="pdf"||broken) {
+    const Icon=item.kind==="audio"?Music:item.kind==="pdf"?FileText:item.kind==="video"?Film:ImageOff
     return (
-      <span className={cn("grid size-11 flex-none place-items-center rounded-[14px] bg-muted", item.kind==="audio"?"text-primary":"text-muted-foreground")}>
+      <span className={cn("grid size-11 flex-none place-items-center rounded-[14px] bg-muted", item.kind==="audio"||item.kind==="pdf"?"text-primary":"text-muted-foreground")}>
         <Icon aria-hidden className="size-5" strokeWidth={2.2} />
       </span>
     )
@@ -31,7 +31,7 @@ function Row({ item, onRetry, onRemove }:{ item:Item; onRetry:()=>void; onRemove
   const change=after!==undefined?Math.round((1-after/before)*100):null
   const name=item.result?outputName(item.file.name,item.result.ext):item.file.name
 
-  const errors={ decode:t.errDecode, encode:t.errEncode, "unsupported-output":t.errUnsupported, "too-large":t.errTooLarge, "no-track":t.errNoTrack, codec:t.errCodec }
+  const errors={ decode:t.errDecode, encode:t.errEncode, "unsupported-output":t.errUnsupported, "too-large":t.errTooLarge, "no-track":t.errNoTrack, codec:t.errCodec, "not-animated":t.errNotAnimated }
   // Each "A → B" pair is one no-wrap unit, so narrow screens only break between pairs.
   const pair=(a:string|number,b:string|number,join=" → ")=><span className="whitespace-nowrap">{a+join+b}</span>
   let detail:ReactNode=formatBytes(before)
@@ -59,7 +59,7 @@ function Row({ item, onRetry, onRemove }:{ item:Item; onRetry:()=>void; onRemove
 
   return (
     <li className="grid grid-cols-[44px_1fr_auto] items-center gap-x-4 gap-y-2 border-b border-border py-[11px] last:border-0 md:grid-cols-[44px_minmax(0,1.6fr)_minmax(80px,1fr)_64px_auto_auto]">
-      <Thumb item={item} />
+      <Thumb key={item.previewUrl} item={item} />
       <div className="min-w-0">
         <p className="truncate text-[15px] font-semibold" title={item.file.name}>{item.file.name}</p>
         <p className="my-1 flex items-center gap-2 md:hidden">
@@ -70,7 +70,7 @@ function Row({ item, onRetry, onRemove }:{ item:Item; onRetry:()=>void; onRemove
         {dims&&<p className="text-xs break-words text-muted-foreground tabular-nums md:truncate">{dims}</p>}
         {item.status==="error"&&item.error&&<p className="mt-0.5 text-xs font-semibold text-destructive">{errors[item.error]}</p>}
         {item.result?.missed&&<p className="mt-0.5 text-xs font-semibold text-warn">{t.targetMissed}</p>}
-        {change!==null&&change<0&&!item.result?.missed&&<p className="mt-0.5 text-xs font-semibold text-warn">{t.larger}</p>}
+        {change!==null&&change<0&&!item.result?.missed&&item.kind!=="pdf"&&<p className="mt-0.5 text-xs font-semibold text-warn">{t.larger}</p>}
       </div>
 
       <div className="col-span-3 h-1.5 overflow-hidden rounded-full bg-white/8 md:col-span-1" aria-hidden>
