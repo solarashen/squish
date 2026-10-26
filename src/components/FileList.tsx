@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react"
 import { Download, FileText, Film, ImageOff, Music, RotateCcw, X } from "lucide-react"
 import { useI18n } from "@/i18n/I18nProvider"
-import { downloadBlob, formatChange, formatDuration, outputName, sourceLabel } from "@/lib/files"
+import { RowMenu, type RowAction } from "@/components/RowMenu"
+import { downloadBlob, formatChange, formatDuration, patternName, sourceLabel } from "@/lib/files"
 import type { Item } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -24,12 +25,11 @@ function Thumb({ item }:{ item:Item }) {
 
 const iconBtn="grid size-9 cursor-pointer place-items-center rounded-full border border-border bg-secondary transition-colors hover:bg-white/12"
 
-function Row({ item, onRetry, onRemove }:{ item:Item; onRetry:()=>void; onRemove:()=>void }) {
+function Row({ item, name, actions, onRetry, onRemove }:{ item:Item; name:string; actions:RowAction[]; onRetry:()=>void; onRemove:()=>void }) {
   const { t, formatBytes }=useI18n()
   const before=item.file.size
   const after=item.result?.blob.size
   const change=after!==undefined?Math.round((1-after/before)*100):null
-  const name=item.result?outputName(item.file.name,item.result.ext):item.file.name
 
   const errors={ decode:t.errDecode, encode:t.errEncode, "unsupported-output":t.errUnsupported, "too-large":t.errTooLarge, "no-track":t.errNoTrack, codec:t.errCodec, "not-animated":t.errNotAnimated }
   // Each "A → B" pair is one no-wrap unit, so narrow screens only break between pairs.
@@ -38,7 +38,7 @@ function Row({ item, onRetry, onRemove }:{ item:Item; onRetry:()=>void; onRemove
   let dims:ReactNode=null
   if (item.result) {
     const r=item.result
-    detail=<>{pair(formatBytes(before),formatBytes(r.blob.size))} · {pair(sourceLabel(item.file),r.label)}</>
+    detail=<>{pair(formatBytes(before),formatBytes(r.blob.size))} · {pair(sourceLabel(item.file),r.label)}{item.ms!==undefined&&<> · <span className="whitespace-nowrap">{t.seconds(item.ms/1000)}</span></>}</>
     const length=r.duration?formatDuration(r.duration):null
     if (r.width&&r.height&&r.sourceWidth&&r.sourceHeight) {
       dims=r.width!==r.sourceWidth
@@ -95,6 +95,7 @@ function Row({ item, onRetry, onRemove }:{ item:Item; onRetry:()=>void; onRemove
             <Download aria-hidden className="size-4" strokeWidth={2.2} />
           </button>
         )}
+        {item.status==="done"&&<RowMenu label={t.moreActions(item.file.name)} actions={actions} />}
         {item.status==="error"&&(
           <button type="button" aria-label={t.retry} title={t.retry} onClick={onRetry} className={cn(iconBtn,"text-destructive")}>
             <RotateCcw aria-hidden className="size-4" strokeWidth={2.2} />
@@ -108,19 +109,22 @@ function Row({ item, onRetry, onRemove }:{ item:Item; onRetry:()=>void; onRemove
   )
 }
 
-export function FileList({ items, onRetry, onRemove }:{
+export function FileList({ items, onRetry, onRemove, pattern, actionsFor }:{
   items:Item[]
   onRetry:(id:string)=>void
   onRemove:(id:string)=>void
+  pattern:string
+  actionsFor:(item:Item,name:string)=>RowAction[]
 }) {
   const { t }=useI18n()
   if (!items.length) return null
   return (
     <section aria-label={t.files} className="glass px-4 py-1 sm:px-5">
       <ul>
-        {items.map((item)=>(
-          <Row key={item.id} item={item} onRetry={()=>onRetry(item.id)} onRemove={()=>onRemove(item.id)} />
-        ))}
+        {items.map((item,i)=>{
+          const name=patternName(pattern,item,i,items.length)
+          return <Row key={item.id} item={item} name={name} actions={actionsFor(item,name)} onRetry={()=>onRetry(item.id)} onRemove={()=>onRemove(item.id)} />
+        })}
       </ul>
     </section>
   )

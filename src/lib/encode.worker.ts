@@ -4,7 +4,7 @@ import type { Settings } from "./types"
 
 export type WorkerRequest={ jobId:number; file:Blob; settings:Settings; sourceSize:number }
 export type WorkerResponse=
-  | { jobId:number; ok:true; blob:Blob; width:number; height:number; sourceWidth:number; sourceHeight:number; missed?:boolean }
+  | { jobId:number; ok:true; blob:Blob; width:number; height:number; sourceWidth:number; sourceHeight:number; missed?:boolean; engine?:string }
   | { jobId:number; ok:false; code:string }
 
 // Runs the canvas pipeline off the main thread, so the page stays responsive with large batches.

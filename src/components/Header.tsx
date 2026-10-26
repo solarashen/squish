@@ -14,7 +14,7 @@ export function Logo({ className }:{ className?:string }) {
 
 const chip="inline-flex h-9 cursor-pointer items-center rounded-full border border-border bg-secondary px-3.5 text-[13px] font-semibold transition-colors hover:bg-white/10"
 
-export function Header({ onOpen }:{ onOpen:(page:InfoPage)=>void }) {
+export function Header({ onOpen, onOptions }:{ onOpen:(page:InfoPage)=>void; onOptions:()=>void }) {
   const { t, lang, setLang }=useI18n()
   const langs:Lang[]=["en","hr"]
   return (
@@ -28,6 +28,9 @@ export function Header({ onOpen }:{ onOpen:(page:InfoPage)=>void }) {
         </button>
         <button type="button" aria-haspopup="dialog" onClick={()=>onOpen("about")} className={chip}>
           {t.navAbout}
+        </button>
+        <button type="button" aria-haspopup="dialog" aria-keyshortcuts="?" onClick={onOptions} className={chip}>
+          {t.navOptions}
         </button>
       </nav>
       <div role="group" aria-label={t.langLabel} className="ml-auto flex rounded-full border border-border bg-secondary p-[3px]">

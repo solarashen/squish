@@ -3,6 +3,7 @@ import { detectEncoders, EncodeError } from "@/lib/encode"
 import { EXTENSIONS, FORMAT_LABELS, kindOf } from "@/lib/files"
 import { encode } from "@/lib/pool"
 import { prepareImage } from "@/lib/prepare"
+import { forget, load, mergeDefaults, save } from "@/lib/storage"
 import type { AllSettings, AudioFormat, Item, MediaKind, MediaResult, OutputFormat, VideoCodecChoice, VideoFormat } from "@/lib/types"
 
 export const MAX_FILES=50
@@ -36,10 +37,21 @@ const loadMedia=()=>import("@/lib/media")
 
 let idCounter=0
 
-export function useConverter() {
+const SETTINGS_KEY="squish-settings"
+
+// Totals for everything converted since the page opened, kept even after files are removed.
+export type SessionStats={ files:number; bytesIn:number; bytesOut:number; ms:number; engines:Record<string,number> }
+
+export function useConverter(remember:boolean) {
   const [items,setItemsState]=useState<Item[]>([])
-  const [settings,setAllSettings]=useState<AllSettings>(DEFAULT_SETTINGS)
+  const [settings,setAllSettings]=useState<AllSettings>(()=>remember?mergeDefaults(DEFAULT_SETTINGS,load<AllSettings>(SETTINGS_KEY)):DEFAULT_SETTINGS)
   const [encoders,setEncoders]=useState<Partial<Encoders>>({})
+  const [stats,setStats]=useState<SessionStats>({ files:0, bytesIn:0, bytesOut:0, ms:0, engines:{} })
+
+  useEffect(()=>{
+    if (remember) save(SETTINGS_KEY,settings)
+    else forget(SETTINGS_KEY)
+  },[settings,remember])
 
   // Mirrors of the latest state, so callbacks never read a stale list or stale settings.
   const itemsRef=useRef<Item[]>([])
@@ -56,8 +68,18 @@ export function useConverter() {
 
   const patch=useCallback((id:string,version:number,change:Partial<Item>)=>{
     const list=itemsRef.current
-    if (!list.some((it)=>it.id===id&&it.version===version)) return
-    setItems(list.map((it)=>it.id===id?{ ...it, ...change }:it))
+    const current=list.find((it)=>it.id===id&&it.version===version)
+    if (!current) return
+    let next={ ...current, ...change }
+    if (change.status==="working"&&current.status!=="working") next.startedAt=performance.now()
+    if (change.status==="done"&&next.result) {
+      const ms=Math.round(performance.now()-(next.startedAt??performance.now()))
+      next={ ...next, ms }
+      const engine=next.engine??"?"
+      const bytesOut=change.result?.blob.size??0
+      setStats((s)=>({ files:s.files+1, bytesIn:s.bytesIn+next.file.size, bytesOut:s.bytesOut+bytesOut, ms:s.ms+ms, engines:{ ...s.engines, [engine]:(s.engines[engine]??0)+1 } }))
+    }
+    setItems(list.map((it)=>it.id===id?next:it))
   },[setItems])
 
   useEffect(()=>{
@@ -90,7 +112,7 @@ export function useConverter() {
           }
           return encode(blob,s,item.file.size)
         })
-        .then((r)=>patch(id,version,{ status:"done", error:undefined, result:{ ...r, ext:EXTENSIONS[s.format], label:FORMAT_LABELS[s.format] } }))
+        .then((r)=>patch(id,version,{ status:"done", error:undefined, result:{ ...r, ext:EXTENSIONS[s.format], label:FORMAT_LABELS[s.format] }, engine:r.engine??"Canvas" }))
         .catch((error)=>{
           const code=error instanceof EncodeError?error.code:"decode"
           patch(id,version,{ status:"error", error:code, result:undefined })
@@ -108,23 +130,26 @@ export function useConverter() {
         const onProgress=(p:number)=>patch(id,version,{ progress:p })
         const all=settingsRef.current
         let result:MediaResult
+        let engine="WebCodecs"
         if (kind==="image") {
           result=await media.animatedToVideo(item.file,all.image.format==="video/webm"?"webm":"mp4",onProgress,controller.signal)
         } else if (kind==="pdf") {
           const { pdfToImages }=await import("@/lib/pdf")
+          engine="pdf.js"
           result=await pdfToImages(item.file,all.pdf,onProgress,controller.signal)
         } else if (kind==="audio") {
           result=await media.convertAudio(item.file,all.audio,onProgress,controller.signal)
         } else if (all.video.output==="audio") {
           result=await media.extractAudio(item.file,all.video,onProgress,controller.signal)
         } else if (all.video.output==="gif") {
+          engine="WebCodecs + gifenc"
           result=await media.videoToGif(item.file,all.video,onProgress,controller.signal)
         } else if (all.video.output==="frame") {
           result=await media.videoFrame(item.file,all.video)
         } else {
           result=await media.convertVideo(item.file,all.video,onProgress,controller.signal)
         }
-        patch(id,version,{ status:"done", error:undefined, result, progress:1 })
+        patch(id,version,{ status:"done", error:undefined, result, progress:1, engine })
       } catch (error) {
         if (error instanceof media.Canceled||controller.signal.aborted) return
         const code=error instanceof media.MediaError?error.code:"decode"
@@ -190,5 +215,5 @@ export function useConverter() {
     setItems(itemsRef.current.filter((it)=>it.kind!==kind))
   },[setItems])
 
-  return { items, settings, setSettings, encoders, addFiles, retry, remove, clear }
+  return { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats }
 }

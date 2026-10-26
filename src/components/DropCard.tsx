@@ -78,8 +78,9 @@ export function DropCard({ drag, notice, onFiles, onPaste, className }:{
 
       <input
         ref={input}
+        id="file-input"
         type="file"
-        accept="image/*,video/*,audio/*,application/pdf,.pdf,.svg,.heic,.heif,.mkv,.flac,.opus"
+        accept="image/*,video/*,audio/*,application/pdf,.pdf,.svg,.heic,.heif,.mkv,.flac,.opus,.zip,application/zip"
         multiple
         hidden
         onChange={(e)=>{

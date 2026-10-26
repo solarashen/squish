@@ -80,6 +80,8 @@ export type EncodeResult={
   sourceHeight:number
   // the file could not get down to the target size; this is the smallest result
   missed?:boolean
+  // set when a WebAssembly encoder was used instead of the canvas
+  engine?:string
 }
 
 export type MediaResult={
@@ -107,6 +109,11 @@ export type Item={
   previewUrl:string
   // true once a HEIC or SVG preview was swapped for its decoded PNG
   converted?:boolean
+  // when the current conversion started and how long it took, in milliseconds
+  startedAt?:number
+  ms?:number
+  // which part of the browser did the work, e.g. "Canvas" or "WebCodecs"
+  engine?:string
   status:ItemStatus
   // 0–1 while a video or audio file is converting
   progress?:number

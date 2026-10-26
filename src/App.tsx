@@ -1,15 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from "react"
+import { Copy } from "lucide-react"
 import { Dock } from "@/components/Dock"
 import { DropCard, type DragState } from "@/components/DropCard"
 import { FileList } from "@/components/FileList"
 import { Header } from "@/components/Header"
 import { InfoDialog, type InfoPage } from "@/components/InfoDialog"
 import { KindTabs } from "@/components/KindTabs"
+import { OptionsDialog } from "@/components/OptionsDialog"
 import { SettingsStrip } from "@/components/SettingsStrip"
 import { useConverter } from "@/hooks/useConverter"
+import { useGeneral } from "@/hooks/useGeneral"
+import { canCopyImages, copyImage } from "@/lib/clipboard"
+import { collectDrop, expandZips } from "@/lib/collect"
+import type { RowAction } from "@/components/RowMenu"
 import { useI18n } from "@/i18n/I18nProvider"
 import { EXTENSIONS } from "@/lib/files"
-import type { MediaKind, OutputFormat } from "@/lib/types"
+import type { Item, MediaKind, OutputFormat } from "@/lib/types"
 
 let pasteCounter=0
 
@@ -20,7 +26,16 @@ function namePasted(blob:Blob) {
 
 export default function App() {
   const { t }=useI18n()
-  const { items, settings, setSettings, encoders, addFiles, retry, remove, clear }=useConverter()
+  const general=useGeneral()
+  const { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats }=useConverter(general.remember)
+  const [options,setOptions]=useState(false)
+  // A short message at the bottom of the screen, e.g. after copying.
+  const [toast,setToast]=useState<string|null>(null)
+  useEffect(()=>{
+    if (!toast) return
+    const timer=setTimeout(()=>setToast(null),2200)
+    return ()=>clearTimeout(timer)
+  },[toast])
   const [drag,setDrag]=useState<DragState>("idle")
   const [notice,setNotice]=useState<string|null>(null)
   const [kind,setKind]=useState<MediaKind>("image")
@@ -62,7 +77,7 @@ export default function App() {
       e.preventDefault()
       depth.current=0
       setDrag("idle")
-      take(Array.from(e.dataTransfer?.files??[]))
+      if (e.dataTransfer) collectDrop(e.dataTransfer).then(take)
     }
     const paste=(e:ClipboardEvent)=>{
       const target=e.target as HTMLElement|null
@@ -73,12 +88,26 @@ export default function App() {
         take(files)
       }
     }
+    // Single-key shortcuts, ignored while typing or while a window is open.
+    const key=(e:KeyboardEvent)=>{
+      const target=e.target as HTMLElement|null
+      if (e.ctrlKey||e.metaKey||e.altKey||target?.closest("input, textarea, select, dialog[open]")) return
+      const kinds:MediaKind[]=["image","video","audio","pdf"]
+      if (/^[1-4]$/.test(e.key)) setKind(kinds[Number(e.key)-1])
+      else if (e.key==="o"||e.key==="O") document.getElementById("file-input")?.click()
+      else if (e.key==="d"||e.key==="D") document.getElementById("download-all")?.click()
+      else if (e.key==="?") setOptions(true)
+      else return
+      e.preventDefault()
+    }
+    window.addEventListener("keydown",key)
     window.addEventListener("dragenter",enter)
     window.addEventListener("dragover",over)
     window.addEventListener("dragleave",leave)
     window.addEventListener("drop",drop)
     window.addEventListener("paste",paste)
     return ()=>{
+      window.removeEventListener("keydown",key)
       window.removeEventListener("dragenter",enter)
       window.removeEventListener("dragover",over)
       window.removeEventListener("dragleave",leave)
@@ -134,6 +163,15 @@ export default function App() {
     }
   },[busy,items])
 
+  const actionsFor=(item:Item,_name:string):RowAction[]=>{
+    const actions:RowAction[]=[]
+    const blob=item.result?.blob
+    if (blob&&blob.type.startsWith("image/")&&blob.type!=="image/x-icon"&&canCopyImages()) {
+      actions.push({ id:"copy", label:t.copy, icon:Copy, onSelect:()=>copyImage(blob).then(()=>setToast(t.copied),()=>setToast(t.copyFailed)) })
+    }
+    return actions
+  }
+
   const tally=t.tally(
     visible.filter((it)=>it.status==="done").length,
     visible.filter((it)=>it.status==="working"||it.status==="queued").length,
@@ -142,20 +180,30 @@ export default function App() {
 
   return (
     <>
-      <Header onOpen={setInfo} />
+      <Header onOpen={setInfo} onOptions={()=>setOptions(true)} />
       <main id="top" className={"mx-auto flex max-w-[940px] flex-col gap-3.5 px-4 pt-2 sm:px-6 "+(visible.length?"pb-36":"pb-16")}>
-        <DropCard drag={drag} notice={notice} onFiles={take} onPaste={pasteFromButton} />
+        <DropCard drag={drag} notice={notice} onFiles={(files)=>expandZips(files).then(take)} onPaste={pasteFromButton} />
         <KindTabs value={kind} onChange={setKind} counts={counts} />
         <SettingsStrip kind={kind} settings={settings} setSettings={setSettings} encoders={encoders} />
         <div id="kind-panel" role="tabpanel" aria-labelledby={"tab-"+kind}>
           {tally&&<p className="mb-2 px-1 text-right text-sm text-muted-foreground tabular-nums">{tally}</p>}
           {visible.length>0
-            ?<FileList items={visible} onRetry={retry} onRemove={remove} />
+            ?<FileList items={visible} onRetry={retry} onRemove={remove} pattern={general.pattern} actionsFor={actionsFor} />
             :<p className="glass px-5 py-6 text-center text-sm text-muted-foreground">{t.listEmpty}</p>}
         </div>
       </main>
-      {visible.length>0&&<Dock kind={kind} items={visible} onClear={()=>clear(kind)} />}
+      {visible.length>0&&<Dock kind={kind} items={visible} onClear={()=>clear(kind)} pattern={general.pattern} />}
+      <p role="status" aria-live="polite" className={toast?"glass fixed bottom-28 left-1/2 z-40 -translate-x-1/2 rounded-full px-5 py-2.5 text-sm font-semibold sm:bottom-32":"sr-only"}>{toast}</p>
       <InfoDialog page={info} onClose={()=>setInfo(null)} />
+      <OptionsDialog
+        open={options}
+        onClose={()=>setOptions(false)}
+        pattern={general.pattern}
+        setPattern={general.setPattern}
+        remember={general.remember}
+        setRemember={general.setRemember}
+        stats={stats}
+      />
     </>
   )
 }

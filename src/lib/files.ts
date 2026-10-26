@@ -91,13 +91,32 @@ export function downloadBlob(blob:Blob,name:string) {
   setTimeout(()=>URL.revokeObjectURL(url),1000)
 }
 
+export const DEFAULT_PATTERN="{name}"
+
+// Builds a download name from the naming pattern: {name} is the original name without its extension,
+// {n} the position in the list, {format} the output format and {date} today's date.
+export function patternName(pattern:string,item:Item,index:number,total:number) {
+  if (!item.result) return item.file.name
+  const dot=item.file.name.lastIndexOf(".")
+  const base=dot>0?item.file.name.slice(0,dot):item.file.name
+  const digits=Math.max(2,String(total).length)
+  const filled=(pattern.trim()||DEFAULT_PATTERN)
+    .replaceAll("{name}",base)
+    .replaceAll("{n}",String(index+1).padStart(digits,"0"))
+    .replaceAll("{format}",item.result.ext)
+    .replaceAll("{date}",new Date().toISOString().slice(0,10))
+    // Characters Windows and macOS do not allow in file names.
+    .replace(/[\\/:*?"<>|]/g,"-")
+  return (filled||base)+"."+item.result.ext
+}
+
 // Media is already compressed, so the ZIP only stores files (level 0) and stays fast.
-export async function downloadZip(items:Item[],zipName:string) {
+export async function downloadZip(items:Item[],zipName:string,pattern=DEFAULT_PATTERN) {
   const files:Record<string,[Uint8Array,{ level:0 }]>={}
   const used=new Set<string>()
-  for (const item of items) {
+  for (const [index,item] of items.entries()) {
     if (!item.result) continue
-    const base=outputName(item.file.name,item.result.ext)
+    const base=patternName(pattern,item,index,items.length)
     const dot=base.lastIndexOf(".")
     let name=base
     let n=2
