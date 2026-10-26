@@ -24,6 +24,29 @@ export type Target={
   percent:number
 }
 
+// Colour and sharpness changes applied to every image; all zero means untouched.
+export type Adjust={
+  // -100 to 100
+  brightness:number
+  contrast:number
+  saturation:number
+  grayscale:boolean
+  // 0 to 100
+  sharpen:number
+}
+
+export type WatermarkPosition="tl"|"tr"|"bl"|"br"|"center"|"tile"
+export type Watermark={
+  text:string
+  // a logo image; not kept between visits
+  logo:Blob|null
+  position:WatermarkPosition
+  // 5 to 100, percent
+  opacity:number
+  // size relative to the image width, 2 to 30 percent
+  size:number
+}
+
 export type Settings={
   format:OutputFormat
   // 1–100, ignored for PNG
@@ -32,6 +55,8 @@ export type Settings={
   maxWidth:number|null
   maxHeight:number|null
   target:Target
+  adjust:Adjust
+  watermark:Watermark
 }
 
 export type VideoSettings={

@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Copy } from "lucide-react"
+import { Copy, Info, SplitSquareHorizontal } from "lucide-react"
 import { Dock } from "@/components/Dock"
+import { CompareDialog } from "@/components/CompareDialog"
 import { DropCard, type DragState } from "@/components/DropCard"
 import { FileList } from "@/components/FileList"
 import { Header } from "@/components/Header"
 import { InfoDialog, type InfoPage } from "@/components/InfoDialog"
 import { KindTabs } from "@/components/KindTabs"
 import { OptionsDialog } from "@/components/OptionsDialog"
+import { PhotoInfoDialog } from "@/components/PhotoInfoDialog"
 import { SettingsStrip } from "@/components/SettingsStrip"
 import { useConverter } from "@/hooks/useConverter"
 import { useGeneral } from "@/hooks/useGeneral"
@@ -29,6 +31,8 @@ export default function App() {
   const general=useGeneral()
   const { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats }=useConverter(general.remember)
   const [options,setOptions]=useState(false)
+  const [comparing,setComparing]=useState<Item|null>(null)
+  const [inspecting,setInspecting]=useState<Item|null>(null)
   // A short message at the bottom of the screen, e.g. after copying.
   const [toast,setToast]=useState<string|null>(null)
   useEffect(()=>{
@@ -166,6 +170,13 @@ export default function App() {
   const actionsFor=(item:Item,_name:string):RowAction[]=>{
     const actions:RowAction[]=[]
     const blob=item.result?.blob
+    // Side-by-side only makes sense when the result is a picture the browser can show.
+    if (item.kind==="image"&&blob&&/^image\/(jpeg|png|webp|avif|gif|bmp)$/.test(blob.type)) {
+      actions.push({ id:"compare", label:t.compare, icon:SplitSquareHorizontal, onSelect:()=>setComparing(item) })
+    }
+    if (item.kind==="image"&&/^image\/(jpeg|heic|heif|tiff|png|webp|avif)$/.test(item.file.type||"image/heic")) {
+      actions.push({ id:"info", label:t.photoInfo, icon:Info, onSelect:()=>setInspecting(item) })
+    }
     if (blob&&blob.type.startsWith("image/")&&blob.type!=="image/x-icon"&&canCopyImages()) {
       actions.push({ id:"copy", label:t.copy, icon:Copy, onSelect:()=>copyImage(blob).then(()=>setToast(t.copied),()=>setToast(t.copyFailed)) })
     }
@@ -195,6 +206,8 @@ export default function App() {
       {visible.length>0&&<Dock kind={kind} items={visible} onClear={()=>clear(kind)} pattern={general.pattern} />}
       <p role="status" aria-live="polite" className={toast?"glass fixed bottom-28 left-1/2 z-40 -translate-x-1/2 rounded-full px-5 py-2.5 text-sm font-semibold sm:bottom-32":"sr-only"}>{toast}</p>
       <InfoDialog page={info} onClose={()=>setInfo(null)} />
+      <CompareDialog item={comparing} onClose={()=>setComparing(null)} />
+      <PhotoInfoDialog item={inspecting} onClose={()=>setInspecting(null)} />
       <OptionsDialog
         open={options}
         onClose={()=>setOptions(false)}

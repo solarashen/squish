@@ -1,6 +1,8 @@
 import { targetBytes } from "./target"
 import type { CanvasFormat, EncodeResult, ErrorCode, OutputFormat, Settings } from "./types"
+import { applyAdjust, drawWatermark, hasWatermark } from "./effects"
 import { writeBmp, writeGif, writeIco, writePdf } from "./writers"
+import type { Adjust, Watermark } from "./types"
 
 // Largest canvas area that every current browser can allocate safely (16 384 × 16 384 is the iOS limit).
 const MAX_PIXELS=16384*16384
@@ -41,7 +43,10 @@ export function targetSize(width:number,height:number,maxWidth:number|null,maxHe
   }
 }
 
-function draw(bitmap:ImageBitmap,width:number,height:number,format:OutputFormat):AnyCanvas {
+// What gets painted on top of the plain resize: colour changes and a watermark.
+type Effects={ adjust:Adjust; watermark:Watermark; logo:ImageBitmap|null }
+
+function draw(bitmap:ImageBitmap,width:number,height:number,format:OutputFormat,fx?:Effects):AnyCanvas {
   const canvas=makeCanvas(width,height)
   const ctx=canvas.getContext("2d") as OffscreenCanvasRenderingContext2D|CanvasRenderingContext2D|null
   if (!ctx) throw new EncodeError("encode")
@@ -54,6 +59,10 @@ function draw(bitmap:ImageBitmap,width:number,height:number,format:OutputFormat)
   ctx.imageSmoothingEnabled=true
   ctx.imageSmoothingQuality="high"
   ctx.drawImage(bitmap,0,0,width,height)
+  if (fx) {
+    applyAdjust(ctx,width,height,fx.adjust)
+    drawWatermark(ctx,width,height,fx.watermark,fx.logo)
+  }
   return canvas
 }
 
@@ -93,13 +102,13 @@ async function fitQuality(canvas:AnyCanvas,format:OutputFormat,budget:number) {
 }
 
 // Aims the image at a byte budget: first lower the quality, then shrink the pixels until it fits.
-async function encodeToBudget(bitmap:ImageBitmap,width:number,height:number,format:OutputFormat,budget:number) {
+async function encodeToBudget(bitmap:ImageBitmap,width:number,height:number,format:OutputFormat,budget:number,fx:Effects) {
   const lossless=LOSSLESS.includes(format)
   let w=width
   let h=height
   let smallest:{ blob:Blob; width:number; height:number }|null=null
   const attempt=async (aw:number,ah:number)=>{
-    const canvas=draw(bitmap,aw,ah,format)
+    const canvas=draw(bitmap,aw,ah,format,fx)
     return lossless?await toBlob(canvas,format,1):await fitQuality(canvas,format,budget)
   }
   for (let round=0;round<10;round++) {
@@ -124,7 +133,7 @@ async function encodeToBudget(bitmap:ImageBitmap,width:number,height:number,form
       }
       return { ...best, missed:false }
     }
-    const sized=blob??await toBlob(draw(bitmap,w,h,format),format,0.04)
+    const sized=blob??await toBlob(draw(bitmap,w,h,format,fx),format,0.04)
     if (!smallest||sized.size<smallest.blob.size) smallest={ blob:sized, width:w, height:h }
     // File size grows roughly with the pixel count, so scale both sides by the square root of the overshoot.
     const scale=Math.min(0.9,Math.sqrt(budget/sized.size)*0.95)
@@ -161,13 +170,16 @@ export async function encodeImage(file:Blob,settings:Settings,sourceSize=file.si
       return { blob, width:side, height:side, sourceWidth, sourceHeight }
     }
 
+    const logo=settings.watermark.logo&&hasWatermark(settings.watermark)?await createImageBitmap(settings.watermark.logo).catch(()=>null):null
+    const fx:Effects={ adjust:settings.adjust, watermark:settings.watermark, logo }
+
     const budget=targetBytes(settings.target,sourceSize)
     if (budget!==null) {
-      const hit=await encodeToBudget(bitmap,width,height,settings.format,budget)
+      const hit=await encodeToBudget(bitmap,width,height,settings.format,budget,fx)
       return { ...hit, sourceWidth, sourceHeight }
     }
 
-    const blob=await toBlob(draw(bitmap,width,height,settings.format),settings.format,settings.quality/100)
+    const blob=await toBlob(draw(bitmap,width,height,settings.format,fx),settings.format,settings.quality/100)
     return { blob, width, height, sourceWidth, sourceHeight }
   } finally {
     bitmap.close()

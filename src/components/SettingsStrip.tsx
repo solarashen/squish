@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { AdjustPanel, Presets } from "@/components/ImageExtras"
 import { Segmented } from "@/components/ui/segmented"
 import type { Encoders } from "@/hooks/useConverter"
 import { useI18n } from "@/i18n/I18nProvider"
@@ -176,6 +177,7 @@ function ImageSettings({ settings, set, encoders }:{ settings:AllSettings["image
   const formatNote=animated?t.animatedNote:icon?t.icoNote:f==="application/pdf"?t.pdfOutNote:missing.length?t.formatsUnavailable(missing.join(", ")):null
   return (
     <>
+      <Presets settings={settings} set={set} />
       <div>
         <Segmented
           label={t.convertTo}
@@ -219,6 +221,8 @@ function ImageSettings({ settings, set, encoders }:{ settings:AllSettings["image
       {animated||icon
         ?<Note>{t.targetOff}</Note>
         :<TargetControl kind="image" target={settings.target} set={(target)=>set({ ...settings, target })} />}
+      {!animated&&!icon&&<AdjustPanel settings={settings} set={set} />}
+      {!animated&&<Note>{t.metadataNote}</Note>}
     </>
   )
 }

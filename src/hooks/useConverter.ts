@@ -11,7 +11,11 @@ export const MAX_FILES=50
 const DEFAULT_TARGET={ mode:"quality" as const, sizeKb:500, percent:50 }
 
 const DEFAULT_SETTINGS:AllSettings={
-  image:{ format:"image/webp", quality:78, maxWidth:1920, maxHeight:null, target:DEFAULT_TARGET },
+  image:{
+    format:"image/webp", quality:78, maxWidth:1920, maxHeight:null, target:DEFAULT_TARGET,
+    adjust:{ brightness:0, contrast:0, saturation:0, grayscale:false, sharpen:0 },
+    watermark:{ text:"", logo:null, position:"br", opacity:60, size:6 },
+  },
   video:{
     output:"video", format:"mp4", codec:"auto", quality:"medium", maxHeight:720, removeAudio:false, target:{ ...DEFAULT_TARGET, sizeKb:10240 },
     audioFormat:"mp3", audioBitrate:192, gifFps:12, gifWidth:480, framePosition:0.5, frameFormat:"image/jpeg",
@@ -44,12 +48,19 @@ export type SessionStats={ files:number; bytesIn:number; bytesOut:number; ms:num
 
 export function useConverter(remember:boolean) {
   const [items,setItemsState]=useState<Item[]>([])
-  const [settings,setAllSettings]=useState<AllSettings>(()=>remember?mergeDefaults(DEFAULT_SETTINGS,load<AllSettings>(SETTINGS_KEY)):DEFAULT_SETTINGS)
+  const [settings,setAllSettings]=useState<AllSettings>(()=>{
+    if (!remember) return DEFAULT_SETTINGS
+    const merged=mergeDefaults(DEFAULT_SETTINGS,load<AllSettings>(SETTINGS_KEY))
+    // Nested groups saved by an older version may miss fields, so fill those in too.
+    merged.image={ ...merged.image, adjust:{ ...DEFAULT_SETTINGS.image.adjust, ...merged.image.adjust }, watermark:{ ...DEFAULT_SETTINGS.image.watermark, ...merged.image.watermark, logo:null } }
+    return merged
+  })
   const [encoders,setEncoders]=useState<Partial<Encoders>>({})
   const [stats,setStats]=useState<SessionStats>({ files:0, bytesIn:0, bytesOut:0, ms:0, engines:{} })
 
   useEffect(()=>{
-    if (remember) save(SETTINGS_KEY,settings)
+    // A logo is a file and cannot be stored as JSON, so it is left out.
+    if (remember) save(SETTINGS_KEY,{ ...settings, image:{ ...settings.image, watermark:{ ...settings.image.watermark, logo:null } } })
     else forget(SETTINGS_KEY)
   },[settings,remember])
 
