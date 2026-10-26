@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { detectEncoders, EncodeError } from "@/lib/encode"
+import { avifNative, detectEncoders, EncodeError } from "@/lib/encode"
 import { EXTENSIONS, FORMAT_LABELS, kindOf } from "@/lib/files"
 import { encode } from "@/lib/pool"
 import { prepareImage } from "@/lib/prepare"
@@ -15,6 +15,7 @@ const DEFAULT_SETTINGS:AllSettings={
     format:"image/webp", quality:78, maxWidth:1920, maxHeight:null, target:DEFAULT_TARGET,
     adjust:{ brightness:0, contrast:0, saturation:0, grayscale:false, sharpen:0 },
     watermark:{ text:"", logo:null, position:"br", opacity:60, size:6 },
+    optimized:false,
   },
   video:{
     output:"video", format:"mp4", codec:"auto", quality:"medium", maxHeight:720, removeAudio:false, target:{ ...DEFAULT_TARGET, sizeKb:10240 },
@@ -29,6 +30,8 @@ export type Encoders={
   video:Record<VideoFormat,boolean>
   codecs:Record<VideoCodecChoice,boolean>
   audio:Record<AudioFormat,boolean>
+  // false when AVIF is written by the slower WebAssembly encoder
+  avifNative:boolean
 }
 
 // Image outputs that are videos (from animated GIF, WebP or APNG) go through WebCodecs, not the canvas.
@@ -94,7 +97,7 @@ export function useConverter(remember:boolean) {
   },[setItems])
 
   useEffect(()=>{
-    detectEncoders().then((image)=>setEncoders((e)=>({ ...e, image })))
+    detectEncoders().then((image)=>setEncoders((e)=>({ ...e, image, avifNative })))
   },[])
 
   const ensureMediaEncoders=useCallback(()=>{

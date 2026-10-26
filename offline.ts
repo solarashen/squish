@@ -1,8 +1,11 @@
 import type { Plugin } from "vite"
 
-// Writes sw.js at build time with the full list of built files, so the first visit caches the whole
-// app (including the lazily loaded encoders) and squish keeps working without a connection.
+// Writes sw.js at build time with the list of built files, so the first visit caches the app and
+// squish keeps working without a connection. Files over 1 MB (the AVIF and HEIC codecs, the PDF
+// renderer) are left out of that first download and cached the first time they are used instead.
 // The cache name changes with every build, so a new deploy replaces the old files.
+
+const PRECACHE_LIMIT=1024*1024
 
 const STATIC=["/","/favicon.svg","/manifest.webmanifest","/icon-192.png","/icon-512.png","/icon-maskable-512.png","/apple-touch-icon.png"]
 
@@ -49,8 +52,13 @@ export function offline():Plugin {
     name:"squish-offline",
     apply:"build",
     generateBundle(_options,bundle) {
-      const built=Object.keys(bundle).filter((f)=>!f.endsWith(".map")).map((f)=>"/"+f)
-      const files=[...STATIC,...built]
+      const all=Object.keys(bundle).filter((f)=>!f.endsWith(".map"))
+      const size=(f:string)=>{
+        const out=bundle[f]
+        return out.type==="chunk"?out.code.length:typeof out.source==="string"?out.source.length:out.source.byteLength
+      }
+      const built=all.map((f)=>"/"+f)
+      const files=[...STATIC,...all.filter((f)=>size(f)<=PRECACHE_LIMIT).map((f)=>"/"+f)]
       let hash=0
       for (const ch of built.join("|")) hash=(hash*31+ch.charCodeAt(0))|0
       this.emitFile({ type:"asset", fileName:"sw.js", source:worker((hash>>>0).toString(36),files) })

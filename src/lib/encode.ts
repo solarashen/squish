@@ -1,6 +1,7 @@
 import { targetBytes } from "./target"
 import type { CanvasFormat, EncodeResult, ErrorCode, OutputFormat, Settings } from "./types"
 import { applyAdjust, drawWatermark, hasWatermark } from "./effects"
+import { libavif, mozjpeg, oxipng } from "./wasm"
 import { writeBmp, writeGif, writeIco, writePdf } from "./writers"
 import type { Adjust, Watermark } from "./types"
 
@@ -44,7 +45,15 @@ export function targetSize(width:number,height:number,maxWidth:number|null,maxHe
 }
 
 // What gets painted on top of the plain resize: colour changes and a watermark.
-type Effects={ adjust:Adjust; watermark:Watermark; logo:ImageBitmap|null }
+type Effects={
+  adjust:Adjust
+  watermark:Watermark
+  logo:ImageBitmap|null
+  // use the WebAssembly encoders for JPEG and PNG
+  optimized:boolean
+  // filled in when a WebAssembly encoder did the work, for the statistics
+  engine?:string
+}
 
 function draw(bitmap:ImageBitmap,width:number,height:number,format:OutputFormat,fx?:Effects):AnyCanvas {
   const canvas=makeCanvas(width,height)
@@ -70,27 +79,45 @@ const CANVAS_FORMATS:OutputFormat[]=["image/jpeg","image/webp","image/png","imag
 // Formats where quality has no effect, so only the pixel count can bring the size down.
 const LOSSLESS:OutputFormat[]=["image/png","image/bmp"]
 
-async function toBlob(canvas:AnyCanvas,format:OutputFormat,quality:number) {
+function pixels(canvas:AnyCanvas) {
+  const ctx=canvas.getContext("2d") as OffscreenCanvasRenderingContext2D|CanvasRenderingContext2D
+  return ctx.getImageData(0,0,canvas.width,canvas.height)
+}
+
+async function toBlob(canvas:AnyCanvas,format:OutputFormat,quality:number,fx?:Effects) {
   if (format==="image/gif") return writeGif(canvas,quality)
   if (format==="image/bmp") return writeBmp(canvas)
   if (format==="application/pdf") return writePdf(canvas,quality)
   if (!CANVAS_FORMATS.includes(format)) throw new EncodeError("unsupported-output")
+  if (fx?.optimized&&format==="image/jpeg") {
+    fx.engine="MozJPEG"
+    return mozjpeg(pixels(canvas),quality)
+  }
   const blob=await canvasToBlob(canvas,format,quality)
-  // Browsers silently fall back to PNG when they cannot encode the requested type.
-  if (blob.type!==format) throw new EncodeError("unsupported-output")
-  return blob
+  if (fx?.optimized&&format==="image/png"&&blob.type==="image/png") {
+    fx.engine="OxiPNG"
+    return oxipng(blob)
+  }
+  if (blob.type===format) return blob
+  // Browsers silently fall back to PNG when they cannot encode the requested type; AVIF then goes
+  // through the WebAssembly encoder instead.
+  if (format==="image/avif") {
+    if (fx) fx.engine="libavif"
+    return libavif(pixels(canvas),quality)
+  }
+  throw new EncodeError("unsupported-output")
 }
 
 // Highest quality whose output still fits the budget, by binary search. Null when even the lowest is too big.
-async function fitQuality(canvas:AnyCanvas,format:OutputFormat,budget:number) {
-  const top=await toBlob(canvas,format,1)
+async function fitQuality(canvas:AnyCanvas,format:OutputFormat,budget:number,fx:Effects) {
+  const top=await toBlob(canvas,format,1,fx)
   if (top.size<=budget) return top
   let low=0.04
   let high=1
   let best:Blob|null=null
   for (let i=0;i<7;i++) {
     const mid=(low+high)/2
-    const blob=await toBlob(canvas,format,mid)
+    const blob=await toBlob(canvas,format,mid,fx)
     if (blob.size<=budget) {
       best=blob
       low=mid
@@ -109,7 +136,7 @@ async function encodeToBudget(bitmap:ImageBitmap,width:number,height:number,form
   let smallest:{ blob:Blob; width:number; height:number }|null=null
   const attempt=async (aw:number,ah:number)=>{
     const canvas=draw(bitmap,aw,ah,format,fx)
-    return lossless?await toBlob(canvas,format,1):await fitQuality(canvas,format,budget)
+    return lossless?await toBlob(canvas,format,1,fx):await fitQuality(canvas,format,budget,fx)
   }
   for (let round=0;round<10;round++) {
     const blob=await attempt(w,h)
@@ -133,7 +160,7 @@ async function encodeToBudget(bitmap:ImageBitmap,width:number,height:number,form
       }
       return { ...best, missed:false }
     }
-    const sized=blob??await toBlob(draw(bitmap,w,h,format,fx),format,0.04)
+    const sized=blob??await toBlob(draw(bitmap,w,h,format,fx),format,0.04,fx)
     if (!smallest||sized.size<smallest.blob.size) smallest={ blob:sized, width:w, height:h }
     // File size grows roughly with the pixel count, so scale both sides by the square root of the overshoot.
     const scale=Math.min(0.9,Math.sqrt(budget/sized.size)*0.95)
@@ -171,16 +198,16 @@ export async function encodeImage(file:Blob,settings:Settings,sourceSize=file.si
     }
 
     const logo=settings.watermark.logo&&hasWatermark(settings.watermark)?await createImageBitmap(settings.watermark.logo).catch(()=>null):null
-    const fx:Effects={ adjust:settings.adjust, watermark:settings.watermark, logo }
+    const fx:Effects={ adjust:settings.adjust, watermark:settings.watermark, logo, optimized:settings.optimized }
 
     const budget=targetBytes(settings.target,sourceSize)
     if (budget!==null) {
       const hit=await encodeToBudget(bitmap,width,height,settings.format,budget,fx)
-      return { ...hit, sourceWidth, sourceHeight }
+      return { ...hit, sourceWidth, sourceHeight, engine:fx.engine }
     }
 
-    const blob=await toBlob(draw(bitmap,width,height,settings.format,fx),settings.format,settings.quality/100)
-    return { blob, width, height, sourceWidth, sourceHeight }
+    const blob=await toBlob(draw(bitmap,width,height,settings.format,fx),settings.format,settings.quality/100,fx)
+    return { blob, width, height, sourceWidth, sourceHeight, engine:fx.engine }
   } finally {
     bitmap.close()
   }
@@ -192,7 +219,7 @@ export async function detectEncoders():Promise<Record<OutputFormat,boolean>> {
   // GIF, BMP, ICO and PDF are written in JavaScript and always work; animated video needs WebCodecs.
   const video=typeof VideoEncoder!=="undefined"
   const result:Record<OutputFormat,boolean>={
-    "image/jpeg":false, "image/png":false, "image/webp":false, "image/avif":false,
+    "image/jpeg":false, "image/png":false, "image/webp":false, "image/avif":true,
     "image/gif":true, "image/bmp":true, "image/x-icon":true, "application/pdf":true,
     "video/mp4":video, "video/webm":video,
   }
@@ -208,5 +235,11 @@ export async function detectEncoders():Promise<Record<OutputFormat,boolean>> {
       result[type]=false
     }
   }))
+  // AVIF falls back to the WebAssembly encoder where the canvas cannot write it.
+  avifNative=result["image/avif"]
+  result["image/avif"]=true
   return result
 }
+
+// Whether the canvas itself writes AVIF; known after detectEncoders has run.
+export let avifNative=false

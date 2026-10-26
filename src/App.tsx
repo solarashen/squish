@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Copy, Info, SplitSquareHorizontal } from "lucide-react"
+import { Binary, Copy, Info, Palette, SplitSquareHorizontal, Star } from "lucide-react"
 import { Dock } from "@/components/Dock"
 import { CompareDialog } from "@/components/CompareDialog"
 import { DropCard, type DragState } from "@/components/DropCard"
@@ -8,11 +8,13 @@ import { Header } from "@/components/Header"
 import { InfoDialog, type InfoPage } from "@/components/InfoDialog"
 import { KindTabs } from "@/components/KindTabs"
 import { OptionsDialog } from "@/components/OptionsDialog"
+import { PaletteDialog } from "@/components/PaletteDialog"
 import { PhotoInfoDialog } from "@/components/PhotoInfoDialog"
 import { SettingsStrip } from "@/components/SettingsStrip"
 import { useConverter } from "@/hooks/useConverter"
 import { useGeneral } from "@/hooks/useGeneral"
-import { canCopyImages, copyImage } from "@/lib/clipboard"
+import { canCopyImages, copyImage, copyText } from "@/lib/clipboard"
+import { dataUrl, faviconPack } from "@/lib/imagetools"
 import { collectDrop, expandZips } from "@/lib/collect"
 import type { RowAction } from "@/components/RowMenu"
 import { useI18n } from "@/i18n/I18nProvider"
@@ -33,6 +35,7 @@ export default function App() {
   const [options,setOptions]=useState(false)
   const [comparing,setComparing]=useState<Item|null>(null)
   const [inspecting,setInspecting]=useState<Item|null>(null)
+  const [colours,setColours]=useState<Item|null>(null)
   // A short message at the bottom of the screen, e.g. after copying.
   const [toast,setToast]=useState<string|null>(null)
   useEffect(()=>{
@@ -180,6 +183,23 @@ export default function App() {
     if (blob&&blob.type.startsWith("image/")&&blob.type!=="image/x-icon"&&canCopyImages()) {
       actions.push({ id:"copy", label:t.copy, icon:Copy, onSelect:()=>copyImage(blob).then(()=>setToast(t.copied),()=>setToast(t.copyFailed)) })
     }
+    if (item.kind==="image"&&blob) {
+      actions.push({ id:"palette", label:t.palette, icon:Palette, onSelect:()=>setColours(item) })
+      actions.push({
+        id:"favicon",
+        label:t.faviconPack,
+        icon:Star,
+        onSelect:()=>fetch(item.previewUrl).then((r)=>r.blob()).then((b)=>faviconPack(b,item.file.name.replace(/\.[^.]+$/,""))),
+      })
+      if (blob.type.startsWith("image/")) {
+        actions.push({
+          id:"base64",
+          label:t.base64,
+          icon:Binary,
+          onSelect:()=>dataUrl(blob).then(copyText).then(()=>setToast(blob.size>500*1024?t.base64Large:t.copied),()=>setToast(t.copyFailed)),
+        })
+      }
+    }
     return actions
   }
 
@@ -208,6 +228,7 @@ export default function App() {
       <InfoDialog page={info} onClose={()=>setInfo(null)} />
       <CompareDialog item={comparing} onClose={()=>setComparing(null)} />
       <PhotoInfoDialog item={inspecting} onClose={()=>setInspecting(null)} />
+      <PaletteDialog item={colours} onClose={()=>setColours(null)} onCopied={(hex)=>setToast(t.copied+": "+hex)} />
       <OptionsDialog
         open={options}
         onClose={()=>setOptions(false)}

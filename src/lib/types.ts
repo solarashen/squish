@@ -57,6 +57,8 @@ export type Settings={
   target:Target
   adjust:Adjust
   watermark:Watermark
+  // MozJPEG and OxiPNG instead of the canvas encoders: smaller files, slower
+  optimized:boolean
 }
 
 export type VideoSettings={

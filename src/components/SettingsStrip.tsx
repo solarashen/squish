@@ -162,7 +162,7 @@ function QualitySlider({ id, value, disabled, onChange, note }:{ id:string; valu
   )
 }
 
-function ImageSettings({ settings, set, encoders }:{ settings:AllSettings["image"]; set:(s:AllSettings["image"])=>void; encoders?:Record<OutputFormat,boolean> }) {
+function ImageSettings({ settings, set, encoders, avifNative }:{ settings:AllSettings["image"]; set:(s:AllSettings["image"])=>void; encoders?:Record<OutputFormat,boolean>; avifNative?:boolean }) {
   const { t }=useI18n()
   const f=settings.format
   const animated=f==="video/mp4"||f==="video/webm"
@@ -175,6 +175,7 @@ function ImageSettings({ settings, set, encoders }:{ settings:AllSettings["image
   const preset=settings.maxHeight===null&&(settings.maxWidth===null||SIZE_PRESETS.includes(settings.maxWidth))
   const size=custom||!preset?"custom":settings.maxWidth===null?"orig":String(settings.maxWidth)
   const formatNote=animated?t.animatedNote:icon?t.icoNote:f==="application/pdf"?t.pdfOutNote:missing.length?t.formatsUnavailable(missing.join(", ")):null
+  const canOptimize=f==="image/jpeg"||f==="image/png"
   return (
     <>
       <Presets settings={settings} set={set} />
@@ -187,6 +188,7 @@ function ImageSettings({ settings, set, encoders }:{ settings:AllSettings["image
           options={IMAGE_FORMATS.map((o)=>({ value:o, label:FORMAT_LABELS[o], disabled:encoders?!encoders[o]:false, title:encoders&&!encoders[o]?t.notSupported:undefined }))}
         />
         {formatNote&&<Hint>{formatNote}</Hint>}
+        {f==="image/avif"&&avifNative===false&&<Hint>{t.avifWasm}</Hint>}
       </div>
       <QualitySlider
         id="quality"
@@ -221,6 +223,19 @@ function ImageSettings({ settings, set, encoders }:{ settings:AllSettings["image
       {animated||icon
         ?<Note>{t.targetOff}</Note>
         :<TargetControl kind="image" target={settings.target} set={(target)=>set({ ...settings, target })} />}
+      {canOptimize&&(
+        <label className="col-span-full flex cursor-pointer items-center justify-between gap-4 rounded-2xl border border-border bg-white/[0.03] px-4 py-3">
+          <span>
+            <span className="block text-sm font-semibold">{t.optimized}</span>
+            <span className="block text-xs text-muted-foreground">{t.optimizedHint}</span>
+          </span>
+          <input type="checkbox" checked={settings.optimized} onChange={(e)=>set({ ...settings, optimized:e.target.checked })} className="peer sr-only" />
+          <span
+            aria-hidden
+            className={"relative h-8 w-14 flex-none rounded-full border border-border bg-white/8 transition-colors peer-checked:bg-primary peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-primary after:absolute after:top-[3px] after:left-[3px] after:size-6 after:rounded-full after:bg-foreground after:transition-transform after:duration-200 "+(settings.optimized?"after:translate-x-6":"")}
+          />
+        </label>
+      )}
       {!animated&&!icon&&<AdjustPanel settings={settings} set={set} />}
       {!animated&&<Note>{t.metadataNote}</Note>}
     </>
@@ -455,7 +470,7 @@ export function SettingsStrip({ kind, settings, setSettings, encoders }:{
   const { t }=useI18n()
   return (
     <section aria-label={t.settingsLabel} className={cn("glass grid items-start gap-x-5 gap-y-5 px-5 py-[18px] sm:px-[22px]",COLUMNS[kind])}>
-      {kind==="image"&&<ImageSettings settings={settings.image} set={(s)=>setSettings("image",s)} encoders={encoders.image} />}
+      {kind==="image"&&<ImageSettings settings={settings.image} set={(s)=>setSettings("image",s)} encoders={encoders.image} avifNative={encoders.avifNative} />}
       {kind==="video"&&<VideoSettings settings={settings.video} set={(s)=>setSettings("video",s)} encoders={encoders.video} codecs={encoders.codecs} audio={encoders.audio} />}
       {kind==="audio"&&<AudioSettings settings={settings.audio} set={(s)=>setSettings("audio",s)} encoders={encoders.audio} />}
       {kind==="pdf"&&<PdfSettings settings={settings.pdf} set={(s)=>setSettings("pdf",s)} />}
