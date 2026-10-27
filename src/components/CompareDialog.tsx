@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Sheet } from "@/components/Sheet"
 import { Segmented } from "@/components/ui/segmented"
 import { useI18n } from "@/i18n/I18nProvider"
+import { measure, type Quality } from "@/lib/metrics"
 import type { Item } from "@/lib/types"
 
 const ZOOMS=["1","2","4"]
@@ -13,6 +14,7 @@ export function CompareDialog({ item, onClose }:{ item:Item|null; onClose:()=>vo
   const [split,setSplit]=useState(50)
   const [zoom,setZoom]=useState("1")
   const [after,setAfter]=useState<string|null>(null)
+  const [quality,setQuality]=useState<Quality|null>(null)
 
   useEffect(()=>{
     if (!item?.result) return
@@ -20,7 +22,16 @@ export function CompareDialog({ item, onClose }:{ item:Item|null; onClose:()=>vo
     setAfter(url)
     setSplit(50)
     setZoom("1")
-    return ()=>URL.revokeObjectURL(url)
+    setQuality(null)
+    let alive=true
+    fetch(item.previewUrl)
+      .then((res)=>res.blob())
+      .then((original)=>measure(original,item.result!.blob,item.edit))
+      .then((q)=>alive&&setQuality(q),()=>{})
+    return ()=>{
+      alive=false
+      URL.revokeObjectURL(url)
+    }
   },[item])
 
   const r=item?.result
@@ -33,6 +44,11 @@ export function CompareDialog({ item, onClose }:{ item:Item|null; onClose:()=>vo
               <span className="font-semibold text-foreground">{t.before}</span> {formatBytes(item.file.size)}
               <span aria-hidden> · </span>
               <span className="font-semibold text-primary">{t.after}</span> {formatBytes(r.blob.size)} ({r.label})
+              <span className="mt-1 block text-xs" title={t.metricsHelp}>
+                {quality
+                  ?"SSIM "+quality.ssim.toFixed(4)+" · PSNR "+(Number.isFinite(quality.psnr)?quality.psnr.toFixed(1)+" dB":"∞")
+                  :t.measuring}
+              </span>
             </p>
             <div className="w-48">
               <Segmented label={t.zoom} value={zoom} onChange={setZoom} options={ZOOMS.map((z)=>({ value:z, label:z+"×" }))} />

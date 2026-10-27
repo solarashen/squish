@@ -4,7 +4,7 @@ import { EXTENSIONS, FORMAT_LABELS, kindOf } from "@/lib/files"
 import { encode } from "@/lib/pool"
 import { prepareImage } from "@/lib/prepare"
 import { forget, load, mergeDefaults, save } from "@/lib/storage"
-import type { AllSettings, AudioFormat, ImageEdit, Item, MediaEdit, PdfEdit, MediaKind, MediaResult, OutputFormat, VideoCodecChoice, VideoFormat } from "@/lib/types"
+import type { AllSettings, AudioFormat, ImageEdit, ImageOverride, Item, MediaEdit, PdfEdit, MediaKind, MediaResult, OutputFormat, VideoCodecChoice, VideoFormat } from "@/lib/types"
 
 export const MAX_FILES=50
 
@@ -112,8 +112,11 @@ export function useConverter(remember:boolean) {
     const { id, version, kind }=item
     aborts.current.get(id)?.abort()
 
-    if (kind==="image"&&!isVideoOutput(settingsRef.current.image.format)) {
-      const s=settingsRef.current.image
+    // A file with its own settings uses its own quality, so a shared target size does not apply to it.
+    const shared=settingsRef.current.image
+    const own=item.override?{ ...shared, ...item.override, target:{ ...shared.target, mode:"quality" as const } }:shared
+    if (kind==="image"&&!isVideoOutput(own.format)) {
+      const s=own
       patch(id,version,{ status:"working" })
       prepareImage(item.file)
         .then((blob)=>{
@@ -230,6 +233,14 @@ export function useConverter(remember:boolean) {
     process(next)
   },[process,setItems])
 
+  const setOverride=useCallback((id:string,override:ImageOverride|undefined)=>{
+    const target=itemsRef.current.find((it)=>it.id===id)
+    if (!target) return
+    const next={ ...target, override, version:target.version+1, status:"queued" as const, progress:undefined }
+    setItems(itemsRef.current.map((it)=>it.id===id?next:it))
+    process(next)
+  },[process,setItems])
+
   const setPdfEdit=useCallback((id:string,pdfEdit:PdfEdit|undefined)=>{
     const target=itemsRef.current.find((it)=>it.id===id)
     if (!target) return
@@ -261,5 +272,5 @@ export function useConverter(remember:boolean) {
     setItems(itemsRef.current.filter((it)=>it.kind!==kind))
   },[setItems])
 
-  return { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit, setMediaEdit, setPdfEdit }
+  return { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit, setMediaEdit, setPdfEdit, setOverride }
 }

@@ -139,7 +139,7 @@ function Hint({ children }:{ children:string }) {
   return <p className="mt-1.5 text-xs text-muted-foreground">{children}</p>
 }
 
-function QualitySlider({ id, value, disabled, onChange, note }:{ id:string; value:number; disabled?:boolean; onChange:(v:number)=>void; note?:string }) {
+export function QualitySlider({ id, value, disabled, onChange, note }:{ id:string; value:number; disabled?:boolean; onChange:(v:number)=>void; note?:string }) {
   const { t }=useI18n()
   return (
     <div>

@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Binary, Copy, Crop, Files, Info, Palette, Scissors, SplitSquareHorizontal, Star } from "lucide-react"
+import { Binary, ChartScatter, Copy, Crop, Files, Info, Palette, Scissors, SlidersHorizontal, SplitSquareHorizontal, Star } from "lucide-react"
 import { Dock } from "@/components/Dock"
 import { CompareDialog } from "@/components/CompareDialog"
 import { DropCard, type DragState } from "@/components/DropCard"
 import { EditDialog } from "@/components/EditDialog"
 import { MediaEditDialog } from "@/components/MediaEditDialog"
+import { FileSettingsDialog } from "@/components/FileSettingsDialog"
+import { FormatsDialog } from "@/components/FormatsDialog"
 import { MergeDialog } from "@/components/MergeDialog"
 import { PdfPagesDialog } from "@/components/PdfPagesDialog"
 import { FileList } from "@/components/FileList"
@@ -35,7 +37,7 @@ function namePasted(blob:Blob) {
 export default function App() {
   const { t }=useI18n()
   const general=useGeneral()
-  const { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit, setMediaEdit, setPdfEdit }=useConverter(general.remember)
+  const { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit, setMediaEdit, setPdfEdit, setOverride }=useConverter(general.remember)
   const [options,setOptions]=useState(false)
   const [comparing,setComparing]=useState<Item|null>(null)
   const [inspecting,setInspecting]=useState<Item|null>(null)
@@ -44,6 +46,8 @@ export default function App() {
   const [trimming,setTrimming]=useState<Item|null>(null)
   const [paging,setPaging]=useState<Item|null>(null)
   const [merging,setMerging]=useState(false)
+  const [benchmarking,setBenchmarking]=useState<Item|null>(null)
+  const [tuning,setTuning]=useState<Item|null>(null)
   // A short message at the bottom of the screen, e.g. after copying.
   const [toast,setToast]=useState<string|null>(null)
   useEffect(()=>{
@@ -184,6 +188,10 @@ export default function App() {
     if (item.kind==="image"&&!/^video\//.test(settings.image.format)) {
       actions.push({ id:"edit", label:t.edit, icon:Crop, onSelect:()=>setEditing(item) })
     }
+    if (item.kind==="image"&&!/^video\//.test(settings.image.format)) {
+      actions.push({ id:"own", label:t.fileSettings, icon:SlidersHorizontal, onSelect:()=>setTuning(item) })
+      actions.push({ id:"formats", label:t.compareFormats, icon:ChartScatter, onSelect:()=>setBenchmarking(item) })
+    }
     if (item.kind==="pdf") {
       actions.push({ id:"pages", label:t.pagesAction, icon:Files, onSelect:()=>setPaging(item) })
     }
@@ -246,6 +254,8 @@ export default function App() {
       <CompareDialog item={comparing} onClose={()=>setComparing(null)} />
       <PhotoInfoDialog item={inspecting} onClose={()=>setInspecting(null)} />
       <EditDialog item={editing} onClose={()=>setEditing(null)} onApply={(edit)=>editing&&setEdit(editing.id,edit)} />
+      <FormatsDialog item={benchmarking} settings={settings.image} onClose={()=>setBenchmarking(null)} />
+      <FileSettingsDialog item={tuning} shared={settings.image} encoders={encoders.image} onClose={()=>setTuning(null)} onApply={(o)=>tuning&&setOverride(tuning.id,o)} />
       <PdfPagesDialog item={paging} onClose={()=>setPaging(null)} onApply={(edit)=>paging&&setPdfEdit(paging.id,edit)} />
       <MergeDialog items={items.filter((it)=>it.kind==="pdf")} open={merging} onClose={()=>setMerging(false)} />
       <MediaEditDialog item={trimming} onClose={()=>setTrimming(null)} onApply={(edit)=>trimming&&setMediaEdit(trimming.id,edit)} />

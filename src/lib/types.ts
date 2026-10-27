@@ -119,6 +119,8 @@ export type PdfSettings={
   scale:number
 }
 
+export type ImageOverride=Partial<Pick<Settings,"format"|"quality"|"maxWidth">>
+
 export type PdfEdit={
   // page numbers start at 0 and refer to the original file
   pages:{ index:number; rotate:0|90|180|270 }[]
@@ -201,4 +203,6 @@ export type Item={
   mediaEdit?:MediaEdit
   // pages kept, their order and turns, set in the page editor for this one PDF
   pdfEdit?:PdfEdit
+  // format, quality and size for this one image, instead of the shared settings
+  override?:ImageOverride
 }

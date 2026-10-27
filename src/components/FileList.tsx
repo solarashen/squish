@@ -63,6 +63,7 @@ function Row({ item, name, actions, onRetry, onRemove }:{ item:Item; name:string
       <div className="min-w-0">
         <p className="flex items-center gap-2 text-[15px] font-semibold" title={item.file.name}>
           <span className="truncate">{item.file.name}</span>
+          {item.override&&<span className="flex-none rounded-full border border-primary/40 px-2 py-px text-[11px] font-bold text-primary">{t.ownSettings}</span>}
           {(item.edit||item.mediaEdit||item.pdfEdit)&&<span className="flex-none rounded-full border border-primary/40 px-2 py-px text-[11px] font-bold text-primary">{t.edited}</span>}
         </p>
         <p className="my-1 flex items-center gap-2 md:hidden">
