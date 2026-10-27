@@ -142,8 +142,8 @@ export function FormatsDialog({ item, settings, onClose }:{ item:Item|null; sett
             </p>
           </div>
 
-          <figure className="rounded-2xl border border-border bg-[#141a24] p-2 sm:p-3">
-            <div className="relative">
+          <figure className="overflow-x-auto rounded-2xl border border-border bg-[#141a24] p-2 sm:p-3">
+            <div className="relative min-w-[540px]">
               <svg viewBox={"0 0 "+W+" "+H} className="block h-auto w-full" role="img" aria-label={t.formatsChart}>
                 {yTicks.map((v)=>(
                   <g key={v}>
