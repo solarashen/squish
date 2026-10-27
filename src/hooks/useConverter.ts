@@ -4,7 +4,7 @@ import { EXTENSIONS, FORMAT_LABELS, kindOf } from "@/lib/files"
 import { encode } from "@/lib/pool"
 import { prepareImage } from "@/lib/prepare"
 import { forget, load, mergeDefaults, save } from "@/lib/storage"
-import type { AllSettings, AudioFormat, ImageEdit, Item, MediaEdit, MediaKind, MediaResult, OutputFormat, VideoCodecChoice, VideoFormat } from "@/lib/types"
+import type { AllSettings, AudioFormat, ImageEdit, Item, MediaEdit, PdfEdit, MediaKind, MediaResult, OutputFormat, VideoCodecChoice, VideoFormat } from "@/lib/types"
 
 export const MAX_FILES=50
 
@@ -23,7 +23,7 @@ const DEFAULT_SETTINGS:AllSettings={
     rotate:0, flip:false, fps:null, speed:1,
   },
   audio:{ format:"mp3", bitrate:128, target:{ ...DEFAULT_TARGET, sizeKb:2048 }, fadeIn:0, fadeOut:0, normalize:false, mono:false, sampleRate:null },
-  pdf:{ format:"image/jpeg", quality:85, scale:2 },
+  pdf:{ output:"images", compress:false, pageNumbers:false, format:"image/jpeg", quality:85, scale:2 },
 }
 
 export type Encoders={
@@ -150,8 +150,14 @@ export function useConverter(remember:boolean) {
           result=await media.animatedToVideo(item.file,all.image.format==="video/webm"?"webm":"mp4",onProgress,controller.signal)
         } else if (kind==="pdf") {
           const { pdfToImages }=await import("@/lib/pdf")
-          engine="pdf.js"
-          result=await pdfToImages(item.file,all.pdf,onProgress,controller.signal)
+          const tools=await import("@/lib/pdftools")
+          const source=await tools.applyPdfEdit(item.file,item.pdfEdit)
+          const output=all.pdf.output
+          engine=output==="images"||output==="text"||all.pdf.compress?"pdf.js":"pdf-lib"
+          if (output==="pdf") result=await tools.rebuildPdf(source,all.pdf,onProgress,controller.signal)
+          else if (output==="split") result=await tools.splitPdf(source,onProgress)
+          else if (output==="text") result=await tools.pdfText(source,onProgress,controller.signal)
+          else result=await pdfToImages(source,all.pdf,onProgress,controller.signal)
         } else if (kind==="audio") {
           result=await media.convertAudio(item.file,all.audio,onProgress,controller.signal,item.mediaEdit)
         } else if (all.video.output==="audio") {
@@ -224,6 +230,14 @@ export function useConverter(remember:boolean) {
     process(next)
   },[process,setItems])
 
+  const setPdfEdit=useCallback((id:string,pdfEdit:PdfEdit|undefined)=>{
+    const target=itemsRef.current.find((it)=>it.id===id)
+    if (!target) return
+    const next={ ...target, pdfEdit, version:target.version+1, status:"queued" as const, progress:undefined }
+    setItems(itemsRef.current.map((it)=>it.id===id?next:it))
+    process(next)
+  },[process,setItems])
+
   const setMediaEdit=useCallback((id:string,mediaEdit:MediaEdit|undefined)=>{
     const target=itemsRef.current.find((it)=>it.id===id)
     if (!target) return
@@ -247,5 +261,5 @@ export function useConverter(remember:boolean) {
     setItems(itemsRef.current.filter((it)=>it.kind!==kind))
   },[setItems])
 
-  return { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit, setMediaEdit }
+  return { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit, setMediaEdit, setPdfEdit }
 }

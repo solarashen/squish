@@ -1,11 +1,11 @@
 import { useState } from "react"
 import { AdjustPanel, Presets } from "@/components/ImageExtras"
-import { AudioTools, VideoPresets, VideoTools } from "@/components/MediaExtras"
+import { AudioTools, Toggle, VideoPresets, VideoTools } from "@/components/MediaExtras"
 import { Segmented } from "@/components/ui/segmented"
 import type { Encoders } from "@/hooks/useConverter"
 import { useI18n } from "@/i18n/I18nProvider"
 import { FORMAT_LABELS } from "@/lib/files"
-import type { AllSettings, AudioFormat, MediaKind, OutputFormat, StillFormat, Target, TargetMode, VideoCodecChoice, VideoFormat, VideoOutput, VideoQuality } from "@/lib/types"
+import type { AllSettings, AudioFormat, MediaKind, OutputFormat, PdfOutput, StillFormat, Target, TargetMode, VideoCodecChoice, VideoFormat, VideoOutput, VideoQuality } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
 const IMAGE_FORMATS:OutputFormat[]=["image/jpeg","image/webp","image/png","image/avif","image/gif","image/bmp","image/x-icon","application/pdf","video/mp4","video/webm"]
@@ -431,8 +431,54 @@ function AudioSettings({ settings, set, encoders }:{ settings:AllSettings["audio
 
 function PdfSettings({ settings, set }:{ settings:AllSettings["pdf"]; set:(s:AllSettings["pdf"])=>void }) {
   const { t }=useI18n()
+  const outputs:PdfOutput[]=["images","pdf","split","text"]
+  const turnInto=(
+    <Segmented
+      label={t.output}
+      value={settings.output}
+      columns={2}
+      onChange={(output)=>set({ ...settings, output })}
+      options={outputs.map((o)=>({ value:o, label:t.pdfOutputs[o] }))}
+    />
+  )
+  const scale=(
+    <Segmented
+      label={t.pdfScale}
+      value={String(settings.scale)}
+      onChange={(v)=>set({ ...settings, scale:Number(v) })}
+      options={PDF_SCALES.map((n)=>({ value:String(n), label:n*72+" dpi" }))}
+    />
+  )
+
+  if (settings.output==="pdf") {
+    return (
+      <>
+        {turnInto}
+        <Toggle label={t.pdfCompress} checked={settings.compress} onChange={(compress)=>set({ ...settings, compress })} />
+        <Toggle label={t.pageNumbers} checked={settings.pageNumbers} onChange={(pageNumbers)=>set({ ...settings, pageNumbers })} />
+        {settings.compress&&(
+          <>
+            <QualitySlider id="pdf-quality" value={settings.quality} onChange={(quality)=>set({ ...settings, quality })} />
+            {scale}
+          </>
+        )}
+        <Note>{settings.compress?t.pdfCompressNote:t.pdfEditNote}</Note>
+      </>
+    )
+  }
+
+  if (settings.output!=="images") {
+    return (
+      <>
+        {turnInto}
+        <Note>{settings.output==="split"?t.pdfSplitNote:t.pdfTextNote}</Note>
+      </>
+    )
+  }
+
   return (
     <>
+      {turnInto}
       <Segmented
         label={t.convertTo}
         value={settings.format}
@@ -446,12 +492,7 @@ function PdfSettings({ settings, set }:{ settings:AllSettings["pdf"]; set:(s:All
         onChange={(quality)=>set({ ...settings, quality })}
         note={settings.format==="image/png"?t.qualityLossless:undefined}
       />
-      <Segmented
-        label={t.pdfScale}
-        value={String(settings.scale)}
-        onChange={(v)=>set({ ...settings, scale:Number(v) })}
-        options={PDF_SCALES.map((n)=>({ value:String(n), label:n*72+" dpi" }))}
-      />
+      {scale}
       <Note>{t.pdfNote}</Note>
     </>
   )

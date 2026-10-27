@@ -39,7 +39,7 @@ export function VideoPresets({ settings, set }:{ settings:Video; set:(s:Video)=>
   )
 }
 
-function Toggle({ label, checked, onChange }:{ label:string; checked:boolean; onChange:(v:boolean)=>void }) {
+export function Toggle({ label, checked, onChange }:{ label:string; checked:boolean; onChange:(v:boolean)=>void }) {
   return (
     <label className="flex cursor-pointer items-center justify-between gap-3 self-end pb-1">
       <span className="text-xs font-semibold text-muted-foreground">{label}</span>

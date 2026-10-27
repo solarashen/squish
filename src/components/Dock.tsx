@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Download, Share2, Trash2 } from "lucide-react"
+import { Combine, Download, Share2, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useCountUp } from "@/hooks/useCountUp"
 import { useI18n } from "@/i18n/I18nProvider"
@@ -7,7 +7,7 @@ import { DEFAULT_PATTERN, downloadBlob, downloadZip, formatChange, patternName }
 import type { Item, MediaKind } from "@/lib/types"
 
 // The result of the active tab, pinned to the bottom of the window: saving, sizes and the download.
-export function Dock({ kind, items, onClear, pattern=DEFAULT_PATTERN }:{ kind:MediaKind; items:Item[]; onClear:()=>void; pattern?:string }) {
+export function Dock({ kind, items, onClear, onMerge, pattern=DEFAULT_PATTERN }:{ kind:MediaKind; items:Item[]; onClear:()=>void; onMerge?:()=>void; pattern?:string }) {
   const { t, formatBytes }=useI18n()
   const [zipping,setZipping]=useState(false)
 
@@ -54,6 +54,12 @@ export function Dock({ kind, items, onClear, pattern=DEFAULT_PATTERN }:{ kind:Me
           {canShare&&(
             <Button variant="ghost" size="icon" onClick={share} aria-label={t.share} title={t.share} className="size-10 sm:size-11">
               <Share2 aria-hidden className="size-4" strokeWidth={2.2} />
+            </Button>
+          )}
+          {onMerge&&items.length>1&&(
+            <Button variant="ghost" onClick={onMerge} className="h-10 gap-2 px-3 sm:h-11 sm:px-4">
+              <Combine aria-hidden className="size-4" strokeWidth={2.2} />
+              <span className="hidden sm:inline">{t.merge}</span>
             </Button>
           )}
           <Button

@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Binary, Copy, Crop, Info, Palette, Scissors, SplitSquareHorizontal, Star } from "lucide-react"
+import { Binary, Copy, Crop, Files, Info, Palette, Scissors, SplitSquareHorizontal, Star } from "lucide-react"
 import { Dock } from "@/components/Dock"
 import { CompareDialog } from "@/components/CompareDialog"
 import { DropCard, type DragState } from "@/components/DropCard"
 import { EditDialog } from "@/components/EditDialog"
 import { MediaEditDialog } from "@/components/MediaEditDialog"
+import { MergeDialog } from "@/components/MergeDialog"
+import { PdfPagesDialog } from "@/components/PdfPagesDialog"
 import { FileList } from "@/components/FileList"
 import { Header } from "@/components/Header"
 import { InfoDialog, type InfoPage } from "@/components/InfoDialog"
@@ -33,13 +35,15 @@ function namePasted(blob:Blob) {
 export default function App() {
   const { t }=useI18n()
   const general=useGeneral()
-  const { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit, setMediaEdit }=useConverter(general.remember)
+  const { items, settings, setSettings, encoders, addFiles, retry, remove, clear, stats, setEdit, setMediaEdit, setPdfEdit }=useConverter(general.remember)
   const [options,setOptions]=useState(false)
   const [comparing,setComparing]=useState<Item|null>(null)
   const [inspecting,setInspecting]=useState<Item|null>(null)
   const [colours,setColours]=useState<Item|null>(null)
   const [editing,setEditing]=useState<Item|null>(null)
   const [trimming,setTrimming]=useState<Item|null>(null)
+  const [paging,setPaging]=useState<Item|null>(null)
+  const [merging,setMerging]=useState(false)
   // A short message at the bottom of the screen, e.g. after copying.
   const [toast,setToast]=useState<string|null>(null)
   useEffect(()=>{
@@ -180,6 +184,9 @@ export default function App() {
     if (item.kind==="image"&&!/^video\//.test(settings.image.format)) {
       actions.push({ id:"edit", label:t.edit, icon:Crop, onSelect:()=>setEditing(item) })
     }
+    if (item.kind==="pdf") {
+      actions.push({ id:"pages", label:t.pagesAction, icon:Files, onSelect:()=>setPaging(item) })
+    }
     if (item.kind==="video"||item.kind==="audio") {
       actions.push({ id:"trim", label:item.kind==="video"?t.trimVideo:t.trimAudio, icon:Scissors, onSelect:()=>setTrimming(item) })
     }
@@ -233,12 +240,14 @@ export default function App() {
             :<p className="glass px-5 py-6 text-center text-sm text-muted-foreground">{t.listEmpty}</p>}
         </div>
       </main>
-      {visible.length>0&&<Dock kind={kind} items={visible} onClear={()=>clear(kind)} pattern={general.pattern} />}
+      {visible.length>0&&<Dock kind={kind} items={visible} onClear={()=>clear(kind)} onMerge={kind==="pdf"?()=>setMerging(true):undefined} pattern={general.pattern} />}
       <p role="status" aria-live="polite" className={toast?"glass fixed bottom-28 left-1/2 z-40 -translate-x-1/2 rounded-full px-5 py-2.5 text-sm font-semibold sm:bottom-32":"sr-only"}>{toast}</p>
       <InfoDialog page={info} onClose={()=>setInfo(null)} />
       <CompareDialog item={comparing} onClose={()=>setComparing(null)} />
       <PhotoInfoDialog item={inspecting} onClose={()=>setInspecting(null)} />
       <EditDialog item={editing} onClose={()=>setEditing(null)} onApply={(edit)=>editing&&setEdit(editing.id,edit)} />
+      <PdfPagesDialog item={paging} onClose={()=>setPaging(null)} onApply={(edit)=>paging&&setPdfEdit(paging.id,edit)} />
+      <MergeDialog items={items.filter((it)=>it.kind==="pdf")} open={merging} onClose={()=>setMerging(false)} />
       <MediaEditDialog item={trimming} onClose={()=>setTrimming(null)} onApply={(edit)=>trimming&&setMediaEdit(trimming.id,edit)} />
       <PaletteDialog item={colours} onClose={()=>setColours(null)} onCopied={(hex)=>setToast(t.copied+": "+hex)} />
       <OptionsDialog

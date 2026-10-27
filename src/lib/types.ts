@@ -104,11 +104,24 @@ export type AudioSettings={
   sampleRate:number|null
 }
 
+// images: every page as a picture; pdf: the same document, edited, numbered or compressed;
+// split: one PDF per page; text: the words on each page as a .txt file
+export type PdfOutput="images"|"pdf"|"split"|"text"
+
 export type PdfSettings={
+  output:PdfOutput
+  // redraw every page as a JPEG (smaller scans, but text stops being selectable)
+  compress:boolean
+  pageNumbers:boolean
   format:StillFormat
   quality:number
   // render scale: 1 = 72 dpi, 2 = 144 dpi, 3 = 216 dpi
   scale:number
+}
+
+export type PdfEdit={
+  // page numbers start at 0 and refer to the original file
+  pages:{ index:number; rotate:0|90|180|270 }[]
 }
 
 export type AllSettings={ image:Settings; video:VideoSettings; audio:AudioSettings; pdf:PdfSettings }
@@ -186,4 +199,6 @@ export type Item={
   edit?:ImageEdit
   // trim (and for video, crop shape) set in the editor for this one file
   mediaEdit?:MediaEdit
+  // pages kept, their order and turns, set in the page editor for this one PDF
+  pdfEdit?:PdfEdit
 }
